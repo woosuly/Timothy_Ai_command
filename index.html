@@ -570,6 +570,24 @@ main.active-view{display:flex;}
   background:rgba(16,185,129,.15);padding:1px 6px;border-radius:3px;
   animation:interp-blink .9s infinite;
 }
+/* ════════════════════════════════
+   번역 뷰 — 트리 구조 CSS
+════════════════════════════════ */
+.tv-depth1{background:rgba(30,41,59,.3);border:1px solid #1e293b;border-radius:11px;padding:9px 13px;flex-shrink:0;}
+.tv-depth2-tabs{display:flex;gap:0;background:#020617;border:1px solid #334155;border-radius:11px;padding:4px;flex-shrink:0;}
+.tv-main-tab{flex:1;padding:10px 0;text-align:center;font-size:13px;font-weight:700;cursor:pointer;border-radius:8px;border:none;background:none;color:#64748b;transition:.18s;letter-spacing:-.2px;}
+.tv-main-tab:hover{color:#e2e8f0;background:rgba(30,41,59,.5);}
+.tv-main-tab.active{background:linear-gradient(135deg,#1e3a5f,#1e293b);color:#60a5fa;box-shadow:0 2px 8px rgba(0,0,0,.3);}
+.tv-panel{display:flex;flex-direction:column;gap:10px;flex:1;min-height:0;}
+.tv-depth3-tabs{display:flex;gap:5px;flex-shrink:0;}
+.tv-sub-tab{padding:7px 16px;border-radius:8px;border:1px solid #334155;background:none;color:#64748b;font-size:12px;font-weight:600;cursor:pointer;transition:.15s;}
+.tv-sub-tab:hover{border-color:#60a5fa;color:#60a5fa;}
+.tv-sub-tab.active{background:rgba(59,130,246,.15);border-color:#3b82f6;color:#60a5fa;}
+.tv-gender-btn{padding:5px 14px;border-radius:6px;border:none;background:none;color:#64748b;font-size:12px;font-weight:700;cursor:pointer;transition:.15s;}
+.tv-gender-btn:hover{color:#e2e8f0;}
+.tv-gender-btn.active{background:rgba(59,130,246,.18);color:#60a5fa;}
+#interpLogKo,#interpLogForeign{resize:none;min-height:180px;font-size:12px;line-height:1.8;}
+
 .trans-file-row{display:flex;align-items:center;gap:7px;flex-shrink:0;}
 .trans-file-btn{background:#1e293b;border:1px solid #334155;padding:5px 11px;border-radius:6px;cursor:pointer;color:#cbd5e1;font-size:11px;font-weight:600;white-space:nowrap;}
 .trans-file-btn:hover{border-color:#f59e0b;color:#f59e0b;}
@@ -1098,23 +1116,15 @@ main.active-view{display:flex;}
   </div>
 </main>
 
-<!-- ════════════ TRANSLATE + 협조 메일 빌더 ════════════ -->
+<!-- ════════════ TRANSLATE ════════════ -->
 <main id="view-translate" style="overflow:hidden;overflow-y:auto;">
   <div class="trans-view">
-    <div class="trans-view-title" data-i18n="trans_view_title">🌐 Gemini 번역</div>
+    <div class="trans-view-title" data-i18n="trans_view_title">🌐 Gemini 번역 / 실시간 통역</div>
 
-    <!-- ★ 상단 컨트롤 바: 파일첨부 + 언어선택 + 초기화 + 실시간 통역 -->
-    <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;flex-shrink:0;background:rgba(30,41,59,.25);border:1px solid #1e293b;border-radius:10px;padding:9px 13px;">
-      <label for="transFileInput" class="trans-file-btn">📎 파일 첨부</label>
-      <input type="file" id="transFileInput" accept="image/*,application/pdf,.txt,.md,.docx"
-        style="display:none;" onchange="handleTransFile(event)">
-      <span id="transFileBadge" class="trans-file-badge" style="flex:1;min-width:100px;">이미지·PDF·txt·md 업로드 가능</span>
-      <button id="transFileClearBtn" onclick="clearTransFile()"
-        style="display:none;background:none;border:none;color:#f43f5e;cursor:pointer;font-size:14px;" title="파일 제거">✕</button>
-      <div style="width:1px;height:18px;background:#334155;flex-shrink:0;"></div>
-      <!-- 언어 선택 -->
-      <div class="trans-lang-row" style="gap:4px;flex-wrap:nowrap;">
-        <span style="font-size:10px;color:#64748b;white-space:nowrap;">언어:</span>
+    <!-- ══ 1 DEPTH: 타겟 언어 선택 (항상 표시) ══ -->
+    <div class="tv-depth1">
+      <div class="trans-lang-row">
+        <span style="font-size:11px;color:#64748b;align-self:center;flex-shrink:0;font-weight:600;">타겟 언어:</span>
         <button class="trans-lang-btn active" onclick="setTransLang(this,'영어','en')">🇺🇸 영어</button>
         <button class="trans-lang-btn" onclick="setTransLang(this,'중국어','zh')">🇨🇳 중국어</button>
         <button class="trans-lang-btn" onclick="setTransLang(this,'일본어','ja')">🇯🇵 일본어</button>
@@ -1123,114 +1133,158 @@ main.active-view{display:flex;}
         <button class="trans-lang-btn" onclick="setTransLang(this,'독일어','de')">🇩🇪 독일어</button>
         <button class="trans-lang-btn" onclick="setTransLang(this,'한국어','ko')">🇰🇷 한국어</button>
       </div>
-      <div style="width:1px;height:18px;background:#334155;flex-shrink:0;"></div>
-      <!-- 초기화 -->
-      <button onclick="clearTrans()"
-        style="padding:5px 12px;background:rgba(244,63,94,.15);border:1px solid rgba(244,63,94,.4);color:#f43f5e;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;white-space:nowrap;flex-shrink:0;">
-        🗑 초기화
+    </div>
+
+    <!-- ══ 2 DEPTH: 메인 모드 탭 ══ -->
+    <div class="tv-depth2-tabs">
+      <button class="tv-main-tab active" id="mainTabDoc" onclick="switchMainMode('doc')">
+        📄 문서 / 텍스트 번역
       </button>
-      <div style="width:1px;height:18px;background:#334155;flex-shrink:0;"></div>
-      <!-- ★ 통역 모드 선택 (단방향 / 양방향) -->
-      <div style="display:flex;background:#020617;border:1px solid #334155;border-radius:8px;padding:3px;gap:3px;flex-shrink:0;">
-        <button id="interpModeOne" onclick="setInterpMode('one')"
-          style="padding:4px 11px;border-radius:5px;border:none;font-size:11px;font-weight:700;cursor:pointer;
-                 background:rgba(59,130,246,.18);color:#3b82f6;transition:.15s;"
-          title="내 음성(한국어)만 인식하여 타겟 언어로 번역">
-          🎙️ 단방향
-        </button>
-        <button id="interpModeBoth" onclick="setInterpMode('both')"
-          style="padding:4px 11px;border-radius:5px;border:none;font-size:11px;font-weight:700;cursor:pointer;
-                 background:none;color:#64748b;transition:.15s;"
-          title="나와 상대방 양쪽 음성을 모두 인식하여 상호 번역">
-          🔄 양방향
-        </button>
+      <button class="tv-main-tab" id="mainTabVoice" onclick="switchMainMode('voice')">
+        🎙️ 실시간 음성 통역
+      </button>
+    </div>
+
+    <!-- ════ [문서/텍스트 번역] 패널 ════ -->
+    <div id="panelDoc" class="tv-panel">
+
+      <!-- 3 Depth: 문서 하위 탭 -->
+      <div class="tv-depth3-tabs">
+        <button class="tv-sub-tab active" id="docTabText" onclick="switchDocSubMode('text')">📝 텍스트 직접 입력</button>
+        <button class="tv-sub-tab" id="docTabFile" onclick="switchDocSubMode('file')">📎 문서 / 음성 파일 번역</button>
       </div>
-    </div>
 
-    <!-- ★ 양방향 통역 진행 상태 바 -->
-    <div class="interp-status-bar" id="interpStatusBar">
-      <span class="interp-dot"></span>
-      <span id="interpStatusText">통역 진행 중</span>
-      <span id="interpInterim" class="interp-interim"></span>
-      <span style="margin-left:auto;font-size:10px;color:#94a3b8;" id="interpLangBadge"></span>
-    </div>
-
-    <!-- ★ 좌우 textarea — 양방향 통역 마이크 버튼 포함 -->
-    <div class="trans-layout">
-      <!-- 원문 입력 (한국어 내 음성) -->
-      <div class="trans-panel">
-        <div style="display:flex;align-items:center;justify-content:space-between;flex-shrink:0;">
-          <div class="trans-panel-title" id="transSrcTitle" data-i18n="trans_src_title">원문 입력 (한국어)</div>
-          <!-- ★ 내 음성 인식 버튼 -->
-          <button class="bidir-mic-btn" id="myMicBtn" onclick="toggleMyMic()" title="내 음성(한국어)을 인식하여 타겟 언어로 번역합니다">
-            <span class="bidir-mic-dot"></span>
-            <span id="myMicIcon">🎙️</span>
-            <span id="myMicText">🇰🇷 내 음성</span>
-          </button>
+      <!-- 파일 업로드 영역 (file 서브탭에서만 표시) -->
+      <div id="docFileArea" style="display:none;background:rgba(30,41,59,.25);border:1px solid #1e293b;border-radius:10px;padding:10px 13px;flex-shrink:0;">
+        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+          <label for="transFileInput" class="trans-file-btn">📎 파일 선택</label>
+          <input type="file" id="transFileInput" accept="image/*,application/pdf,.txt,.md,.docx,audio/*"
+            style="display:none;" onchange="handleTransFile(event)">
+          <span id="transFileBadge" class="trans-file-badge" style="flex:1;">이미지·PDF·txt·md·음성 파일 업로드 가능</span>
+          <button id="transFileClearBtn" onclick="clearTransFile()"
+            style="display:none;background:none;border:none;color:#f43f5e;cursor:pointer;font-size:14px;">✕</button>
         </div>
-        <textarea id="transInput" class="trans-textarea"
-          placeholder="번역할 텍스트를 입력하거나&#10;🇰🇷 내 음성 버튼으로 말씀하세요."></textarea>
       </div>
-      <!-- 번역 결과 (외국어 상대방 음성) -->
-      <div class="trans-panel">
-        <div style="display:flex;align-items:center;justify-content:space-between;flex-shrink:0;">
-          <div class="trans-panel-title" id="transResultTitle" data-i18n="trans_result_title">번역 결과 (<span id="transLangLabel">영어</span>)</div>
-          <!-- ★ 상대방 음성 인식 버튼 — 양방향 모드일 때만 표시 -->
-          <button class="bidir-mic-btn" id="peerMicBtn" onclick="togglePeerMic()"
-            style="display:none;"
-            title="상대방 외국어 음성을 인식하여 한국어로 번역합니다">
+
+      <!-- 번역 창 (좌: 원문 / 우: 결과) -->
+      <div class="trans-layout">
+        <div class="trans-panel">
+          <div style="display:flex;align-items:center;justify-content:space-between;flex-shrink:0;">
+            <div class="trans-panel-title">원문 입력 (한국어)</div>
+            <button onclick="clearTrans()" style="padding:4px 10px;background:rgba(244,63,94,.12);border:1px solid rgba(244,63,94,.35);color:#f43f5e;border-radius:6px;font-size:10px;font-weight:700;cursor:pointer;">🗑 초기화</button>
+          </div>
+          <textarea id="transInput" class="trans-textarea"
+            placeholder="번역할 텍스트를 입력하세요..."></textarea>
+        </div>
+        <div class="trans-panel">
+          <div class="trans-panel-title">번역 결과 (<span id="transLangLabel">영어</span>)</div>
+          <textarea id="transResult" class="trans-textarea"
+            placeholder="번역 결과가 여기에 표시됩니다..." readonly></textarea>
+        </div>
+      </div>
+
+      <!-- 번역 액션 버튼 -->
+      <div style="display:flex;gap:8px;flex-shrink:0;">
+        <button id="transRunBtn" class="trans-run-btn" onclick="runTranslate()" style="flex:2;">▶ 번역하기</button>
+        <button class="trans-copy-btn" onclick="copyTrans()" style="flex:1;padding:10px;">📄 복사</button>
+        <button class="trans-copy-btn" onclick="swapTrans()" style="flex:1;padding:10px;border-color:#3b82f6;color:#3b82f6;">⇄ 교체</button>
+      </div>
+
+      <!-- 협조 요청 메일 빌더 (문서 번역 모드 하단에 배치) -->
+      <div class="collab-section">
+        <div class="collab-title" data-i18n="collab_section_title">✉️ 유관부서 협조 요청 메일 빌더</div>
+        <div class="field-label" style="margin-bottom:8px;" data-i18n="collab_style_label">작성 스타일 (어조) 선택</div>
+        <div class="collab-style-row" id="collabStyleRow">
+          <button class="collab-style-btn active" onclick="selCollabStyle(this,'formal_bilingual')" data-style="formal_bilingual">📋 격식체 <span style="font-size:9px;opacity:.7;">(중/한 병기)</span></button>
+          <button class="collab-style-btn" onclick="selCollabStyle(this,'direct')" data-style="direct">⚡ 직접 지시체 <span style="font-size:9px;opacity:.7;">(단호한 어조)</span></button>
+          <button class="collab-style-btn" onclick="selCollabStyle(this,'concise')" data-style="concise">📌 간결체 <span style="font-size:9px;opacity:.7;">(현장 중심)</span></button>
+          <button class="collab-style-btn" onclick="selCollabStyle(this,'official')" data-style="official">📜 공식 서한체 <span style="font-size:9px;opacity:.7;">(안전·규정)</span></button>
+          <button class="collab-style-btn" onclick="selCollabStyle(this,'data_driven')" data-style="data_driven">📊 데이터 중심체 <span style="font-size:9px;opacity:.7;">(논리·지표)</span></button>
+          <button class="collab-style-btn" onclick="selCollabStyle(this,'polite')" data-style="polite">🤝 정중체 <span style="font-size:9px;opacity:.7;">(부드러운 협조)</span></button>
+        </div>
+        <input type="hidden" id="collabTarget" value="formal_bilingual">
+        <div class="collab-content-row">
+          <div class="field-label" style="margin-bottom:5px;">핵심 요청 내용</div>
+          <textarea id="collabContent" class="field-textarea" style="min-height:70px;" placeholder="예: 5월 20일까지 설비 점검 결과 보고 요청 / 안전 교육 일정 확인 협조 요청 등"></textarea>
+        </div>
+        <button onclick="genCollabMail()" style="padding:10px 22px;background:linear-gradient(135deg,#d97706,#f59e0b);color:#0f172a;border:none;border-radius:8px;font-size:13px;font-weight:bold;cursor:pointer;box-shadow:0 2px 8px rgba(245,158,11,.3);">▶ 맞춤형 초안 생성</button>
+        <div id="collabResult" class="collab-result" style="margin-top:12px;display:none;"></div>
+      </div>
+    </div><!-- /panelDoc -->
+
+    <!-- ════ [실시간 음성 통역] 패널 ════ -->
+    <div id="panelVoice" class="tv-panel" style="display:none;">
+
+      <!-- 3 Depth: 단방향 / 양방향 -->
+      <div class="tv-depth3-tabs">
+        <button class="tv-sub-tab active" id="voiceTabOne" onclick="switchVoiceSubMode('one')">➡️ 단방향 통역 (내 말만 번역)</button>
+        <button class="tv-sub-tab" id="voiceTabBoth" onclick="switchVoiceSubMode('both')">↔️ 양방향 통역 (티키타카)</button>
+      </div>
+
+      <!-- 4 Depth: 음성 성별 선택 + 상태 바 -->
+      <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;flex-shrink:0;background:rgba(30,41,59,.2);border:1px solid #1e293b;border-radius:10px;padding:9px 14px;">
+        <!-- 성별 선택 -->
+        <span style="font-size:11px;color:#64748b;font-weight:600;white-space:nowrap;">🔊 TTS 음성:</span>
+        <div style="display:flex;background:#020617;border:1px solid #334155;border-radius:8px;padding:3px;gap:3px;">
+          <button class="tv-gender-btn active" id="genderMale" onclick="setTtsGender('male')" title="남성 음성으로 TTS 출력">👨 남자</button>
+          <button class="tv-gender-btn" id="genderFemale" onclick="setTtsGender('female')" title="여성 음성으로 TTS 출력">👩 여자</button>
+        </div>
+        <div style="width:1px;height:18px;background:#334155;flex-shrink:0;"></div>
+        <!-- 통역 상태 바 (인라인) -->
+        <div class="interp-status-bar" id="interpStatusBar" style="flex:1;margin:0;border:none;background:none;padding:0;">
+          <span class="interp-dot"></span>
+          <span id="interpStatusText" style="font-size:11px;">대기 중</span>
+          <span id="interpInterim" class="interp-interim"></span>
+          <span id="interpLangBadge" style="font-size:10px;color:#94a3b8;margin-left:auto;"></span>
+        </div>
+      </div>
+
+      <!-- 단방향 마이크 버튼 -->
+      <div id="voiceOneCtrl" style="display:flex;justify-content:center;padding:8px 0;flex-shrink:0;">
+        <button class="bidir-mic-btn" id="myMicBtn" onclick="toggleMyMic()" style="padding:12px 32px;font-size:13px;border-radius:12px;">
+          <span class="bidir-mic-dot"></span>
+          <span id="myMicIcon">🎙️</span>
+          <span id="myMicText">🇰🇷 내 음성 통역 시작</span>
+        </button>
+      </div>
+
+      <!-- 양방향 마이크 버튼 2개 -->
+      <div id="voiceBothCtrl" style="display:none;flex-shrink:0;">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:8px 0;">
+          <button class="bidir-mic-btn" id="myMicBtnB" onclick="toggleMyMic()" style="padding:12px 0;font-size:13px;border-radius:12px;justify-content:center;">
+            <span class="bidir-mic-dot"></span>
+            <span id="myMicIconB">🎙️</span>
+            <span id="myMicTextB">🇰🇷 내 음성 인식</span>
+          </button>
+          <button class="bidir-mic-btn" id="peerMicBtn" onclick="togglePeerMic()" style="padding:12px 0;font-size:13px;border-radius:12px;justify-content:center;">
             <span class="bidir-mic-dot"></span>
             <span id="peerMicIcon">🎙️</span>
-            <span id="peerMicText">🌐 상대방 음성</span>
+            <span id="peerMicText">🌐 상대방 음성 인식</span>
           </button>
         </div>
-        <textarea id="transResult" class="trans-textarea"
-          placeholder="번역 결과가 여기에 표시됩니다.&#10;🌐 상대방 음성 버튼으로 상대방 말을 인식하세요." readonly></textarea>
       </div>
-    </div>
 
-    <!-- ★ 하단 공통 액션 버튼 바 -->
-    <div style="display:flex;gap:8px;flex-shrink:0;">
-      <button id="transRunBtn" class="trans-run-btn" onclick="runTranslate()" style="flex:2;">▶ 번역하기</button>
-      <button class="trans-copy-btn" onclick="copyTrans()" style="flex:1;padding:10px;">📄 복사</button>
-      <button class="trans-copy-btn" onclick="swapTrans()" style="flex:1;padding:10px;border-color:#3b82f6;color:#3b82f6;">⇄ 교체</button>
-    </div>
-    <!-- ★ 협조 요청 메일 빌더 — 어조 선택 방식 -->
-    <div class="collab-section">
-      <div class="collab-title" data-i18n="collab_section_title">✉️ 유관부서 협조 요청 메일 빌더</div>
-
-      <!-- 문체 스타일 선택 (6종) -->
-      <div class="field-label" style="margin-bottom:8px;" data-i18n="collab_style_label">작성 스타일 (어조) 선택</div>
-      <div class="collab-style-row" id="collabStyleRow">
-        <button class="collab-style-btn active" onclick="selCollabStyle(this,'formal_bilingual')" data-style="formal_bilingual">
-          📋 격식체 <span style="font-size:9px;opacity:.7;">(중/한 병기)</span>
-        </button>
-        <button class="collab-style-btn" onclick="selCollabStyle(this,'direct')" data-style="direct">
-          ⚡ 직접 지시체 <span style="font-size:9px;opacity:.7;">(단호한 어조)</span>
-        </button>
-        <button class="collab-style-btn" onclick="selCollabStyle(this,'concise')" data-style="concise">
-          📌 간결체 <span style="font-size:9px;opacity:.7;">(현장 중심)</span>
-        </button>
-        <button class="collab-style-btn" onclick="selCollabStyle(this,'official')" data-style="official">
-          📜 공식 서한체 <span style="font-size:9px;opacity:.7;">(안전·규정)</span>
-        </button>
-        <button class="collab-style-btn" onclick="selCollabStyle(this,'data_driven')" data-style="data_driven">
-          📊 데이터 중심체 <span style="font-size:9px;opacity:.7;">(논리·지표)</span>
-        </button>
-        <button class="collab-style-btn" onclick="selCollabStyle(this,'polite')" data-style="polite">
-          🤝 정중체 <span style="font-size:9px;opacity:.7;">(부드러운 협조)</span>
-        </button>
+      <!-- 실시간 대화 기록 창 -->
+      <div class="trans-layout" style="flex:1;min-height:0;">
+        <div class="trans-panel">
+          <div style="display:flex;align-items:center;justify-content:space-between;flex-shrink:0;">
+            <div class="trans-panel-title" id="transSrcTitle">🇰🇷 한국어 (내 발화)</div>
+            <button onclick="clearInterpLog()" style="padding:3px 8px;background:rgba(244,63,94,.1);border:1px solid rgba(244,63,94,.25);color:#f43f5e;border-radius:5px;font-size:10px;cursor:pointer;">🗑 초기화</button>
+          </div>
+          <textarea id="interpLogKo" class="trans-textarea"
+            style="flex:1;resize:none;font-size:12px;"
+            placeholder="통역 시작 후 내 음성이 여기에 기록됩니다..." readonly></textarea>
+        </div>
+        <div class="trans-panel">
+          <div class="trans-panel-title" id="transResultTitle">🌐 <span id="interpTargetLangLabel">영어</span> (번역 결과)</div>
+          <textarea id="interpLogForeign" class="trans-textarea"
+            style="flex:1;resize:none;font-size:12px;"
+            placeholder="번역된 내용이 여기에 기록됩니다..." readonly></textarea>
+        </div>
       </div>
-      <input type="hidden" id="collabTarget" value="formal_bilingual">
 
-      <!-- 요청 내용 -->
-      <div class="collab-content-row">
-        <div class="field-label" style="margin-bottom:5px;">핵심 요청 내용</div>
-        <textarea id="collabContent" class="field-textarea" style="min-height:70px;" placeholder="예: 5월 20일까지 설비 점검 결과 보고 요청 / 안전 교육 일정 확인 협조 요청 등"></textarea>
-      </div>
-      <button onclick="genCollabMail()" style="padding:10px 22px;background:linear-gradient(135deg,#d97706,#f59e0b);color:#0f172a;border:none;border-radius:8px;font-size:13px;font-weight:bold;cursor:pointer;box-shadow:0 2px 8px rgba(245,158,11,.3);">▶ 맞춤형 초안 생성</button>
-      <div id="collabResult" class="collab-result" style="margin-top:12px;display:none;"></div>
-    </div>
+    </div><!-- /panelVoice -->
+
   </div>
 </main>
 
@@ -3388,46 +3442,161 @@ let myRecognition      = null;
 let peerRecognition    = null;
 let interpMode         = 'one';  // 'one' | 'both'
 
-/** ★ 통역 모드 전환 (단방향/양방향) */
-function setInterpMode(mode){
-  // 진행 중이면 모두 중지
+// ══════════════════════════════
+// ★ 번역 뷰 트리 구조 제어 함수
+// ══════════════════════════════
+let ttsGender = 'male'; // 'male' | 'female'
+
+/** 2 Depth: 메인 모드 전환 (doc / voice) */
+function switchMainMode(mode){
+  // 진행 중인 통역 중지
   if(isInterpretingMy)   stopMyMic();
   if(isInterpretingPeer) stopPeerMic();
 
-  interpMode = mode;
+  document.getElementById('panelDoc').style.display   = mode==='doc'   ? 'flex' : 'none';
+  document.getElementById('panelVoice').style.display = mode==='voice' ? 'flex' : 'none';
 
-  // 버튼 스타일 업데이트
-  const btnOne  = document.getElementById('interpModeOne');
-  const btnBoth = document.getElementById('interpModeBoth');
-  if(btnOne){
-    btnOne.style.background = mode==='one' ? 'rgba(59,130,246,.18)' : 'none';
-    btnOne.style.color      = mode==='one' ? '#3b82f6' : '#64748b';
-  }
-  if(btnBoth){
-    btnBoth.style.background = mode==='both' ? 'rgba(16,185,129,.18)' : 'none';
-    btnBoth.style.color      = mode==='both' ? '#10b981' : '#64748b';
-  }
-
-  // 상대방 마이크 버튼 표시/숨김
-  const peerBtn = document.getElementById('peerMicBtn');
-  if(peerBtn) peerBtn.style.display = mode==='both' ? 'flex' : 'none';
-
-  // 내 마이크 버튼 텍스트 조정
-  const myText = document.getElementById('myMicText');
-  if(myText) myText.innerText = mode==='one' ? '🎙️ 내 음성 통역' : '🇰🇷 내 음성';
-
-  // 패널 제목 placeholder 업데이트
-  const inputEl  = document.getElementById('transInput');
-  const resultEl = document.getElementById('transResult');
-  if(inputEl)  inputEl.placeholder = mode==='one'
-    ? '번역할 텍스트를 입력하거나\n🎙️ 내 음성 통역 버튼으로 말씀하세요.'
-    : '번역할 텍스트를 입력하거나\n🇰🇷 내 음성 버튼으로 말씀하세요.';
-  if(resultEl) resultEl.placeholder = mode==='one'
-    ? '번역 결과가 여기에 표시됩니다...'
-    : '번역 결과 / 상대방 음성 인식 결과가 누적됩니다.\n🌐 상대방 음성 버튼으로 상대방 말을 인식하세요.';
-
-  showToast(mode==='one' ? '🎙️ 단방향 통역 모드' : '🔄 양방향 통역 모드');
+  const tabDoc   = document.getElementById('mainTabDoc');
+  const tabVoice = document.getElementById('mainTabVoice');
+  if(tabDoc)   tabDoc.classList.toggle('active',   mode==='doc');
+  if(tabVoice) tabVoice.classList.toggle('active', mode==='voice');
 }
+
+/** 3 Depth: 문서 하위 탭 전환 (text / file) */
+function switchDocSubMode(sub){
+  const fileArea = document.getElementById('docFileArea');
+  if(fileArea) fileArea.style.display = sub==='file' ? 'block' : 'none';
+
+  const tabText = document.getElementById('docTabText');
+  const tabFile = document.getElementById('docTabFile');
+  if(tabText) tabText.classList.toggle('active', sub==='text');
+  if(tabFile) tabFile.classList.toggle('active', sub==='file');
+}
+
+/** 3 Depth: 음성 통역 하위 탭 전환 (one / both) */
+function switchVoiceSubMode(sub){
+  // 진행 중 통역 중지
+  if(isInterpretingMy)   stopMyMic();
+  if(isInterpretingPeer) stopPeerMic();
+
+  const oneCtrl  = document.getElementById('voiceOneCtrl');
+  const bothCtrl = document.getElementById('voiceBothCtrl');
+  if(oneCtrl)  oneCtrl.style.display  = sub==='one'  ? 'flex'  : 'none';
+  if(bothCtrl) bothCtrl.style.display = sub==='both' ? 'block' : 'none';
+
+  const tabOne  = document.getElementById('voiceTabOne');
+  const tabBoth = document.getElementById('voiceTabBoth');
+  if(tabOne)  tabOne.classList.toggle('active',  sub==='one');
+  if(tabBoth) tabBoth.classList.toggle('active', sub==='both');
+
+  // interpMode 변수 동기화
+  interpMode = sub;
+}
+
+/** 4 Depth: TTS 성별 선택 + 휴리스틱 보이스 필터링 */
+function setTtsGender(gender){
+  ttsGender = gender;
+  const btnM = document.getElementById('genderMale');
+  const btnF = document.getElementById('genderFemale');
+  if(btnM) btnM.classList.toggle('active', gender==='male');
+  if(btnF) btnF.classList.toggle('active', gender==='female');
+  showToast(gender==='male' ? '👨 남자 목소리 선택됨' : '👩 여자 목소리 선택됨');
+}
+
+/**
+ * TTS 성별 휴리스틱 보이스 선택
+ * - 브라우저 Voice.name에 Male/Female/남성/여성 포함 여부로 필터
+ * - 없으면 타겟 언어에 맞는 첫 번째 보이스 사용
+ */
+function getVoiceForGender(lang){
+  const voices = window.speechSynthesis.getVoices();
+  if(!voices || voices.length === 0) return null;
+
+  // 타겟 언어 코드 매핑
+  const ttsLang = TTS_LANG_MAP[lang] || 'en-US';
+  const baseLang = ttsLang.split('-')[0].toLowerCase();
+
+  // 성별 키워드 패턴
+  const maleKw   = /male|man|남성|남자|guy|eric|david|george|daniel|fred/i;
+  const femaleKw = /female|woman|여성|여자|zira|samantha|victoria|kate|alice|karen/i;
+  const kw = ttsGender === 'male' ? maleKw : femaleKw;
+
+  // 1차: 타겟 언어 + 성별 키워드 매칭
+  let v = voices.find(v => v.lang.toLowerCase().startsWith(baseLang) && kw.test(v.name));
+  // 2차: 전체 언어 중 성별 키워드만 매칭
+  if(!v) v = voices.find(v => kw.test(v.name));
+  // 3차: 타겟 언어 첫 번째
+  if(!v) v = voices.find(v => v.lang.toLowerCase().startsWith(baseLang));
+  // 4차: 기본값
+  return v || voices[0];
+}
+
+/** speakBidir 오버라이드 — 성별 선택 반영 */
+function speakBidir(text, lang){
+  if(!text || !window.speechSynthesis) return;
+  const utter = new SpeechSynthesisUtterance(text);
+  const voice = getVoiceForGender(lang.replace(/-.*/,'')); // 'en-US' → 'en'
+  if(voice) utter.voice = voice;
+  utter.lang   = lang;
+  utter.rate   = 1.0;
+  utter.pitch  = 1.0;
+  utter.volume = 1.0;
+  window.speechSynthesis.speak(utter);
+}
+
+/** 통역 로그 초기화 */
+function clearInterpLog(){
+  const ko = document.getElementById('interpLogKo');
+  const fo = document.getElementById('interpLogForeign');
+  if(ko) ko.value = '';
+  if(fo) fo.value = '';
+  showToast('통역 기록이 초기화됐습니다.');
+}
+
+/** appendToResultArea — interpLogForeign도 함께 지원 */
+function appendToResultArea(text){
+  // 음성 통역 모드에서는 interpLogForeign에 누적
+  const voicePanel = document.getElementById('panelVoice');
+  if(voicePanel && voicePanel.style.display !== 'none'){
+    const el = document.getElementById('interpLogForeign');
+    if(el){
+      if(el.value && !el.value.endsWith('\n')) el.value += '\n';
+      el.value += text;
+      el.scrollTop = el.scrollHeight;
+      return;
+    }
+  }
+  // 문서 번역 모드에서는 transResult에 누적
+  const el = document.getElementById('transResult');
+  if(!el) return;
+  el.removeAttribute('readonly');
+  if(el.value && !el.value.endsWith('\n')) el.value += '\n';
+  el.value += text;
+  el.scrollTop = el.scrollHeight;
+  el.setAttribute('readonly','');
+}
+
+/** appendToTextarea — interpLogKo도 함께 지원 */
+function appendToTextarea(id, text){
+  // 음성 통역 모드 + 한국어 창이면 interpLogKo에 누적
+  const voicePanel = document.getElementById('panelVoice');
+  const targetId   = (id === 'transInput' && voicePanel && voicePanel.style.display !== 'none')
+    ? 'interpLogKo' : id;
+
+  const el = document.getElementById(targetId);
+  if(!el) return;
+  if(el.value && !el.value.endsWith('\n')) el.value += '\n';
+  el.value += text;
+  el.scrollTop = el.scrollHeight;
+}
+
+// 보이스 목록 비동기 로딩 (Chrome은 onvoiceschanged 필요)
+if(window.speechSynthesis){
+  window.speechSynthesis.onvoiceschanged = ()=>{ window.speechSynthesis.getVoices(); };
+}
+
+// ── 기존 setInterpMode 호환 유지 ──
+function setInterpMode(sub){ switchVoiceSubMode(sub); }
 
 /** SpeechRecognition 지원 여부 확인 */
 function checkSpeechSupport(){
@@ -3651,31 +3820,43 @@ function speakBidir(text, lang){
   window.speechSynthesis.speak(utter);
 }
 
-/** 마이크 버튼 UI 업데이트 */
+/** 마이크 버튼 UI 업데이트 — 단방향/양방향 버튼 모두 동기화 */
 function updateMicBtn(side, on){
-  const btnId  = side==='my' ? 'myMicBtn'   : 'peerMicBtn';
-  const iconId = side==='my' ? 'myMicIcon'  : 'peerMicIcon';
-  const textId = side==='my' ? 'myMicText'  : 'peerMicText';
-  const btn  = document.getElementById(btnId);
-  const icon = document.getElementById(iconId);
-  const text = document.getElementById(textId);
-  if(!btn) return;
-  if(on){
-    btn.classList.add('on');
-    if(icon) icon.innerText = '⏸️';
-    if(text) text.innerText = side==='my' ? '🇰🇷 인식 중지' : '🌐 인식 중지';
-    // 패널 제목 LIVE 표시
-    const titleId = side==='my' ? 'transSrcTitle' : 'transResultTitle';
-    const title = document.getElementById(titleId);
-    if(title) title.classList.add('live');
-  } else {
-    btn.classList.remove('on');
-    if(icon) icon.innerText = '🎙️';
-    if(text) text.innerText = side==='my' ? '🇰🇷 내 음성' : '🌐 상대방 음성';
-    const titleId = side==='my' ? 'transSrcTitle' : 'transResultTitle';
-    const title = document.getElementById(titleId);
-    if(title) title.classList.remove('live');
-  }
+  // 단방향 버튼 ID: myMicBtn / peerMicBtn
+  // 양방향 패널 내 버튼 ID: myMicBtnB / peerMicBtn (공유)
+  const ids = side === 'my'
+    ? ['myMicBtn', 'myMicBtnB']
+    : ['peerMicBtn'];
+
+  ids.forEach(btnId => {
+    const btn = document.getElementById(btnId);
+    if(!btn) return;
+    if(on){
+      btn.classList.add('on');
+    } else {
+      btn.classList.remove('on');
+    }
+  });
+
+  // 아이콘/텍스트 업데이트 (단방향 + 양방향 버튼 각각)
+  const iconIds = side === 'my' ? ['myMicIcon','myMicIconB'] : ['peerMicIcon'];
+  const textIds = side === 'my' ? ['myMicText','myMicTextB'] : ['peerMicText'];
+
+  iconIds.forEach(id => {
+    const el = document.getElementById(id);
+    if(el) el.innerText = on ? '⏸️' : '🎙️';
+  });
+  textIds.forEach(id => {
+    const el = document.getElementById(id);
+    if(!el) return;
+    if(side === 'my')   el.innerText = on ? '🇰🇷 인식 중지' : (interpMode==='one' ? '🇰🇷 내 음성 통역 시작' : '🇰🇷 내 음성 인식');
+    if(side === 'peer') el.innerText = on ? '🌐 인식 중지' : '🌐 상대방 음성 인식';
+  });
+
+  // LIVE 배지
+  const titleId = side==='my' ? 'transSrcTitle' : 'transResultTitle';
+  const title = document.getElementById(titleId);
+  if(title) title.classList.toggle('live', on);
 }
 
 /** 상태 바 업데이트 */
