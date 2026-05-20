@@ -3625,6 +3625,8 @@ function toggleMyMic(){
 }
 
 function startMyMic(){
+  // ★ 모바일 TTS Audio Context unlock
+  if(window.speechSynthesis) window.speechSynthesis.speak(new SpeechSynthesisUtterance(''));
   isInterpretingMy = true;
   updateMicBtn('my', true);
   updateBidirStatusBar('my');
@@ -3657,10 +3659,11 @@ function initMyRecognition(){
     updateInterpInterim(interim ? `🇰🇷 "${interim}"` : '');
     if(final){
       // 왼쪽(원문)에 한국어 누적
-      appendToTextarea('transInput', final);
+      // ★ 수정: 음성 통역 로그창에 누적 (transInput X → interpLogKo O)
+      appendToTextarea('interpLogKo', final);
       updateInterpInterim('');
-      // 타겟 언어로 번역 → 오른쪽 + TTS(타겟)
-      quickTranslateBidir(final, 'ko', transTargetLang, transTargetName, 'transResult',
+      // ★ 수정: 번역 결과도 interpLogForeign에 누적 (transResult X → interpLogForeign O)
+      quickTranslateBidir(final, 'ko', transTargetLang, transTargetName, 'interpLogForeign',
         TTS_LANG_MAP[transTargetLang] || 'en-US');
     }
   };
@@ -3693,6 +3696,8 @@ function togglePeerMic(){
 }
 
 function startPeerMic(){
+  // ★ 모바일 TTS Audio Context unlock
+  if(window.speechSynthesis) window.speechSynthesis.speak(new SpeechSynthesisUtterance(''));
   isInterpretingPeer = true;
   updateMicBtn('peer', true);
   updateBidirStatusBar('peer');
@@ -3724,11 +3729,11 @@ function initPeerRecognition(){
     }
     updateInterpInterim(interim ? `🌐 "${interim}"` : '');
     if(final){
-      // 오른쪽(결과)에 외국어 누적
-      appendToResultArea(final);
+      // ★ 수정: 상대방 외국어 → interpLogForeign에 누적 (appendToResultArea X)
+      appendToTextarea('interpLogForeign', final);
       updateInterpInterim('');
-      // 한국어로 번역 → 왼쪽 + TTS(한국어)
-      quickTranslateBidir(final, transTargetLang, 'ko', '한국어', 'transInput', 'ko-KR');
+      // ★ 수정: 한국어 번역 결과 → interpLogKo에 누적 (transInput X → interpLogKo O)
+      quickTranslateBidir(final, transTargetLang, 'ko', '한국어', 'interpLogKo', 'ko-KR');
     }
   };
   peerRecognition.onerror = (e)=>{
@@ -3809,16 +3814,6 @@ async function quickTranslateBidir(text, fromLang, toLang, toLangName, targetElI
   }
 }
 
-/** TTS 음성 출력 */
-function speakBidir(text, lang){
-  if(!text || !window.speechSynthesis) return;
-  const utter = new SpeechSynthesisUtterance(text);
-  utter.lang  = lang;
-  utter.rate  = 1.0;
-  utter.pitch = 1.0;
-  utter.volume= 1.0;
-  window.speechSynthesis.speak(utter);
-}
 
 /** 마이크 버튼 UI 업데이트 — 단방향/양방향 버튼 모두 동기화 */
 function updateMicBtn(side, on){
