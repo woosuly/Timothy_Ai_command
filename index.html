@@ -756,7 +756,7 @@ main.active-view{display:flex;}
 /* ════════════════════════════════
    MODALS
 ════════════════════════════════ */
-.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:400;align-items:center;justify-content:center;padding:20px;}
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:9999;align-items:center;justify-content:center;padding:20px;}
 .modal-overlay.open{display:flex;}
 .modal-box{background:#0f172a;border:1px solid #3b82f6;border-radius:16px;padding:24px;width:100%;position:relative;max-height:92vh;overflow-y:auto;}
 .modal-box::-webkit-scrollbar{width:4px;}
@@ -2706,76 +2706,25 @@ function setLanguage(lang){
   if(!LANG_PACKS[lang]) return;
   currentLang = lang;
   localStorage.setItem('ui_lang', lang);
-  localStorage.setItem('app_language', lang); // ★ callAI 참조용 추가 저장
-  // 버튼 활성 표시 (설정 모달 버튼)
+  localStorage.setItem('app_language', lang);
+
+  // 언어 버튼 활성 표시
   ['KO','ZH','EN','JA'].forEach(l=>{
-    const b=document.getElementById('sLangBtn-'+l);
+    const b  = document.getElementById('sLangBtn-'+l);
+    const b2 = document.getElementById('langBtn-'+l);
     if(b){ b.style.background=l===lang?'rgba(59,130,246,.18)':'none'; b.style.color=l===lang?'#60a5fa':'#64748b'; b.style.borderColor=l===lang?'#3b82f6':'#334155'; }
-    const b2=document.getElementById('langBtn-'+l);
     if(b2) b2.classList.toggle('active', l===lang);
   });
-  // data-i18n 요소 텍스트 교체
-  document.querySelectorAll('[data-i18n]').forEach(el=>{
-    const k=el.getAttribute('data-i18n');
-    const v=t(k);
-    if(v && v!==k) el.innerText=v;
-  });
-  // data-i18n-placeholder 요소 placeholder 교체
-  document.querySelectorAll('[data-i18n-placeholder]').forEach(el=>{
-    const k=el.getAttribute('data-i18n-placeholder');
-    const v=t(k);
-    if(v && v!==k) el.placeholder=v;
-  });
-  // html lang 속성
-  const langMap={KO:'ko',ZH:'zh',EN:'en',JA:'ja'};
-  document.documentElement.lang = langMap[lang]||'ko';
 
-  // ★ Dynamic Font Scaling (언어별 폰트 미세 조정)
-  const root = document.documentElement;
-  if(lang==='EN'){
-    root.style.fontSize = '95%';          // 영어: 5% 작게
-    root.style.lineHeight = '1.6';
-  } else if(lang==='ZH'){
-    root.style.fontSize = '100%';
-    root.style.lineHeight = '1.45';       // 중국어: 줄 높이 확보
-  } else if(lang==='JA'){
-    root.style.fontSize = '97%';
-    root.style.lineHeight = '1.65';
-  } else {                                // KO 기본
-    root.style.fontSize = '100%';
-    root.style.lineHeight = '1.6';
-  }
+  // ★ 중앙 언어 갱신 함수 — 모든 DOM 일괄 업데이트
+  updateUI();
 
-  // ★ 분석 탭 가이드 문구 즉시 반영
-  const analyzeGuideMap = {
-    KO:'메일 텍스트를 붙여넣거나, 이미지/PDF를 업로드하세요.',
-    ZH:'请粘贴邮件文本或上传图片/PDF文件。',
-    EN:'Paste email text or upload an image/PDF file.',
-    JA:'メールテキストを貼り付けるか、画像/PDFをアップロードしてください。',
-  };
-  const emailPaste = document.getElementById('emailPasteInput');
-  if(emailPaste) emailPaste.placeholder = analyzeGuideMap[lang] || analyzeGuideMap.KO;
-
-  // ★ 설정 모달 내 동적 문구 즉시 반영 (모달이 열려있을 때)
-  const settingsModal = document.getElementById('settingsModal');
-  if(settingsModal && settingsModal.style.display !== 'none'){
-    document.querySelectorAll('#settingsModal [data-i18n]').forEach(el=>{
-      const k=el.getAttribute('data-i18n'); const v=t(k);
-      if(v && v!==k) el.innerText=v;
-    });
-  }
-
-  // ★ 사이드바 기본 텍스트 즉시 반영
-  const dd = document.getElementById('displayDept');
-  if(dd && (dd.innerText === '로그인 전' || dd.innerText === '未登录' || dd.innerText === 'Not logged in' || dd.innerText === 'ログイン前')){
-    dd.innerText = t('login_status');
-  }
-
-  // JS 렌더링 요소 재렌더
+  // JS 렌더링 요소 재렌더 (목록 내 메시지 언어 갱신)
   renderEmails();
   renderTracking();
   renderLearning();
 }
+
 
 // ══════════════════════════════
 // 2. 스토리지 (API Key 기반 격리)
@@ -2793,21 +2742,35 @@ function lsArr(k){const v=lsGet(k);return Array.isArray(v)?v:[];}
 // 3. 초기화
 // ══════════════════════════════
 document.addEventListener('DOMContentLoaded',()=>{
-  // ★ 버전 체크 + 자동 마이그레이션 (최우선)
-  checkAndMigrateVersion();
-  const badge = document.getElementById('appVersionBadge');
-  if(badge) badge.innerText = `v${APP_VERSION}`;
+  console.log('[Timothy] DOMContentLoaded 시작');
+  try{
+    // ★ 버전 체크 + 자동 마이그레이션 (최우선)
+    checkAndMigrateVersion();
+    const badge = document.getElementById('appVersionBadge');
+    if(badge) badge.innerText = `v${APP_VERSION}`;
+    console.log('[Timothy] 버전 체크 완료');
 
-  initLearnDB().then(()=>{
-    migrateStylesFromLS();
-    renderLearning();
-  });
-  setLanguage(currentLang);
-  syncFunctionLockState();
-  syncModelSelectsToKeys(); // ★ API키 상태로 모델 옵션 초기 비활성화
-  switchMainMode('doc');
-  restoreLangSettings();
-  renderAll();
+    initLearnDB().then(()=>{
+      migrateStylesFromLS();
+      renderLearning();
+      console.log('[Timothy] IndexedDB 초기화 완료');
+    }).catch(err=> console.error('[Timothy] IndexedDB 오류:', err));
+
+    console.log('[Timothy] setLanguage 호출');
+    setLanguage(currentLang);
+    updateUI(); // ★ 중앙 언어 상태 최종 동기화
+    syncFunctionLockState();
+    syncModelSelectsToKeys();
+    console.log('[Timothy] switchMainMode 호출');
+    switchMainMode('doc');
+    restoreLangSettings();
+    console.log('[Timothy] renderAll 호출');
+    renderAll();
+    console.log('[Timothy] DOMContentLoaded 완료 ✅');
+  }catch(err){
+    console.error('[Timothy] DOMContentLoaded 오류:', err);
+    alert('[Timothy 초기화 오류]\n' + err.message + '\n\n콘솔(F12)에서 자세한 내용을 확인하세요.');
+  }
 });
 
 function renderAll(){
@@ -3143,10 +3106,12 @@ function switchAnalyzeTab(tab){
 // 10. AI 메일 분석
 // ══════════════════════════════
 async function analyzeMail(){
+  console.log('[Timothy] analyzeMail 호출');
   if(!requireApiKey()) return;
   const apiKey = localStorage.getItem('gemini_api_key');
   const area=document.getElementById('emailPasteInput');
   const text=area.value.trim();
+  console.log('[Timothy] 입력 텍스트 길이:', text.length, '/ 파일 첨부:', !!fileAttachmentData);
   if(!text&&!fileAttachmentData){showToast('데이터를 입력해 주세요.');return;}
   const btn=document.getElementById('analyzeBtn');
   btn.disabled=true; btn.innerText='AI 분석 진행 중...';
@@ -3475,12 +3440,11 @@ function buildSttAccordion(m, gi){
          <!-- 피드백 루프 -->
          <div class="reply-feedback" style="margin-top:8px;">
            <textarea class="reply-feedback-input" id="stt-fb-input-${gi}" rows="2"
-             placeholder="⚡ 자동: 'R&R 논리 강화해줘' / '모터 종류 검색해서 추가' / '더 간결하게'&#10;AI가 수정·논리보강·검색을 자동 판단합니다. 또는 버튼으로 직접 선택하세요."
+             placeholder="수정 요청, 논리 보강, 검색 등을 자유롭게 입력하세요. (Shift+Enter: 줄바꿈)"
              onclick="event.stopPropagation()"
              onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();event.stopPropagation();handleAnalysisFeedback('auto','stt',${gi});}"></textarea>
            <div class="feedback-btn-row">
-             <button class="reply-feedback-btn" onclick="event.stopPropagation();handleAnalysisFeedback('auto','stt',${gi})" title="AI가 자동으로 수정/논리보강/검색을 판단합니다">⚡ 실행</button>
-             <button class="reply-feedback-btn" onclick="event.stopPropagation();handleAnalysisFeedback('fix','stt',${gi})" style="background:rgba(59,130,246,.12);color:#3b82f6;border-color:rgba(59,130,246,.3);">🔄 수정</button>
+             <button class="reply-feedback-btn" onclick="event.stopPropagation();handleAnalysisFeedback('auto','stt',${gi})">🔄 수정 요청</button>
              <button class="logic-boost-btn" onclick="event.stopPropagation();handleAnalysisFeedback('logic','stt',${gi})">🧠 논리 보강</button>
            </div>
            <div class="sag-steps" id="stt-sag-steps-${gi}">
@@ -3535,10 +3499,98 @@ function cpSttReply(idx){
 
 /** STT 회신 피드백 루프 */
 // ══════════════════════════════
-// ★ 앱 버전 관리 & 데이터 백업/복구
+// ★ 전역 에러 핸들러 (디버깅용)
 // ══════════════════════════════
+window.addEventListener('error', (e)=>{
+  console.error('[Timothy ERROR]', e.message, '\n파일:', e.filename, '\n줄:', e.lineno);
+  // 사용자에게도 표시 (토스트가 준비된 후)
+  if(typeof showToast === 'function'){
+    showToast('⚠️ 오류: ' + e.message);
+  }
+});
+window.addEventListener('unhandledrejection', (e)=>{
+  console.error('[Timothy UNHANDLED PROMISE]', e.reason);
+  if(typeof showToast === 'function'){
+    showToast('⚠️ 비동기 오류: ' + (e.reason?.message || e.reason));
+  }
+});
+console.log('[Timothy] 스크립트 로드 시작');
 
 const APP_VERSION = '2.1.0';
+
+// ══════════════════════════════
+// ★ Localization Engine — 중앙 언어 상태 관리
+// ══════════════════════════════
+
+/**
+ * updateUI() — 현재 언어로 앱 전체 DOM 즉시 갱신
+ * setLanguage()와 연동하여 모든 data-i18n 요소를 한 번에 교체.
+ * 개별 함수에서 텍스트를 수정하지 않고, 이 함수 하나로 통일.
+ */
+function updateUI(){
+  const lang = localStorage.getItem('app_language') || currentLang || 'KO';
+  const pack = LANG_PACKS[lang] || LANG_PACKS.KO;
+
+  // 1. data-i18n 텍스트 요소 전체 순회 갱신
+  document.querySelectorAll('[data-i18n]').forEach(el=>{
+    const key = el.getAttribute('data-i18n');
+    const val = pack[key];
+    if(val && val !== key) el.innerText = val;
+  });
+
+  // 2. data-i18n-placeholder 순회 갱신
+  document.querySelectorAll('[data-i18n-placeholder]').forEach(el=>{
+    const key = el.getAttribute('data-i18n-placeholder');
+    const val = pack[key];
+    if(val && val !== key) el.placeholder = val;
+  });
+
+  // 3. 동적 요소 — JS로 생성되는 텍스트 즉시 갱신
+  // 사이드바 상태 도트 + 텍스트
+  const hasKey = !!localStorage.getItem('gemini_api_key');
+  const stxt = document.getElementById('statusTxt');
+  const dot  = document.getElementById('statusDot');
+  if(stxt) stxt.innerText = hasKey ? (pack.status_active||'Timothy AI 가동 중') : (pack.status_need_login||'API 키 미등록');
+  if(dot)  dot.style.background = hasKey ? '#10b981' : '#f43f5e';
+
+  // displayDept — 사용자 로그인 전 상태
+  const dd = document.getElementById('displayDept');
+  if(dd && !dd.dataset.userSet) dd.innerText = pack.login_status || '로그인 전';
+
+  // 분석 탭 textarea placeholder
+  const ep = document.getElementById('emailPasteInput');
+  if(ep && pack.mail_ph) ep.placeholder = pack.mail_ph;
+  const mp = document.getElementById('meetingPasteInput');
+  if(mp && pack.stt_text_ph) mp.placeholder = pack.stt_text_ph;
+
+  // html lang 속성
+  const langMap = {KO:'ko', ZH:'zh', EN:'en', JA:'ja'};
+  document.documentElement.lang = langMap[lang] || 'ko';
+
+  // Dynamic Font Scaling
+  const root = document.documentElement;
+  if(lang==='EN'){ root.style.fontSize='95%'; root.style.lineHeight='1.6'; }
+  else if(lang==='ZH'){ root.style.fontSize='100%'; root.style.lineHeight='1.45'; }
+  else if(lang==='JA'){ root.style.fontSize='97%'; root.style.lineHeight='1.65'; }
+  else { root.style.fontSize='100%'; root.style.lineHeight='1.6'; }
+
+  console.log(`[Timothy] updateUI 완료 — 언어: ${lang}`);
+}
+
+// ══════════════════════════════
+// ★ 문서 자동 매니저 — 독립 모듈 (추후 구현)
+// ══════════════════════════════
+
+/**
+ * manageDocumentFlow(data)
+ * 문서 자동 매니저 기능 진입점.
+ * 다른 기능들과 완전히 분리된 독립 함수 — 호출해도 에러 없음.
+ * @param {object} data - 문서 데이터 (추후 정의)
+ */
+async function manageDocumentFlow(data){
+  console.log('[Timothy] 문서 자동 매니저 준비 중...', data);
+  // TODO: 문서 분석 → 자동 생성 → PPT 연동 로직 추가 예정
+}
 
 /**
  * 백업에 포함할 localStorage 키 목록
@@ -3992,6 +4044,7 @@ async function sagSearch(query, _ignored){
  */
 async function sagReplyFix({ mailData, feedback, apiKey, replyTextEl, fbInputEl, btnEl, sagPrefix, sagIdx, forceSystemRole }){
   const needSearch = isSearchRequest(feedback);
+  console.log('[Timothy] sagReplyFix 시작 — mode:', needSearch?'search':'text', 'card:', sagPrefix);
 
   sagSetStep(sagPrefix, sagIdx, 1);
   if(btnEl){ btnEl.disabled=true; btnEl.innerText='처리 중...'; }
@@ -4039,7 +4092,27 @@ async function sagReplyFix({ mailData, feedback, apiKey, replyTextEl, fbInputEl,
 개선된 회신 초안만 출력하세요.`;
 
   try{
-    const newDraft = await callAI(prompt, systemRole, 'write');
+    let newDraft = '';
+    // ★ callAI 실패 시 Gemini 직접 호출로 폴백 (모바일 네트워크 간헐적 실패 대비)
+    try{
+      newDraft = await callAI(prompt, systemRole, 'write');
+    }catch(callErr){
+      console.warn('[Timothy] callAI 실패, Gemini 직접 폴백:', callErr.message);
+      const gKey = localStorage.getItem('gemini_api_key');
+      if(!gKey) throw callErr;
+      const gUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${gKey}`;
+      const controller = new AbortController();
+      const timer = setTimeout(()=>controller.abort(), 25000);
+      const gRes = await fetch(gUrl,{
+        method:'POST', headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({contents:[{parts:[{text:systemRole+'\n\n'+prompt}]}]}),
+        signal: controller.signal
+      });
+      clearTimeout(timer);
+      if(!gRes.ok) throw new Error(`Gemini ${gRes.status}: ${gRes.statusText}`);
+      const gData = await gRes.json();
+      newDraft = gData.candidates?.[0]?.content?.parts?.[0]?.text?.trim() || '';
+    }
     if(!newDraft) throw new Error('AI 응답 없음');
 
     // 저장 & UI 업데이트
@@ -4121,12 +4194,11 @@ function renderEmails(){
     const feedbackHtml=`
       <div class="reply-feedback">
         <textarea class="reply-feedback-input" id="fb-input-${i}" rows="2"
-          placeholder="⚡ 자동: 'R&R 논리 강화해줘' / '최신 동향 검색해서 추가' / '더 간결하게'&#10;AI가 수정·논리보강·검색을 자동 판단합니다. 또는 버튼으로 직접 선택하세요."
+          placeholder="수정 요청, 논리 보강, 검색 등을 자유롭게 입력하세요. (Shift+Enter: 줄바꿈)"
           onclick="event.stopPropagation()"
           onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();event.stopPropagation();handleAnalysisFeedback('auto','mail',${i});}"></textarea>
         <div class="feedback-btn-row">
-          <button class="reply-feedback-btn" onclick="event.stopPropagation();handleAnalysisFeedback('auto','mail',${i})" title="AI가 자동으로 수정/논리보강/검색을 판단합니다">⚡ 실행</button>
-          <button class="reply-feedback-btn" onclick="event.stopPropagation();handleAnalysisFeedback('fix','mail',${i})" style="background:rgba(59,130,246,.12);color:#3b82f6;border-color:rgba(59,130,246,.3);">🔄 수정</button>
+          <button class="reply-feedback-btn" onclick="event.stopPropagation();handleAnalysisFeedback('auto','mail',${i})">🔄 수정 요청</button>
           <button class="logic-boost-btn" onclick="event.stopPropagation();handleAnalysisFeedback('logic','mail',${i})">🧠 논리 보강</button>
         </div>
         <div class="sag-steps" id="sag-steps-${i}">
@@ -4733,7 +4805,7 @@ async function renderLearning(){
     c.innerHTML=`<div style="color:#64748b;text-align:center;padding:36px 20px;border:1px dashed #1e293b;border-radius:12px;font-size:12px;line-height:2;">
       <div style="font-size:28px;margin-bottom:10px;opacity:.4;">✍️</div>
       <div style="color:#94a3b8;font-weight:600;margin-bottom:6px;">${t('no_learning')}</div>
-      <div style="font-size:11px;">우측 상단 <b style="color:#3b82f6;">+ 스타일 저장</b> 버튼을 눌러<br>부서장의 고유 문체를 학습시키세요.</div>
+      <div style="font-size:11px;">${t("learning_guide_text")}</div>
     </div>`;
     document.getElementById('learningPagination').innerHTML='';
     return;
@@ -7090,10 +7162,11 @@ const API_KEY_MAP = {
  */
 function requireApiKey(openSettings = true){
   const k = localStorage.getItem('gemini_api_key');
+  console.log('[Timothy] requireApiKey 호출 — 키 존재:', !!k);
   if(!k){
-    showToast('🔑 API 키 등록이 필요합니다. (설정 탭 확인)');
+    alert('🔑 API 키가 설정되지 않았습니다.\n설정 탭에서 Google Gemini API 키를 등록하세요.');
     if(openSettings){
-      setTimeout(()=>{ openSettingsModal(); switchSettingsTab('api'); }, 600);
+      setTimeout(()=>{ openSettingsModal(); switchSettingsTab('api'); }, 300);
     }
     return false;
   }
