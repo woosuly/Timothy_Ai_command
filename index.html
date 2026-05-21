@@ -2669,6 +2669,50 @@ const LANG_PACKS = {
     api_register_btn:'注册',
     interp_log_ph:'通译开始后将记录我的语音...',
     interp_start_btn:'🎙️ 开始我的语音通译',
+    mon:'月',
+    tue:'火',
+    wed:'水',
+    thu:'木',
+    fri:'金',
+    sat:'土',
+    mon_jan:'1月',
+    mon_feb:'2月',
+    mon_mar:'3月',
+    mon_apr:'4月',
+    mon_may:'5月',
+    mon_jun:'6月',
+    mon_jul:'7月',
+    mon_aug:'8月',
+    mon_sep:'9月',
+    mon_oct:'10月',
+    mon_nov:'11月',
+    mon_dec:'12月',
+    lbl_memo:'备注',
+    lbl_place:'场所',
+    lbl_meet_time:'会议时间',
+    lbl_due_date:'截止日',
+    lbl_current_loc:'当前位置',
+    lbl_font_tone:'字体/语调',
+    lbl_work_directive:'⚡ 指示',
+    lbl_pick_time:'选择时间',
+    btn_save:'💾 保存',
+    btn_register:'💾 登记',
+    btn_copy_all:'📄 全部复制',
+    btn_delete:'🗑 删除',
+    settings_save_btn:'✅ 保存设置',
+    tab_stt:'🎙️ STT语音分析',
+    nav_translate:'🎙️ AI通译/翻译',
+    next_week:'下周',
+    weekly_title:'📆 周计划',
+    scope_all_desc:'标题+发件人+正文',
+    scope_body_desc:'AI摘要内容',
+    scope_subject_desc:'邮件标题基准',
+    status_active:'Timothy AI 运行中',
+    no_learning:'尚无保存的文体风格。',
+    ph_event_title:'日程标题',
+    btn_apply_sel:'应用',
+    msg_speech_cnt:'发话 ${n}件',
+    nav_no_file:'未选择文件',
   },
   EN: {
     tab_mail:'📩 Mail Analysis', tab_stt:'🎙️ STT Analysis',
@@ -4146,6 +4190,11 @@ function classifyIntent(text){
  */
 async function handleAnalysisFeedback(mode, card, idx){
   if(!requireApiKey()) return;
+
+  // ★ 중복 호출 방지 — 같은 카드의 처리 중 재클릭 차단
+  const lockKey = `_sagLock_${card}_${idx}`;
+  if(window[lockKey]) return;
+  window[lockKey] = true;
   const apiKey   = localStorage.getItem('gemini_api_key');
   const inputId  = card==='stt' ? `stt-fb-input-${idx}` : `fb-input-${idx}`;
   const textId   = card==='stt' ? `stt-reply-text-${idx}` : `reply-text-${idx}`;
@@ -4204,6 +4253,7 @@ async function handleAnalysisFeedback(mode, card, idx){
       sagPrefix:sagPfx, sagIdx:idx,
     });
   }
+  window[lockKey] = false; // ★ 처리 완료 후 잠금 해제
 }
 
 // ══════════════════════════════
@@ -5456,6 +5506,10 @@ let isInterpretingMy   = false;
 let isInterpretingPeer = false;
 let myRecognition      = null;
 let peerRecognition    = null;
+let confRecognition    = null;
+let _myStopIntentional   = false; // ★ 싱글톤 의도적 중지 플래그
+let _peerStopIntentional = false;
+let _confStopIntentional = false;
 let interpMode         = 'one';  // 'one' | 'both'
 
 // ══════════════════════════════
@@ -5557,6 +5611,7 @@ async function startConfMic(){
 }
 
 function stopConfMic(){
+  _confStopIntentional = true; // ★ 의도적 중지
   isConfRunning = false; _isConfRunning = false;
   onConfStop(); // ★ 타이머 + 버튼 정리
   if(confRecognition){ try{confRecognition.stop();}catch{} confRecognition=null; }
@@ -5571,57 +5626,50 @@ function stopConfMic(){
 }
 
 function initConfRecognition(){
+  if(confRecognition){
+    try{ confRecognition.onresult=null; confRecognition.onend=null; confRecognition.stop(); }catch{}
+    confRecognition = null;
+  }
   const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-  const myLang   = document.getElementById('confMyLang')?.value   || 'ko';
-  const peerLang = document.getElementById('confPeerLang')?.value || 'en';
+  if(!SR) return;
 
-  // 상대방 언어로 STT 설정
+  const myLangEl   = document.getElementById('confMyLang');
+  const peerLangEl = document.getElementById('confPeerLang');
+  const myLang     = myLangEl?.value   || 'ko';
+  const peerLang   = peerLangEl?.value || 'en';
+
   confRecognition = new SR();
-  confRecognition.lang = LANG_BCP47[peerLang] || 'en-US';
-  confRecognition.continuous = true;
-  confRecognition.interimResults = true;
-  let _confLastFinalIdx = 0; // ★ 중복 방지
+  confRecognition.lang         = LANG_BCP47[peerLang] || 'en-US'; // 상대 언어 인식
+  confRecognition.continuous   = false;
+  confRecognition.interimResults = false; // ★ 확정만
 
   confRecognition.onresult = async (e) => {
-    let interim='', final='';
-    for(let i=e.resultIndex;i<e.results.length;i++){
-      if(e.results[i].isFinal){
-        if(i < _confLastFinalIdx) continue;
-        final += e.results[i][0].transcript.trim() + ' ';
-        _confLastFinalIdx = i + 1;
-      } else {
-        interim += e.results[i][0].transcript;
-      }
-    }
-    final = final.trim();
+    const result = e.results[e.resultIndex];
+    if(!result || !result.isFinal) return;
+    const text = result[0].transcript.trim();
+    if(!text) return;
+    console.log('[STT Conf] 확정:', text);
     const interimBar = document.getElementById('confInterimBar');
-    if(interimBar) interimBar.innerText = interim ? `"${interim}"` : t('status_listening')||'인식 중...';
+    if(interimBar) interimBar.innerText = t('status_listening');
+    await translateConfCaption(text, peerLang, myLang);
+  };
 
-    if(final){
-      if(interimBar) interimBar.innerText = t('status_listening');
-      await translateConfCaption(final, peerLang, myLang);
+  confRecognition.onend = () => {
+    if(isConfRunning && !_confStopIntentional){
+      setTimeout(() => {
+        if(isConfRunning) initConfRecognition();
+      }, 150);
     }
+    _confStopIntentional = false;
   };
 
   confRecognition.onerror = (e) => {
-    if(e.error==='not-allowed'){
-      if(isConfRunning){
-        isConfRunning = false; _isConfRunning = false;
-        const btn = document.getElementById('confMicBtn');
-        const status = document.getElementById('confStatus');
-        if(btn){ btn.innerText='🎤 회의 시작'; btn.style.background='rgba(16,185,129,.15)'; btn.style.borderColor='rgba(16,185,129,.4)'; btn.style.color='#10b981'; }
-        if(status) status.innerText='● 대기 중';
-        if(confRecognition){ try{confRecognition.stop();}catch{} confRecognition=null; }
-        showToast('⚠️ 마이크 권한이 필요합니다. 브라우저 설정에서 허용해 주세요.');
-      }
-      return;
-    }
-    if(isConfRunning) setTimeout(()=>{ if(isConfRunning) initConfRecognition(); }, 800);
+    if(e.error === 'no-speech' || e.error === 'aborted') return;
+    console.warn('[STT Conf] 오류:', e.error);
   };
-  confRecognition.onend = () => {
-    if(isConfRunning) setTimeout(()=>{ if(isConfRunning) initConfRecognition(); }, 300);
-  };
-  try{ confRecognition.start(); } catch(err){ if(isConfRunning) setTimeout(initConfRecognition, 1000); }
+
+  try{ confRecognition.start(); }
+  catch(err){ console.warn('[STT Conf] start 실패:', err); }
 }
 
 /** 회의 자막 번역 + 출력 */
@@ -5977,6 +6025,7 @@ async function startMyMic(){
 }
 
 function stopMyMic(){
+  _myStopIntentional = true; // ★ 의도적 중지
   isInterpretingMy = false;
   updateMicBtn('my', false);
   if(myRecognition){ try{ myRecognition.stop(); }catch{} myRecognition=null; }
@@ -5986,54 +6035,50 @@ function stopMyMic(){
 }
 
 function initMyRecognition(){
+  // ★ 싱글톤: 기존 인식기 완전 정리 후 새로 생성
+  if(myRecognition){
+    try{ myRecognition.onresult=null; myRecognition.onend=null; myRecognition.stop(); }catch{}
+    myRecognition = null;
+  }
   const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-  myRecognition = new SR();
-  myRecognition.lang = 'ko-KR';       // 한국어 인식
-  myRecognition.continuous = true;
-  myRecognition.interimResults = true;
-  let _myLastFinalIdx = 0; // ★ 중복 방지: 마지막 처리한 final 인덱스
+  if(!SR) return;
 
-  myRecognition.onresult = (e)=>{
-    let interim='', final='';
-    for(let i=e.resultIndex; i<e.results.length; i++){
-      if(e.results[i].isFinal){
-        // ★ 이미 처리한 결과는 건너뜀
-        if(i < _myLastFinalIdx) continue;
-        final += e.results[i][0].transcript.trim() + ' ';
-        _myLastFinalIdx = i + 1;
-      } else {
-        interim += e.results[i][0].transcript;
-      }
-    }
-    final = final.trim();
-    updateInterpInterim(interim ? `🇰🇷 "${interim}"` : '');
-    if(final){
-      appendToTextarea('interpLogKo', final);
-      updateInterpInterim('');
-      quickTranslateBidir(final, 'ko', transTargetLang, transTargetName, 'interpLogForeign',
-        TTS_LANG_MAP[transTargetLang] || 'en-US');
-    }
+  myRecognition = new SR();
+  myRecognition.lang         = 'ko-KR';
+  myRecognition.continuous   = false;  // ★ false: 한 문장씩, onend에서 재시작
+  myRecognition.interimResults = false; // ★ false: 확정 문장만 처리
+
+  myRecognition.onresult = (e) => {
+    // resultIndex의 단 하나만 처리 (interimResults=false이므로 항상 isFinal)
+    const result = e.results[e.resultIndex];
+    if(!result || !result.isFinal) return;
+    const text = result[0].transcript.trim();
+    if(!text) return;
+    console.log('[STT My] 확정:', text);
+    appendToTextarea('interpLogKo', text);
+    updateInterpInterim('');
+    quickTranslateBidir(text, 'ko', transTargetLang, transTargetName,
+      'interpLogForeign', TTS_LANG_MAP[transTargetLang] || 'en-US');
   };
-  myRecognition.onerror = (e)=>{
-    console.warn('[MyMic Error]', e.error);
-    if(e.error==='not-allowed'||e.error==='service-not-allowed'){
-      // 한 번만 토스트 표시 후 중지 (중복 방지)
-      if(isInterpretingMy){
-        isInterpretingMy = false;
-        updateMicBtn('my', false);
-        hideBidirStatusBar();
-        showToast('⚠️ 마이크 권한이 필요합니다. 브라우저 설정에서 허용해 주세요.');
-        if(myRecognition){ try{myRecognition.stop();}catch{} myRecognition=null; }
-      }
-      return;
+
+  myRecognition.onend = () => {
+    // ★ 의도적 중지가 아닐 때만 재시작 (자동 재시작으로 연속성 유지)
+    if(isInterpretingMy && !_myStopIntentional){
+      setTimeout(() => {
+        if(isInterpretingMy) initMyRecognition();
+      }, 150);
     }
-    if(isInterpretingMy) setTimeout(()=>{ if(isInterpretingMy) initMyRecognition(); }, 800);
+    _myStopIntentional = false;
   };
-  myRecognition.onend = ()=>{
-    if(isInterpretingMy) setTimeout(()=>{ if(isInterpretingMy) initMyRecognition(); }, 300);
+
+  myRecognition.onerror = (e) => {
+    if(e.error === 'no-speech') return; // 무음 → 조용히 재시작
+    if(e.error === 'aborted')  return;
+    console.warn('[STT My] 오류:', e.error);
   };
+
   try{ myRecognition.start(); }
-  catch(e){ if(isInterpretingMy) setTimeout(()=>{ if(isInterpretingMy) initMyRecognition(); },1000); }
+  catch(err){ console.warn('[STT My] start 실패:', err); }
 }
 
 // ────────────────────────────────
@@ -6065,6 +6110,7 @@ async function startPeerMic(){
 }
 
 function stopPeerMic(){
+  _peerStopIntentional = true; // ★ 의도적 중지
   isInterpretingPeer = false;
   updateMicBtn('peer', false);
   if(peerRecognition){ try{ peerRecognition.stop(); }catch{} peerRecognition=null; }
@@ -6074,51 +6120,45 @@ function stopPeerMic(){
 }
 
 function initPeerRecognition(){
+  if(peerRecognition){
+    try{ peerRecognition.onresult=null; peerRecognition.onend=null; peerRecognition.stop(); }catch{}
+    peerRecognition = null;
+  }
   const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-  peerRecognition = new SR();
-  peerRecognition.lang = TTS_LANG_MAP[transTargetLang] || 'en-US'; // 타겟 언어 인식
-  peerRecognition.continuous = true;
-  peerRecognition.interimResults = true;
-  let _peerLastFinalIdx = 0; // ★ 중복 방지
+  if(!SR) return;
 
-  peerRecognition.onresult = (e)=>{
-    let interim='', final='';
-    for(let i=e.resultIndex;i<e.results.length;i++){
-      if(e.results[i].isFinal){
-        if(i < _peerLastFinalIdx) continue;
-        final += e.results[i][0].transcript.trim() + ' ';
-        _peerLastFinalIdx = i + 1;
-      } else {
-        interim += e.results[i][0].transcript;
-      }
-    }
-    final = final.trim();
-    updateInterpInterim(interim ? `🌐 "${interim}"` : '');
-    if(final){
-      appendToTextarea('interpLogForeign', final);
-      updateInterpInterim('');
-      quickTranslateBidir(final, transTargetLang, 'ko', '한국어', 'interpLogKo', 'ko-KR');
-    }
+  peerRecognition = new SR();
+  peerRecognition.lang         = TTS_LANG_MAP[transTargetLang] || 'en-US';
+  peerRecognition.continuous   = false;
+  peerRecognition.interimResults = false; // ★ 확정 문장만
+
+  peerRecognition.onresult = (e) => {
+    const result = e.results[e.resultIndex];
+    if(!result || !result.isFinal) return;
+    const text = result[0].transcript.trim();
+    if(!text) return;
+    console.log('[STT Peer] 확정:', text);
+    appendToTextarea('interpLogForeign', text);
+    updateInterpInterim('');
+    quickTranslateBidir(text, transTargetLang, 'ko', '한국어', 'interpLogKo', 'ko-KR');
   };
-  peerRecognition.onerror = (e)=>{
-    console.warn('[PeerMic Error]', e.error);
-    if(e.error==='not-allowed'||e.error==='service-not-allowed'){
-      if(isInterpretingPeer){
-        isInterpretingPeer = false;
-        updateMicBtn('peer', false);
-        hideBidirStatusBar();
-        showToast('⚠️ 마이크 권한이 필요합니다. 브라우저 설정에서 허용해 주세요.');
-        if(peerRecognition){ try{peerRecognition.stop();}catch{} peerRecognition=null; }
-      }
-      return;
+
+  peerRecognition.onend = () => {
+    if(isInterpretingPeer && !_peerStopIntentional){
+      setTimeout(() => {
+        if(isInterpretingPeer) initPeerRecognition();
+      }, 150);
     }
-    if(isInterpretingPeer) setTimeout(()=>{ if(isInterpretingPeer) initPeerRecognition(); }, 800);
+    _peerStopIntentional = false;
   };
-  peerRecognition.onend = ()=>{
-    if(isInterpretingPeer) setTimeout(()=>{ if(isInterpretingPeer) initPeerRecognition(); }, 300);
+
+  peerRecognition.onerror = (e) => {
+    if(e.error === 'no-speech' || e.error === 'aborted') return;
+    console.warn('[STT Peer] 오류:', e.error);
   };
+
   try{ peerRecognition.start(); }
-  catch(e){ if(isInterpretingPeer) setTimeout(()=>{ if(isInterpretingPeer) initPeerRecognition(); },1000); }
+  catch(err){ console.warn('[STT Peer] start 실패:', err); }
 }
 
 // ────────────────────────────────
