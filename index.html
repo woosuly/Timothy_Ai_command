@@ -1117,7 +1117,7 @@ textarea::-webkit-scrollbar-thumb{background:#334155;border-radius:4px;}
     <div class="user-info-row" id="userInfoRow">
       <div style="overflow:hidden;flex:1;">
         <div class="user-name" id="displayName">Guest</div>
-        <div class="user-dept" id="displayDept" style="font-size:10px;color:#475569;">로그인 전</div>
+        <div class="user-dept" id="displayDept" style="font-size:10px;color:#475569;">${t('login_status')}</div>
       </div>
       <button class="logout-btn" onclick="openSettingsModal()" title="설정 열기" style="font-size:16px;">⚙️</button>
     </div>
@@ -1284,11 +1284,11 @@ textarea::-webkit-scrollbar-thumb{background:#334155;border-radius:4px;}
           <span id="learningStatusBadge" class="learn-status-badge learn-status-on">학습 적용 중</span>
         </div>
         <!-- 학습 검증 -->
-        <button onclick="verifyLearning()" style="padding:5px 11px;background:rgba(245,158,11,.12);color:#f59e0b;border:1px solid rgba(245,158,11,.25);border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;">🔍 학습 검증</button>
+        <button onclick="verifyLearning()" style="padding:5px 11px;background:rgba(245,158,11,.12);color:#f59e0b;border:1px solid rgba(245,158,11,.25);border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;" data-i18n="learn_verify_btn">🔍 학습 검증</button>
         <!-- 전체 삭제 -->
-        <button onclick="clearAllStyles()" style="padding:5px 11px;background:rgba(244,63,94,.1);color:#f43f5e;border:1px solid rgba(244,63,94,.25);border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;">🗑 전체 삭제</button>
+        <button onclick="clearAllStyles()" style="padding:5px 11px;background:rgba(244,63,94,.1);color:#f43f5e;border:1px solid rgba(244,63,94,.25);border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;" data-i18n="clear_all_btn">🗑 전체 삭제</button>
         <!-- 추가 -->
-        <button onclick="openModal('styleModal')" style="padding:5px 13px;background:rgba(59,130,246,.15);color:#3b82f6;border:1px solid rgba(59,130,246,.3);border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;">+ 스타일 저장</button>
+        <button onclick="openModal('styleModal')" style="padding:5px 13px;background:rgba(59,130,246,.15);color:#3b82f6;border:1px solid rgba(59,130,246,.3);border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;" data-i18n="style_save_btn">+ 스타일 저장</button>
       </div>
     </div>
     <!-- 학습 검증 결과 영역 -->
@@ -1532,7 +1532,7 @@ textarea::-webkit-scrollbar-thumb{background:#334155;border-radius:4px;}
           </div>
         </div>
         <div id="confCaptionLog" class="conf-caption-log">
-          <div class="conf-caption-empty">회의를 시작하면 자막이 여기에 표시됩니다.</div>
+          <div class="conf-caption-empty" data-i18n="conf_waiting">회의를 시작하면 자막이 여기에 표시됩니다.</div>
         </div>
         <div id="confInterimBar" style="padding:6px 12px;background:rgba(30,41,59,.5);border-top:1px solid #1e293b;font-size:11px;color:#64748b;font-style:italic;min-height:30px;border-radius:0 0 10px 10px;">
           인식 중...
@@ -2252,6 +2252,32 @@ textarea::-webkit-scrollbar-thumb{background:#334155;border-radius:4px;}
       <button onclick="closeModal('settingsModal')" style="padding:11px 18px;background:rgba(30,41,59,.6);color:#94a3b8;border:1px solid #334155;border-radius:8px;font-size:13px;cursor:pointer;">닫기</button>
     </div>
 
+    <!-- 💾 데이터 백업 & 복구 -->
+    <div style="margin-top:12px;background:rgba(2,6,23,.5);border:1px solid #1e293b;border-radius:10px;padding:12px 14px;">
+      <div style="font-size:11px;font-weight:700;color:#60a5fa;margin-bottom:10px;">💾 데이터 백업 &amp; 복구
+        <span style="font-size:9px;font-weight:400;color:#475569;margin-left:6px;">앱 버전 <span id="appVersionBadge" style="color:#10b981;"></span></span>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        <!-- 내보내기 -->
+        <button onclick="exportBackup()"
+          style="flex:1;min-width:120px;padding:9px 12px;background:rgba(16,185,129,.12);color:#10b981;border:1px solid rgba(16,185,129,.3);border-radius:7px;font-size:11px;font-weight:700;cursor:pointer;">
+          📥 백업 다운로드
+        </button>
+        <!-- 가져오기 -->
+        <label style="flex:1;min-width:120px;">
+          <input type="file" id="backupFileInput" accept=".json" style="display:none;" onchange="importBackup(event)">
+          <div onclick="document.getElementById('backupFileInput').click()"
+            style="padding:9px 12px;background:rgba(245,158,11,.1);color:#f59e0b;border:1px solid rgba(245,158,11,.3);border-radius:7px;font-size:11px;font-weight:700;cursor:pointer;text-align:center;">
+            📤 백업 복구
+          </div>
+        </label>
+      </div>
+      <div style="font-size:10px;color:#475569;margin-top:7px;line-height:1.7;">
+        • 백업: 분석 메일·일정·업무·설정을 JSON으로 저장<br>
+        • 복구: 기존 데이터를 백업 파일로 덮어씌웁니다
+      </div>
+    </div>
+
     <!-- PWA 안내 (고정 하단) -->
     <div style="margin-top:10px;padding:9px 12px;background:rgba(16,185,129,.07);border:1px solid rgba(16,185,129,.2);border-radius:8px;font-size:10px;color:#64748b;line-height:1.7;">
       📲 <b style="color:#10b981;">앱처럼 사용하기:</b> 크롬 메뉴 <b style="color:#10b981;">⋮</b> → <b style="color:#10b981;">'홈 화면에 추가'</b>를 누르면 마이크 권한이 영구 유지됩니다.
@@ -2402,6 +2428,14 @@ const LANG_PACKS = {
     lbl_pick_date:'날짜 선택', lbl_pick_time:'시간 선택',
     ph_work_title:'업무 제목', ph_worker:'담당자 이름',
     ph_memo:'메모', ph_event_title:'일정 제목', ph_place:'예: 3층 회의실',
+    // 동적 메시지 키
+    learn_applying:'학습 적용 중', learn_off:'학습 꺼짐',
+    learn_verify_btn:'🔍 학습 검증',
+    no_search_result:'검색 결과 없음', no_mail_data:'분석된 메일이 없습니다.',
+    no_deadline_mail:'납기가 있는 메일이 없습니다.',
+    no_tracking:'등록된 업무가 없습니다.', no_learning:'아직 저장된 문체 스타일이 없습니다.',
+    conf_waiting:'회의를 시작하면 자막이 여기에 표시됩니다.',
+    login_status:'로그인 전', guest_name:'Guest',
   },
   ZH: {
     tab_mail:'📩 邮件分析', tab_stt:'🎙️ STT语音分析',
@@ -2464,6 +2498,14 @@ const LANG_PACKS = {
     lbl_pick_date:'选择日期', lbl_pick_time:'选择时间',
     ph_work_title:'任务标题', ph_worker:'负责人姓名',
     ph_memo:'备注', ph_event_title:'日程标题', ph_place:'例：3楼会议室',
+    // 동적 메시지 키
+    learn_applying:'学习应用中', learn_off:'学习已关闭',
+    learn_verify_btn:'🔍 学习验证',
+    no_search_result:'无搜索结果', no_mail_data:'暂无分析邮件。',
+    no_deadline_mail:'没有有截止日期的邮件。',
+    no_tracking:'暂无登记的任务。', no_learning:'尚无保存的文体风格。',
+    conf_waiting:'开始会议后，字幕将显示在此处。',
+    login_status:'未登录', guest_name:'Guest',
   },
   EN: {
     tab_mail:'📩 Mail Analysis', tab_stt:'🎙️ STT Analysis',
@@ -2526,6 +2568,14 @@ const LANG_PACKS = {
     lbl_pick_date:'Select Date', lbl_pick_time:'Select Time',
     ph_work_title:'Task title', ph_worker:'Assignee name',
     ph_memo:'Memo', ph_event_title:'Event title', ph_place:'e.g. Meeting Room 3F',
+    // dynamic message keys
+    learn_applying:'Learning Active', learn_off:'Learning Off',
+    learn_verify_btn:'🔍 Verify Learning',
+    no_search_result:'No results found', no_mail_data:'No analyzed emails.',
+    no_deadline_mail:'No emails with deadlines.',
+    no_tracking:'No tasks registered.', no_learning:'No style data saved yet.',
+    conf_waiting:'Start a meeting to see captions here.',
+    login_status:'Not logged in', guest_name:'Guest',
   },
   JA: {
     tab_mail:'📩 メール分析', tab_stt:'🎙️ STT音声分析',
@@ -2588,6 +2638,14 @@ const LANG_PACKS = {
     lbl_pick_date:'日付を選択', lbl_pick_time:'時間を選択',
     ph_work_title:'タスクタイトル', ph_worker:'担当者名',
     ph_memo:'メモ', ph_event_title:'予定タイトル', ph_place:'例：3F会議室',
+    // 動的メッセージキー
+    learn_applying:'学習適用中', learn_off:'学習オフ',
+    learn_verify_btn:'🔍 学習検証',
+    no_search_result:'検索結果なし', no_mail_data:'分析されたメールがありません。',
+    no_deadline_mail:'納期のあるメールがありません。',
+    no_tracking:'登録された業務がありません。', no_learning:'まだスタイルデータがありません。',
+    conf_waiting:'会議を開始するとここに字幕が表示されます。',
+    login_status:'ログイン前', guest_name:'Guest',
   }
 };
 
@@ -2728,6 +2786,11 @@ function lsArr(k){const v=lsGet(k);return Array.isArray(v)?v:[];}
 // 3. 초기화
 // ══════════════════════════════
 document.addEventListener('DOMContentLoaded',()=>{
+  // ★ 버전 체크 + 자동 마이그레이션 (최우선)
+  checkAndMigrateVersion();
+  const badge = document.getElementById('appVersionBadge');
+  if(badge) badge.innerText = `v${APP_VERSION}`;
+
   initLearnDB().then(()=>{
     migrateStylesFromLS();
     renderLearning();
@@ -3465,7 +3528,194 @@ function cpSttReply(idx){
 
 /** STT 회신 피드백 루프 */
 // ══════════════════════════════
-// ★ 통합 명령창 — 의도 자동 분류 + 라우팅
+// ★ 앱 버전 관리 & 데이터 백업/복구
+// ══════════════════════════════
+
+const APP_VERSION = '2.1.0';
+
+/**
+ * 백업에 포함할 localStorage 키 목록
+ * - uid() 접두사가 붙는 사용자 데이터 + 전역 설정
+ */
+function getBackupKeys(){
+  const u = uid();
+  const userKeys = ['emails','tasks','cal_events','styles','pmap','user_ppt_styles'];
+  const globalKeys = [
+    'ui_lang','app_skin','app_font','ai_model','app_language',
+    'user_location','app_version',
+    'doc_my_lang','doc_peer_lang','voice_my_lang','voice_peer_lang',
+    'conf_my_lang','conf_peer_lang',
+    'model_task_analyze','model_task_write','model_task_translate',
+  ];
+  // API 키는 보안상 백업에서 제외
+  return { userKeys: userKeys.map(k=>u+'_'+k), globalKeys };
+}
+
+/**
+ * 📥 백업 파일 다운로드
+ * - localStorage 전체 데이터를 JSON으로 내보내기
+ * - API 키는 보안상 제외
+ */
+function exportBackup(){
+  const { userKeys, globalKeys } = getBackupKeys();
+  const data = {
+    _meta: {
+      appVersion: APP_VERSION,
+      exportedAt: new Date().toISOString(),
+      uid: uid(),
+    },
+    userData:   {},
+    globalData: {},
+  };
+
+  userKeys.forEach(k=>{
+    const v = localStorage.getItem(k);
+    if(v !== null) data.userData[k] = v;
+  });
+  globalKeys.forEach(k=>{
+    const v = localStorage.getItem(k);
+    if(v !== null) data.globalData[k] = v;
+  });
+
+  const json     = JSON.stringify(data, null, 2);
+  const date     = new Date().toISOString().slice(0,10).replace(/-/g,'');
+  const filename = `Timothy_Backup_${date}.json`;
+
+  const blob = new Blob([json], { type:'application/json' });
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href = url; a.download = filename;
+  document.body.appendChild(a); a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+
+  showToast(`📥 ${filename} 다운로드 완료 (${(json.length/1024).toFixed(1)} KB)`);
+}
+
+/**
+ * 📤 백업 파일 복구
+ * - JSON 파일을 읽어 localStorage에 복원
+ * - 확인 팝업 + 형식 검증 필수
+ */
+function importBackup(event){
+  const file = event.target.files?.[0];
+  if(!file) return;
+  event.target.value = ''; // 동일 파일 재선택 허용
+
+  const reader = new FileReader();
+  reader.onload = (e)=>{
+    let data;
+    // ① 형식 검증
+    try{
+      data = JSON.parse(e.target.result);
+    }catch{
+      showToast('⚠️ 잘못된 백업 파일 형식입니다. JSON을 확인하세요.'); return;
+    }
+    if(!data._meta || !data.userData){
+      showToast('⚠️ Timothy 백업 파일이 아닙니다. 올바른 파일을 선택하세요.'); return;
+    }
+
+    // ② 버전 확인
+    const backupVer = data._meta?.appVersion || '구버전';
+    const itemCount = Object.keys(data.userData).length + Object.keys(data.globalData||{}).length;
+
+    // ③ 확인 팝업
+    const confirmEl = document.getElementById('confirmMsg');
+    const yesBtn    = document.getElementById('confirmYesBtn');
+    if(confirmEl) confirmEl.innerHTML =
+      `백업 파일(v${backupVer})을 복구합니다.<br>
+       <b style="color:#f43f5e;">기존 데이터(${itemCount}개 항목)가 덮어씌워집니다.</b><br>
+       <span style="font-size:10px;color:#64748b;">계속하시겠습니까?</span>`;
+    if(yesBtn){
+      yesBtn.style.display = '';
+      yesBtn.onclick = ()=>{
+        closeModal('confirmModal');
+        // ④ 데이터 마이그레이션 후 복원
+        const migrated = migrateData(data);
+        // 사용자 데이터 복원
+        Object.entries(migrated.userData).forEach(([k,v])=> localStorage.setItem(k, v));
+        // 전역 설정 복원 (API 키 제외)
+        Object.entries(migrated.globalData||{}).forEach(([k,v])=>{
+          if(!k.includes('api_key')) localStorage.setItem(k, v);
+        });
+        localStorage.setItem('app_version', APP_VERSION);
+        showToast('✅ 백업 복구 완료! 앱을 새로고침합니다...');
+        setTimeout(()=> location.reload(), 1200);
+      };
+    }
+    openModal('confirmModal');
+  };
+  reader.readAsText(file);
+}
+
+/**
+ * 🔄 데이터 마이그레이션
+ * - 구버전 백업 파일을 현재 버전 구조로 변환
+ * - 추후 버전별 변환 로직 추가 가능
+ */
+function migrateData(data){
+  const src  = data._meta?.appVersion || '1.0.0';
+  const dest = APP_VERSION;
+  if(src === dest) return data;  // 동일 버전: 변환 불필요
+
+  console.log(`[Timothy] 데이터 마이그레이션: v${src} → v${dest}`);
+
+  // ── v1.x → v2.x: emails 필드 구조 보강 ──
+  const u = data._meta?.uid || uid();
+  const emailKey = u + '_emails';
+  if(data.userData[emailKey]){
+    try{
+      let emails = JSON.parse(data.userData[emailKey]);
+      if(Array.isArray(emails)){
+        emails = emails.map(m=>{
+          // v2.x: _id 필드 자동 부여
+          if(!m._id) m._id = `m_${Date.now()}_${Math.random().toString(36).slice(2,7)}`;
+          // v2.x: category 기본값 보장
+          if(!m.category) m.category = '전체';
+          return m;
+        });
+        data.userData[emailKey] = JSON.stringify(emails);
+      }
+    }catch(err){ console.warn('[Migration] emails 처리 오류:', err); }
+  }
+
+  // ── 추후 버전 추가 시 여기에 분기 ──
+  // if(src.startsWith('2.') && dest.startsWith('3.')) { ... }
+
+  data._meta.appVersion = dest;
+  return data;
+}
+
+/**
+ * 앱 초기 로딩 시 버전 체크 + 자동 마이그레이션
+ */
+function checkAndMigrateVersion(){
+  const stored = localStorage.getItem('app_version');
+  // 버전 배지 표시
+  const badge = document.getElementById('appVersionBadge');
+  if(badge) badge.innerText = `v${APP_VERSION}`;
+
+  if(!stored){
+    // 최초 실행
+    localStorage.setItem('app_version', APP_VERSION);
+    return;
+  }
+  if(stored === APP_VERSION) return; // 최신 버전
+
+  // 버전 불일치 → 자동 마이그레이션 (백업 파일 없이 현재 localStorage 데이터만 업그레이드)
+  console.log(`[Timothy] 자동 마이그레이션: v${stored} → v${APP_VERSION}`);
+  try{
+    const { userKeys } = getBackupKeys();
+    const snapshot = { _meta:{ appVersion:stored, uid:uid() }, userData:{}, globalData:{} };
+    userKeys.forEach(k=>{ const v=localStorage.getItem(k); if(v!==null) snapshot.userData[k]=v; });
+    const migrated = migrateData(snapshot);
+    Object.entries(migrated.userData).forEach(([k,v])=> localStorage.setItem(k, v));
+    localStorage.setItem('app_version', APP_VERSION);
+    console.log('[Timothy] 마이그레이션 완료');
+  }catch(err){
+    console.error('[Timothy] 마이그레이션 오류:', err);
+  }
+}
 // ══════════════════════════════
 
 /**
@@ -3846,7 +4096,7 @@ function renderEmails(){
     (currentDomainFilter==='전체'||m.category===currentDomainFilter)&&mailMatch(m)
   );
   if(!filtered.length){
-    c.innerHTML=`<div style="color:#64748b;text-align:center;padding:22px 0;border:1px dashed #1e293b;border-radius:9px;font-size:11px;">${searchQuery?'검색 결과 없음':'분석된 메일이 없습니다.'}</div>`;
+    c.innerHTML=`<div style="color:#64748b;text-align:center;padding:22px 0;border:1px dashed #1e293b;border-radius:9px;font-size:11px;">${searchQuery?t('no_search_result'):t('no_mail_data')}</div>`;
     return;
   }
   const tot=Math.ceil(filtered.length/PAGE_SIZE);
@@ -3949,7 +4199,7 @@ function renderStatusPanel(){
   const pmap=lsGet('pmap')||{};
   const withDate=mails.filter(m=>m.deadlineDate&&m.deadlineDate!=='null'&&m.deadlineDate!==null);
   if(!withDate.length){
-    sl.innerHTML=`<div style="color:#64748b;text-align:center;padding:8px;font-size:10px;">납기가 있는 메일이 없습니다.</div>`;
+    sl.innerHTML=`<div style="color:#64748b;text-align:center;padding:8px;font-size:10px;">${t('no_deadline_mail')}</div>`;
     return;
   }
   mails.forEach((m,i)=>{
@@ -4242,7 +4492,7 @@ function selectCalType(t){
     if(titleInput){
       titleInput.style.borderColor='';
       titleInput.style.boxShadow='';
-      titleInput.placeholder='일정 제목';
+      titleInput.placeholder=t('ph_event_title');
     }
   }
 }
@@ -4421,7 +4671,7 @@ function onLearningToggleChange(){
   const badge = document.getElementById('learningStatusBadge');
   if(badge){
     badge.className = `learn-status-badge ${learnApplied?'learn-status-on':'learn-status-off'}`;
-    badge.innerText  = learnApplied ? '학습 적용 중' : '학습 꺼짐';
+    badge.innerText  = learnApplied ? t('learn_applying') : t('learn_off');
   }
   showToast(learnApplied ? '✅ 학습 데이터 AI 적용 활성화' : '⏸️ 학습 데이터 AI 적용 비활성화');
 }
@@ -4475,7 +4725,7 @@ async function renderLearning(){
   if(!items.length){
     c.innerHTML=`<div style="color:#64748b;text-align:center;padding:36px 20px;border:1px dashed #1e293b;border-radius:12px;font-size:12px;line-height:2;">
       <div style="font-size:28px;margin-bottom:10px;opacity:.4;">✍️</div>
-      <div style="color:#94a3b8;font-weight:600;margin-bottom:6px;">아직 저장된 문체 스타일이 없습니다.</div>
+      <div style="color:#94a3b8;font-weight:600;margin-bottom:6px;">${t('no_learning')}</div>
       <div style="font-size:11px;">우측 상단 <b style="color:#3b82f6;">+ 스타일 저장</b> 버튼을 눌러<br>부서장의 고유 문체를 학습시키세요.</div>
     </div>`;
     document.getElementById('learningPagination').innerHTML='';
@@ -5056,7 +5306,7 @@ function clearConfLog(){
     meetingScript = [];
     updateConfBadge();
     const log = document.getElementById('confCaptionLog');
-    if(log) log.innerHTML = '<div class="conf-caption-empty">회의를 시작하면 자막이 여기에 표시됩니다.</div>';
+    if(log) log.innerHTML = `<div class="conf-caption-empty" data-i18n="conf_waiting">회의를 시작하면 자막이 여기에 표시됩니다.</div>`;
     const sw = document.getElementById('confSummaryWrap');
     if(sw) sw.style.display = 'none';
   };
