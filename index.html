@@ -4638,7 +4638,7 @@ function renderEmails(){
       ${deptR?`<div class="acc-sec" onclick="event.stopPropagation()"><div class="acc-lbl">🏢 유관 부서</div>${deptR}</div>`:''}
       <div class="acc-sec" onclick="event.stopPropagation()" style="border-color:rgba(16,185,129,.25);background:rgba(16,185,129,.03);">
         <div class="acc-lbl green">✉️ 추천 회신 초안</div>
-        <p id="reply-text-${i}" style="white-space:pre-wrap;font-size:10px;color:#a7f3d0;">${m.reply_draft||'(없음)'}</p>
+        <div id="reply-text-${i}" class="ai-render-wrap" style="font-size:10px;color:#a7f3d0;min-height:20px;">${mdToHtml(m.reply_draft||'')|| '(없음)'}</div>
         <button class="small-copy-btn" onclick="event.stopPropagation();cpReply(${i})">📄 복사</button>
         ${feedbackHtml}
       </div>
@@ -5941,36 +5941,58 @@ function getVoiceForGender(lang){
   const voices = window.speechSynthesis.getVoices();
   if(!voices || voices.length === 0) return null;
 
-  // 타겟 언어 코드 매핑
-  const ttsLang = TTS_LANG_MAP[lang] || 'en-US';
+  const ttsLang  = TTS_LANG_MAP[lang] || 'en-US';
   const baseLang = ttsLang.split('-')[0].toLowerCase();
+  const isMale   = ttsGender === 'male';
 
   // 성별 키워드 패턴
-  const maleKw   = /male|man|남성|남자|guy|eric|david|george|daniel|fred/i;
-  const femaleKw = /female|woman|여성|여자|zira|samantha|victoria|kate|alice|karen/i;
-  const kw = ttsGender === 'male' ? maleKw : femaleKw;
+  const maleKw   = /\b(male|man|남성|남자|guy|eric|david|george|daniel|fred|james|john|tom)\b/i;
+  const femaleKw = /\b(female|woman|여성|여자|zira|samantha|victoria|kate|alice|karen|lisa|emma|amy)\b/i;
+  const kw       = isMale ? maleKw : femaleKw;
+  const oppKw    = isMale ? femaleKw : maleKw;
 
-  // 1차: 타겟 언어 + 성별 키워드 매칭
-  let v = voices.find(v => v.lang.toLowerCase().startsWith(baseLang) && kw.test(v.name));
-  // 2차: 전체 언어 중 성별 키워드만 매칭
+  // 해당 언어 목소리 필터
+  const langVoices = voices.filter(v => v.lang.toLowerCase().startsWith(baseLang));
+
+  // 1차: 언어 + 성별 키워드 정확 매칭
+  let v = langVoices.find(v => kw.test(v.name));
+  // 2차: 언어 목소리 중 반대 성별 아닌 것 (neutral)
+  if(!v) v = langVoices.find(v => !oppKw.test(v.name));
+  // 3차: 전체에서 성별 키워드
   if(!v) v = voices.find(v => kw.test(v.name));
-  // 3차: 타겟 언어 첫 번째
-  if(!v) v = voices.find(v => v.lang.toLowerCase().startsWith(baseLang));
-  // 4차: 기본값
+  // 4차: 해당 언어 첫 번째
+  if(!v) v = langVoices[0];
+  // 5차: 전체 첫 번째
   return v || voices[0];
 }
 
 /** speakBidir 오버라이드 — 성별 선택 반영 */
 function speakBidir(text, lang){
   if(!text || !window.speechSynthesis) return;
-  const utter = new SpeechSynthesisUtterance(text);
-  const voice = getVoiceForGender(lang.replace(/-.*/,'')); // 'en-US' → 'en'
-  if(voice) utter.voice = voice;
-  utter.lang   = lang;
-  utter.rate   = 1.0;
-  utter.pitch  = 1.0;
-  utter.volume = 1.0;
-  window.speechSynthesis.speak(utter);
+
+  const doSpeak = () => {
+    const utter = new SpeechSynthesisUtterance(text);
+    const voice = getVoiceForGender(lang.replace(/-.*/,''));
+    if(voice) utter.voice = voice;
+    utter.lang   = lang;
+    utter.rate   = 1.0;
+    utter.pitch  = ttsGender === 'male' ? 0.9 : 1.1;
+    utter.volume = 1.0;
+    window.speechSynthesis.speak(utter);
+  };
+
+  // ★ getVoices가 아직 로드 안 된 경우 이벤트 후 재시도
+  const voices = window.speechSynthesis.getVoices();
+  if(voices && voices.length > 0){
+    doSpeak();
+  } else {
+    window.speechSynthesis.onvoiceschanged = () => {
+      window.speechSynthesis.onvoiceschanged = null;
+      doSpeak();
+    };
+    // fallback: 1초 후 강제 실행
+    setTimeout(doSpeak, 1000);
+  }
 }
 
 /** 통역 로그 초기화 */
