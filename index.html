@@ -4647,8 +4647,8 @@ function renderEmails(){
     const sttBadgeColor = isStt ? 'background:rgba(168,85,247,.2);color:#a855f7;' : '';
     const sttRowStyle = isStt ? 'border-left-color:#a855f7;background:rgba(168,85,247,.04);' : '';
     c.insertAdjacentHTML('beforeend',`
-      <div class="mail-row ${urgent?'urgent-row':''} ${isOpen?'open':''}" data-idx="${i}" style="${sttRowStyle}">
-        <div class="mail-row-hdr" onclick="toggleMail(${i})">
+      <div class="mail-row ${urgent?'urgent-row':''} ${isOpen?'open':''}" data-idx="${i}" style="${sttRowStyle}" onclick="toggleMail(event,${i})">
+        <div class="mail-row-hdr">
           <span class="mail-badge" style="${sttBadgeColor}">${isStt?'🎙️ STT':(m.category||'-')}</span>
           <span class="mail-subj">${m.subject||'(제목없음)'}</span>
           <span class="mail-sender-sm">${m.sender||'-'}</span>
@@ -4671,7 +4671,23 @@ function cpReply(i){
   const m=lsArr('emails')[i];
   if(m) navigator.clipboard.writeText(m.reply_draft||'').then(()=>showToast('복사 완료'));
 }
-function toggleMail(i){openMailIdx=(openMailIdx===i)?null:i; renderEmails();}
+function toggleMail(e, i){
+  // ★ reply-feedback, mail-accordion 내부 클릭은 무시
+  if(e && e.target){
+    const t = e.target;
+    if(t.closest('.reply-feedback') ||
+       t.closest('.mail-accordion') ||
+       t.closest('.acc-sec') ||
+       t.closest('button') ||
+       t.closest('textarea') ||
+       t.tagName === 'BUTTON' ||
+       t.tagName === 'TEXTAREA') {
+      return;
+    }
+  }
+  openMailIdx=(openMailIdx===i)?null:i;
+  renderEmails();
+}
 function goPage(p){
   const tot=Math.ceil(lsArr('emails').filter(m=>(currentDomainFilter==='전체'||m.category===currentDomainFilter)&&mailMatch(m)).length/PAGE_SIZE);
   if(p<1||p>tot) return;
