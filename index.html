@@ -238,7 +238,7 @@ main.active-view{display:flex;}
   .mob-tab.active .tab-icon{filter:drop-shadow(0 0 4px #3b82f6);}
 
   /* ── 메일 행 모바일 최적화 ── */
-  .mail-row-hdr{padding:10px 12px;gap:7px;}
+  .mail-row-hdr{padding:10px 12px;gap:7px;cursor:pointer;}
   .mail-subj{font-size:12px;}
   .mail-sender-sm,.mail-date-sm{display:none;}
   .mail-section{height:auto;max-height:60vh;overflow-y:auto;}
@@ -343,7 +343,7 @@ main.active-view{display:flex;}
 .mail-stack{display:flex;flex-direction:column;gap:3px;}
 
 /* 메일 행 */
-.mail-row{background:rgba(30,41,59,.35);border:1px solid #1e293b;border-left:3px solid #334155;border-radius:7px;cursor:pointer;transition:.15s;overflow:hidden;}
+.mail-row{background:rgba(30,41,59,.35);border:1px solid #1e293b;border-left:3px solid #334155;border-radius:7px;cursor:default;transition:.15s;overflow:hidden;}
 .mail-row:hover{background:rgba(30,41,59,.6);border-left-color:#3b82f6;}
 .mail-row.urgent-row{border-left-color:#f43f5e;}
 .mail-row.open{border-left-color:#10b981;background:rgba(16,185,129,.05);}
@@ -3816,7 +3816,7 @@ function buildSttAccordion(m, gi){
 
   // ── ④ 추천 회신 초안 (reply_draft)
   const replyHtml = m.reply_draft
-    ? `<div class="acc-sec" style="border-color:rgba(16,185,129,.25);background:rgba(16,185,129,.03);">
+    ? `<div class="acc-sec" onclick="event.stopPropagation()" style="border-color:rgba(16,185,129,.25);background:rgba(16,185,129,.03);">
          <div class="acc-lbl green">✉️ 추천 회신 / 후속 안내 초안
            <button class="small-copy-btn" onclick="event.stopPropagation();cpSttReply(${gi})">📄 복사</button>
          </div>
@@ -3840,16 +3840,16 @@ function buildSttAccordion(m, gi){
        </div>`
     : '';
 
-  return `<div class="mail-accordion">
+  return `<div class="mail-accordion" onclick="event.stopPropagation()">
 
     <!-- ① 핵심 결론 상세 -->
-    <div class="acc-sec" style="border-color:rgba(168,85,247,.25);">
+    <div class="acc-sec" onclick="event.stopPropagation()" style="border-color:rgba(168,85,247,.25);">
       <div class="acc-lbl" style="color:#a855f7;">🎙️ 회의 핵심 결론 및 결정사항</div>
       ${summaryHtml || '<p style="color:#64748b;font-size:11px;">결론 없음</p>'}
     </div>
 
     <!-- ② 지시 가이드 + Action Items -->
-    <div class="acc-sec" style="border-color:rgba(168,85,247,.3);background:rgba(168,85,247,.02);">
+    <div class="acc-sec" onclick="event.stopPropagation()" style="border-color:rgba(168,85,247,.3);background:rgba(168,85,247,.02);">
       <div class="acc-lbl" style="color:#a855f7;">📋 지시 가이드
         ${items.length ? `<button class="sync-btn" style="background:rgba(168,85,247,.15);color:#a855f7;border-color:rgba(168,85,247,.35);"
           onclick="event.stopPropagation();registerMeetingActions(JSON.parse(decodeURIComponent('${encodedItems}')))">트래커 등록 (${items.length}건)</button>` : ''}
@@ -3864,7 +3864,7 @@ function buildSttAccordion(m, gi){
 
     <!-- ③ 유관부서 협조 -->
     ${deptReqs.length ? `
-    <div class="acc-sec" style="border-color:rgba(168,85,247,.2);">
+    <div class="acc-sec" onclick="event.stopPropagation()" style="border-color:rgba(168,85,247,.2);">
       <div class="acc-lbl" style="color:#a855f7;">🏢 유관부서별 대응방안</div>
       ${deptHtml}
     </div>` : ''}
@@ -4626,17 +4626,17 @@ function renderEmails(){
       </div>`;
     // ★ STT 카드이면 전용 아코디언 사용, 일반 메일이면 기존 아코디언
     const sttAcc = buildSttAccordion(m, i);
-    const acc = sttAcc || `<div class="mail-accordion">
-      <div class="acc-sec"><div class="acc-lbl">💡 Timothy AI 핵심 요약</div>${bullets}</div>
-      <div class="acc-sec" style="border-color:rgba(245,158,11,.3);background:rgba(245,158,11,.02);">
+    const acc = sttAcc || `<div class="mail-accordion" onclick="event.stopPropagation()">
+      <div class="acc-sec" onclick="event.stopPropagation()"><div class="acc-lbl">💡 Timothy AI 핵심 요약</div>${bullets}</div>
+      <div class="acc-sec" onclick="event.stopPropagation()" style="border-color:rgba(245,158,11,.3);background:rgba(245,158,11,.02);">
         <div class="acc-lbl orange">📋 지시 가이드
           <button class="sync-btn" onclick="event.stopPropagation();syncTracker('${b64}','${(m.category||'').replace(/'/g,"\\'")}','${(m.subject||'').replace(/'/g,"\\'")}')">트래커 연동</button>
         </div>
         <p style="font-weight:600;color:#f59e0b;font-size:10px;margin-bottom:2px;">[${(m.guide||{}).worker||'-'} / ${(m.guide||{}).due||'-'}]</p>
         <p style="color:#e2e8f0;font-style:italic;font-size:10px;">"${(m.guide||{}).instruction||''}"</p>
       </div>
-      ${deptR?`<div class="acc-sec"><div class="acc-lbl">🏢 유관 부서</div>${deptR}</div>`:''}
-      <div class="acc-sec" style="border-color:rgba(16,185,129,.25);background:rgba(16,185,129,.03);">
+      ${deptR?`<div class="acc-sec" onclick="event.stopPropagation()"><div class="acc-lbl">🏢 유관 부서</div>${deptR}</div>`:''}
+      <div class="acc-sec" onclick="event.stopPropagation()" style="border-color:rgba(16,185,129,.25);background:rgba(16,185,129,.03);">
         <div class="acc-lbl green">✉️ 추천 회신 초안</div>
         <p id="reply-text-${i}" style="white-space:pre-wrap;font-size:10px;color:#a7f3d0;">${m.reply_draft||'(없음)'}</p>
         <button class="small-copy-btn" onclick="event.stopPropagation();cpReply(${i})">📄 복사</button>
@@ -5685,7 +5685,7 @@ function initConfRecognition(){
     if(isConfRunning && !_confStopIntentional){
       setTimeout(() => {
         if(isConfRunning) initConfRecognition();
-      }, 150);
+      }, 500);
     }
     _confStopIntentional = false;
   };
@@ -6093,7 +6093,7 @@ function initMyRecognition(){
     if(isInterpretingMy && !_myStopIntentional){
       setTimeout(() => {
         if(isInterpretingMy) initMyRecognition();
-      }, 150);
+      }, 500); // ★ 500ms: 이전 결과 완전 처리 후 재시작
     }
     _myStopIntentional = false;
   };
@@ -6174,7 +6174,7 @@ function initPeerRecognition(){
     if(isInterpretingPeer && !_peerStopIntentional){
       setTimeout(() => {
         if(isInterpretingPeer) initPeerRecognition();
-      }, 150);
+      }, 500);
     }
     _peerStopIntentional = false;
   };
@@ -6219,12 +6219,16 @@ async function quickTranslateBidir(text, fromLang, toLang, toLangName, targetElI
   const apiKey = localStorage.getItem('gemini_api_key');
   if(!apiKey) return;
 
-  // ★ 중복 번역 방지 — 같은 텍스트를 100ms 내 재호출 차단
-  const dedupKey = `_trbid_${targetElId}`;
-  const lastText  = window[dedupKey];
-  if(lastText === text) return;
-  window[dedupKey] = text;
-  setTimeout(()=>{ if(window[dedupKey]===text) window[dedupKey]=null; }, 300);
+  // ★ 강력한 중복 방지 — 채널별 최근 번역 텍스트 추적 (3초 TTL)
+  if(!window._trbCache) window._trbCache = {};
+  const cacheKey = `${targetElId}::${text}`;
+  const now = Date.now();
+  const last = window._trbCache[cacheKey];
+  if(last && now - last < 3000) {
+    console.log('[quickTranslate] 중복 차단:', text.slice(0,20));
+    return;
+  }
+  window._trbCache[cacheKey] = now;
 
   const fromLabel = fromLang==='ko' ? '한국어' : transTargetName;
   const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
@@ -6244,14 +6248,11 @@ async function quickTranslateBidir(text, fromLang, toLang, toLangName, targetElI
     const translated = data.candidates?.[0]?.content?.parts?.[0]?.text?.trim();
     if(!translated) return;
 
-    // 번역 결과를 지정 영역에 누적
     if(targetElId === 'transResult'){
       appendToResultArea(translated);
     } else {
       appendToTextarea(targetElId, translated);
     }
-
-    // TTS 출력
     speakBidir(translated, ttsLang);
 
   } catch(e){
