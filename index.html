@@ -1372,10 +1372,17 @@ textarea::-webkit-scrollbar-thumb{background:#334155;border-radius:4px;}
       </div>
 
       <!-- 액션 버튼 -->
-      <div style="display:flex;gap:8px;flex-shrink:0;">
+      <div style="display:flex;gap:8px;flex-shrink:0;align-items:center;">
         <button id="transRunBtn" class="trans-run-btn" onclick="runTranslate()" style="flex:2;">▶ 번역하기</button>
         <button class="trans-copy-btn" onclick="copyTrans()" style="flex:1;padding:10px;">📄 복사</button>
         <button class="trans-copy-btn" onclick="swapTrans()" style="flex:1;padding:10px;border-color:#3b82f6;color:#3b82f6;">⇄ 교체</button>
+      </div>
+      <!-- 현재 번역 엔진 표시 -->
+      <div style="display:flex;align-items:center;gap:6px;padding:4px 2px;">
+        <span style="font-size:10px;color:#475569;">번역 엔진:</span>
+        <span id="transEngineBadge" style="font-size:11px;font-weight:700;color:#60a5fa;">🟦 Gemini</span>
+        <button onclick="openSettingsModal();setTimeout(()=>switchSettingsTab('api'),200);"
+          style="font-size:10px;padding:2px 7px;background:rgba(30,41,59,.6);border:1px solid #334155;color:#64748b;border-radius:4px;cursor:pointer;">⚙️ 변경</button>
       </div>
 
       <!-- 협조 요청 메일 빌더 -->
@@ -2227,11 +2234,61 @@ textarea::-webkit-scrollbar-thumb{background:#334155;border-radius:4px;}
             <button class="api-save-btn" onclick="saveApiKey('anthropic')">등록</button>
           </div>
         </div>
+
+        <!-- DeepL -->
+        <div class="api-key-row" style="border-color:rgba(0,180,120,.25);background:rgba(0,180,120,.04);">
+          <div class="api-key-label"><span>🟩</span> DeepL (고품질 문서 번역)</div>
+          <div class="api-state-registered" id="apiReg-deepl" style="display:none;">
+            <div class="api-registered-msg">🔐 API 키가 등록되었습니다.</div>
+            <button class="api-release-btn" onclick="releaseApiKey('deepl')">해제</button>
+          </div>
+          <div class="api-state-input" id="apiInput-deepl">
+            <input type="password" id="inputDeeplKey" class="key-input api-key-input" placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx:fx (deepl.com)">
+            <button class="api-save-btn" onclick="saveApiKey('deepl')">등록</button>
+          </div>
+        </div>
       </div>
+
+      <!-- ★ 번역 엔진 선택 -->
+      <div class="settings-section-hdr" style="margin-top:12px;">🌐 문서 번역 엔진</div>
+      <div style="background:rgba(0,180,120,.06);border:1px solid rgba(0,180,120,.2);border-radius:10px;padding:12px 14px;">
+        <div style="font-size:11px;color:#94a3b8;margin-bottom:10px;">문서/텍스트 번역 탭에서 사용할 번역 엔진을 선택하세요.</div>
+        <div style="display:flex;flex-direction:column;gap:8px;">
+
+          <label style="display:flex;align-items:center;gap:10px;cursor:pointer;padding:8px 10px;border-radius:8px;border:1px solid #334155;background:rgba(30,41,59,.4);" id="engLabel-gemini">
+            <input type="radio" name="transEngine" value="gemini" id="eng-gemini" style="accent-color:#3b82f6;" onchange="setTransEngine('gemini')">
+            <div>
+              <div style="font-size:12px;font-weight:700;color:#e2e8f0;">🟦 Gemini (기본)</div>
+              <div style="font-size:10px;color:#64748b;">Google Gemini 2.5 Flash · 문맥 이해 우수 · Gemini 키 필요</div>
+            </div>
+          </label>
+
+          <label style="display:flex;align-items:center;gap:10px;cursor:pointer;padding:8px 10px;border-radius:8px;border:1px solid #334155;background:rgba(30,41,59,.4);" id="engLabel-gpt">
+            <input type="radio" name="transEngine" value="gpt" id="eng-gpt" style="accent-color:#10b981;" onchange="setTransEngine('gpt')">
+            <div>
+              <div style="font-size:12px;font-weight:700;color:#e2e8f0;">🟩 GPT-4o</div>
+              <div style="font-size:10px;color:#64748b;">OpenAI GPT-4o · 자연스러운 번역 · OpenAI 키 필요</div>
+            </div>
+          </label>
+
+          <label style="display:flex;align-items:center;gap:10px;cursor:pointer;padding:8px 10px;border-radius:8px;border:1px solid rgba(0,180,120,.4);background:rgba(0,180,120,.06);" id="engLabel-deepl">
+            <input type="radio" name="transEngine" value="deepl" id="eng-deepl" style="accent-color:#00b478;" onchange="setTransEngine('deepl')">
+            <div>
+              <div style="font-size:12px;font-weight:700;color:#e2e8f0;">🌿 DeepL <span style="font-size:9px;background:rgba(0,180,120,.2);color:#34d399;padding:1px 5px;border-radius:3px;margin-left:4px;">고품질</span></div>
+              <div style="font-size:10px;color:#64748b;">DeepL API · 정확도 최고 수준 · 한/영/중/일 지원 · DeepL 키 필요</div>
+            </div>
+          </label>
+
+        </div>
+        <div id="deeplEngineNote" style="font-size:10px;color:#34d399;margin-top:8px;display:none;">
+          ✅ DeepL 선택됨 — 통역/회의 모드는 Gemini를 계속 사용합니다.
+        </div>
+      </div>
+
       <div style="font-size:10px;color:#475569;margin-top:6px;line-height:1.6;">
         * Gemini 키 없으면 분석·번역 기능이 비활성화됩니다.<br>
-        * OpenAI·Claude 키 없으면 Gemini로 자동 대체 실행됩니다.
-      </div>
+        * OpenAI·Claude 키 없으면 Gemini로 자동 대체 실행됩니다.<br>
+        * DeepL Free 키는 끝에 <code style="color:#34d399;">:fx</code> 가 붙습니다.</div>
 
       <!-- 장소 설정 -->
       <div class="settings-section-hdr" style="margin-top:12px;">📍 장소 및 날씨</div>
@@ -3157,6 +3214,7 @@ document.addEventListener('DOMContentLoaded',()=>{
     updateUI(); // ★ 중앙 언어 상태 최종 동기화
     syncFunctionLockState();
     syncModelSelectsToKeys();
+    updateTransEngineBadge(); // ★ 번역 엔진 뱃지 초기화
     console.log('[Timothy] switchMainMode 호출');
     switchMainMode('doc');
     restoreLangSettings();
@@ -4488,6 +4546,82 @@ function handlePasteImage(e){
   }
   // 이미지 아닌 경우(텍스트) → 기본 붙여넣기 동작
 }
+
+/** ★ 번역 엔진 설정 */
+function setTransEngine(engine){
+  localStorage.setItem('trans_engine', engine);
+  ['gemini','gpt','deepl'].forEach(e => {
+    const radio = document.getElementById(`eng-${e}`);
+    const label = document.getElementById(`engLabel-${e}`);
+    if(radio) radio.checked = (e === engine);
+    if(label) label.style.borderColor = (e === engine)
+      ? (e==='deepl' ? 'rgba(0,180,120,.6)' : 'rgba(59,130,246,.6)')
+      : '#334155';
+  });
+  const note = document.getElementById('deeplEngineNote');
+  if(note) note.style.display = engine === 'deepl' ? 'block' : 'none';
+  updateTransEngineBadge();
+  const labels = { deepl:'🌿 DeepL', gpt:'🟩 GPT-4o', gemini:'🟦 Gemini' };
+  showToast(`${labels[engine]||'Gemini'} 번역 엔진 선택됨`);
+}
+
+function initTransEngineUI(){
+  const saved = localStorage.getItem('trans_engine') || 'gemini';
+  setTransEngine(saved);
+}
+
+function updateTransEngineBadge(){
+  const engine = localStorage.getItem('trans_engine') || 'gemini';
+  const badge  = document.getElementById('transEngineBadge');
+  if(!badge) return;
+  const labels = { gemini:'🟦 Gemini', gpt:'🟩 GPT-4o', deepl:'🌿 DeepL' };
+  badge.innerText = labels[engine] || 'Gemini';
+  badge.style.color = engine==='deepl' ? '#34d399' : engine==='gpt' ? '#10b981' : '#60a5fa';
+}
+
+/** ★ DeepL API 직접 호출 */
+async function callDeepL(text, targetLang){
+  const key = localStorage.getItem('deepl_api_key');
+  if(!key){ showToast('⚠️ DeepL API 키가 없습니다. 설정에서 등록하세요.'); return null; }
+
+  const isFree = key.endsWith(':fx');
+  const baseUrl = isFree
+    ? 'https://api-free.deepl.com/v2/translate'
+    : 'https://api.deepl.com/v2/translate';
+
+  const DEEPL_LANG = {
+    ko:'KO', en:'EN-US', zh:'ZH', ja:'JA',
+    fr:'FR', de:'DE', es:'ES', ru:'RU',
+    pt:'PT-BR', it:'IT', nl:'NL', pl:'PL',
+  };
+  const dlLang = DEEPL_LANG[targetLang.toLowerCase()] || targetLang.toUpperCase();
+
+  try{
+    const ctrl  = new AbortController();
+    const timer = setTimeout(() => ctrl.abort(), 10000);
+    const res   = await fetch(baseUrl, {
+      method:  'POST',
+      headers: { 'Authorization':`DeepL-Auth-Key ${key}`, 'Content-Type':'application/json' },
+      body:    JSON.stringify({ text:[text], target_lang:dlLang }),
+      signal:  ctrl.signal,
+    });
+    clearTimeout(timer);
+
+    if(res.status === 403){ showToast('⚠️ DeepL 인증 실패. 키를 확인하세요.'); return null; }
+    if(res.status === 456){ showToast('⚠️ DeepL 무료 할당량 초과'); return null; }
+    if(!res.ok){ showToast(`⚠️ DeepL 오류 ${res.status}`); return null; }
+
+    const data = await res.json();
+    return data.translations?.[0]?.text || null;
+
+  } catch(err){
+    if(err.name === 'AbortError'){ showToast('⚠️ DeepL 응답 시간 초과'); return null; }
+    console.error('[DeepL]', err.message);
+    showToast('⚠️ DeepL 오류: ' + err.message);
+    return null;
+  }
+}
+
 function parseMarkdownTables(text){
   const lines = text.split('\n');
   const out = [];
@@ -5689,27 +5823,47 @@ async function runTranslate(){
   const docPeerName = (typeof LANG_NAMES!=='undefined' ? LANG_NAMES[docPeerLang] : null) || transTargetName || docPeerLang;
   const sysRole = `당신은 전문 번역가입니다. 입력 언어: ${docMyName}, 출력 언어: ${docPeerName}. 번역문만 출력하세요.`;
 
+  // ★ 번역 엔진 선택
+  const engine = localStorage.getItem('trans_engine') || 'gemini';
+
   try{
     let translated = '';
-    const prompt = transFileData
-      ? `첨부 파일의 텍스트 내용을 모두 ${docPeerName}(${docPeerLang})으로 번역하세요. 번역문만 출력하세요.${text ? '\n\n추가 지시사항: '+text : ''}`
-      : `다음 텍스트를 ${docPeerName}(${docPeerLang})으로 번역하세요. 번역문만 출력하세요.\n\n${text}`;
 
-    if(transFileData){
-      const url = getGeminiUrl(k);
-      const parts = [{text:prompt},{inlineData:{mimeType:transFileData.mime,data:transFileData.base64}}];
-      const controller = new AbortController();
-      const timer = setTimeout(()=>controller.abort(), 30000);
-      const res = await fetch(url,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({contents:[{parts}]}),signal:controller.signal});
-      clearTimeout(timer);
-      if(!res.ok) throw new Error(`HTTP ${res.status}`);
-      const data = await res.json();
-      translated = data.candidates?.[0]?.content?.parts?.[0]?.text?.trim() || '';
-    } else {
+    // ──────────── DeepL 엔진 ────────────
+    if(engine === 'deepl' && !transFileData){
+      const result = await callDeepL(text, docPeerLang);
+      if(result === null){ return; } // callDeepL 내부에서 토스트 처리
+      translated = result;
+
+    // ──────────── DeepL + 파일 → 파일은 AI로 (DeepL은 텍스트 전용) ────────────
+    } else if(engine === 'deepl' && transFileData){
+      showToast('ℹ️ DeepL은 파일 번역 미지원 — Gemini로 처리합니다.');
+      const prompt = `첨부 파일의 텍스트 내용을 모두 ${docPeerName}(${docPeerLang})으로 번역하세요. 번역문만 출력하세요.${text ? '\n\n추가 지시사항: '+text : ''}`;
       translated = await callAI(prompt, sysRole, 'translate');
-    }
+
+    // ──────────── Gemini / GPT ────────────
+    } else {
+      const prompt = transFileData
+        ? `첨부 파일의 텍스트 내용을 모두 ${docPeerName}(${docPeerLang})으로 번역하세요. 번역문만 출력하세요.${text ? '\n\n추가 지시사항: '+text : ''}`
+        : `다음 텍스트를 ${docPeerName}(${docPeerLang})으로 번역하세요. 번역문만 출력하세요.\n\n${text}`;
+
+      if(transFileData){
+        const url = getGeminiUrl(k);
+        const parts = [{text:prompt},{inlineData:{mimeType:transFileData.mime,data:transFileData.base64}}];
+        const controller = new AbortController();
+        const timer = setTimeout(()=>controller.abort(), 30000);
+        const res = await fetch(url,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({contents:[{parts}]}),signal:controller.signal});
+        clearTimeout(timer);
+        if(!res.ok) throw new Error(`HTTP ${res.status}`);
+        const data = await res.json();
+        translated = data.candidates?.[0]?.content?.parts?.[0]?.text?.trim() || '';
+      } else {
+        translated = await callAI(prompt, sysRole, 'translate');
+      }
+    } // ← Gemini/GPT else 블록 닫기
+
     document.getElementById('transResult') && renderAiOutput(document.getElementById('transResult'), translated);
-    showToast('✅ 번역 완료');
+    showToast(engine==='deepl' ? '🌿 DeepL 번역 완료' : '✅ 번역 완료');
   } catch(err){
     showToast('⚠️ 번역 실패: ' + err.message);
   } finally{
@@ -7836,6 +7990,7 @@ const API_KEY_MAP = {
   gemini:    { storage:'gemini_api_key',    inputId:'inputGeminiKey',    regId:'apiReg-gemini',    inpId:'apiInput-gemini'    },
   openai:    { storage:'openai_api_key',    inputId:'inputOpenaiKey',    regId:'apiReg-openai',    inpId:'apiInput-openai'    },
   anthropic: { storage:'anthropic_api_key', inputId:'inputAnthropicKey', regId:'apiReg-anthropic', inpId:'apiInput-anthropic' },
+  deepl:     { storage:'deepl_api_key',     inputId:'inputDeeplKey',     regId:'apiReg-deepl',     inpId:'apiInput-deepl'     },
 };
 
 /**
@@ -8321,6 +8476,7 @@ function openSettingsModal(){
   const ld=document.getElementById('currentLocDisplay'); if(ld) ld.innerText=`📍 ${curLoc}`;
   renderAiModelSelect();
   const ms=document.getElementById('aiModelSelect'); if(ms) ms.value=currentAiModel;
+  initTransEngineUI(); // ★ 번역 엔진 라디오 초기화
   openModal('settingsModal');
 }
 
