@@ -1363,7 +1363,7 @@ textarea::-webkit-scrollbar-thumb{background:#334155;border-radius:4px;}
           <div style="display:flex;align-items:center;justify-content:space-between;flex-shrink:0;">
             <div class="trans-panel-title" id="docSrcTitle">📝 원문 입력</div>
           </div>
-          <textarea id="transInput" class="trans-textarea" placeholder="번역할 텍스트를 입력하세요..."></textarea>
+          <textarea id="transInput" class="trans-textarea" placeholder="번역할 텍스트를 입력하세요..." onpaste="handlePasteImage(event)"></textarea>
         </div>
         <div class="trans-panel">
           <div class="trans-panel-title" id="docDstTitle">🌐 번역 결과</div>
@@ -4525,13 +4525,15 @@ function mdToHtml(md){
   return t;
 }
 
-/** ★ 클립보드 이미지 붙여넣기 처리 */
+/** ★ 클립보드 이미지 붙여넣기 + HTML 텍스트 정제 */
 function handlePasteImage(e){
   const items = e.clipboardData?.items;
   if(!items) return;
+
+  // 이미지 감지
   for(const item of items){
     if(item.type.startsWith('image/')){
-      e.preventDefault(); // textarea에 텍스트로 삽입되는 것 방지
+      e.preventDefault();
       const file = item.getAsFile();
       if(!file) continue;
       const reader = new FileReader();
@@ -4541,10 +4543,38 @@ function handlePasteImage(e){
         showToast('🖼️ 이미지가 첨부됐습니다. 분석 시작하세요.');
       };
       reader.readAsDataURL(file);
-      return; // 이미지 하나만 처리
+      return;
     }
   }
-  // 이미지 아닌 경우(텍스트) → 기본 붙여넣기 동작
+
+  // ★ HTML 텍스트 붙여넣기 → 순수 텍스트로 정제
+  const htmlData = e.clipboardData.getData('text/html');
+  if(htmlData && htmlData.trim()){
+    e.preventDefault();
+    const tmp = document.createElement('div');
+    tmp.innerHTML = htmlData;
+    // 블록 요소 앞뒤 줄바꿈 추가
+    tmp.querySelectorAll('br').forEach(el => el.replaceWith('\n'));
+    tmp.querySelectorAll('p,div,tr,li,h1,h2,h3,h4,h5,h6').forEach(el => {
+      el.prepend('\n');
+      el.append('\n');
+    });
+    // 테이블 셀 탭 구분
+    tmp.querySelectorAll('td,th').forEach(el => el.append('\t'));
+    const plain = (tmp.textContent || tmp.innerText || '')
+      .replace(/\t\n/g, '\n')
+      .replace(/\n{3,}/g, '\n\n')
+      .trim();
+    // textarea 커서 위치에 삽입
+    const ta = e.target;
+    if(ta.tagName === 'TEXTAREA'){
+      const s = ta.selectionStart, end = ta.selectionEnd;
+      ta.value = ta.value.slice(0, s) + plain + ta.value.slice(end);
+      ta.selectionStart = ta.selectionEnd = s + plain.length;
+      ta.dispatchEvent(new Event('input'));
+    }
+  }
+  // 일반 텍스트는 기본 붙여넣기 동작
 }
 
 /** ★ 번역 엔진 설정 */
@@ -4621,6 +4651,42 @@ async function callDeepL(text, targetLang){
     return null;
   }
 }
+
+/**
+ * ★ 서식 있는 복사 — text/html + text/plain 동시 클립보드 저장
+ * 메일 클라이언트(Gmail, Outlook 등)에서 테이블/볼드/줄바꿈 유지
+ */
+async function copyRichText(el, toastMsg){
+  if(!el) return;
+
+  // HTML 추출 (이미지 src는 pollinations.ai URL 유지)
+  const htmlContent = el.innerHTML || '';
+
+  // 순수 텍스트 추출 (줄바꿈 보존)
+  const tmp = document.createElement('div');
+  tmp.innerHTML = htmlContent;
+  tmp.querySelectorAll('br').forEach(e => e.replaceWith('\n'));
+  tmp.querySelectorAll('p,div,tr,li,h1,h2,h3,h4').forEach(e => {
+    e.prepend('\n'); e.append('\n');
+  });
+  tmp.querySelectorAll('td,th').forEach(e => e.append('\t'));
+  const plainText = (tmp.textContent || '').replace(/\t\n/g,'\n').replace(/\n{3,}/g,'\n\n').trim();
+
+  try{
+    // ClipboardItem API (Chrome 86+, Firefox 98+)
+    const clipItem = new ClipboardItem({
+      'text/html':  new Blob([htmlContent], { type:'text/html' }),
+      'text/plain': new Blob([plainText],   { type:'text/plain' }),
+    });
+    await navigator.clipboard.write([clipItem]);
+    showToast(toastMsg || '📋 서식 포함 복사 완료');
+  } catch(e){
+    // fallback: plain text
+    await navigator.clipboard.writeText(plainText);
+    showToast((toastMsg || '📋 복사 완료') + ' (서식 미지원 브라우저)');
+  }
+}
+
 
 function parseMarkdownTables(text){
   const lines = text.split('\n');
@@ -5002,8 +5068,22 @@ function renderEmails(){
 }
 
 function cpReply(i){
-  const m=lsArr('emails')[i];
-  if(m) navigator.clipboard.writeText(m.reply_draft||'').then(()=>showToast('복사 완료'));
+  const el = document.getElementById(`reply-text-${i}`);
+  if(el){
+    copyRichText(el, '📋 회신 초안 복사 완료 (메일에 붙여넣기 시 서식 유지)');
+  } else {
+    // fallback: localStorage에서 텍스트
+    const m = lsArr('emails')[i];
+    if(!m) return;
+    let text = m.reply_draft || '';
+    if(text.trim().startsWith('<')){
+      const tmp = document.createElement('div');
+      tmp.innerHTML = text;
+      tmp.querySelectorAll('br,p,tr,li').forEach(el => { el.prepend('\n'); el.append('\n'); });
+      text = (tmp.textContent || '').replace(/\n{3,}/g,'\n\n').trim();
+    }
+    navigator.clipboard.writeText(text).then(() => showToast('📋 복사 완료'));
+  }
 }
 function toggleMail(e, i){
   // ★ reply-feedback, mail-accordion 내부 클릭은 무시
@@ -5872,9 +5952,12 @@ async function runTranslate(){
 }
 
 function copyTrans(){
-  const t = document.getElementById('transResult').innerText || document.getElementById('transResult').textContent;
-  if(t) navigator.clipboard.writeText(t).then(()=>showToast('번역 결과 복사 완료'));
-  else showToast('복사할 내용이 없습니다.');
+  const el = document.getElementById('transResult');
+  if(el && el.innerHTML.trim()){
+    copyRichText(el, '📋 번역 결과 복사 완료 (메일에 붙여넣기 시 서식 유지)');
+  } else {
+    showToast('복사할 내용이 없습니다.');
+  }
 }
 function swapTrans(){
   const a = document.getElementById('transInput').value;
@@ -6834,16 +6917,16 @@ ${chosen.guide}
 핵심 요청 내용: ${content}`;
 
   try{
-    // ★ 협조 메일 → callAI (write 태스크 → Claude 3.5 Sonnet 기본)
+    // 협조 메일 → callAI (write 태스크 → 설정에서 선택한 모델 사용)
     const text = await callAI(prompt, '부서장 보좌 AI 비서입니다.', 'write');
     renderAiOutput(resultEl, text);
     // 복사 버튼 추가
     const copyBtn = resultEl.nextElementSibling;
     if(!copyBtn || !copyBtn.classList.contains('collab-copy-btn')){
       resultEl.insertAdjacentHTML('afterend',
-        `<button class="collab-copy-btn" onclick="event.stopPropagation();navigator.clipboard.writeText(document.getElementById('collabResult').innerText).then(()=>showToast('복사 완료'))"
+        `<button class="collab-copy-btn" onclick="event.stopPropagation();copyRichText(document.getElementById('collabResult'),'📋 초안 복사 완료 (메일에 서식 유지)')"
           style="margin-top:7px;padding:6px 14px;background:rgba(16,185,129,.12);color:#10b981;border:1px solid rgba(16,185,129,.3);border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;">
-          📄 초안 복사
+          📄 초안 복사 (서식 유지)
         </button>`
       );
     }
