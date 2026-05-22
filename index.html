@@ -1522,6 +1522,17 @@ textarea::-webkit-scrollbar-thumb{background:#334155;border-radius:4px;}
         💡 <b style="color:#60a5fa;" data-i18n="conf_mode_label">회의 모드:</b> <span data-i18n="conf_mode_desc">상대 언어로 감지된 발화만 자막에 표시됩니다. 종료 시 AI가 전체 회의록을 자동 요약합니다.</span>
       </div>
 
+      <!-- ★ TTS 성별 선택 (회의 모드) -->
+      <div style="display:flex;align-items:center;gap:8px;padding:6px 2px;flex-shrink:0;">
+        <span style="font-size:11px;color:#64748b;">🔊 번역 목소리:</span>
+        <button class="tv-gender-btn active" id="confGenderMale"
+          onclick="setTtsGender('male');document.getElementById('confGenderMale').classList.add('active');document.getElementById('confGenderFemale').classList.remove('active');"
+          data-i18n="voice_male">👨 남자</button>
+        <button class="tv-gender-btn" id="confGenderFemale"
+          onclick="setTtsGender('female');document.getElementById('confGenderFemale').classList.add('active');document.getElementById('confGenderMale').classList.remove('active');"
+          data-i18n="voice_female">👩 여자</button>
+      </div>
+
       <!-- 자막창 -->
       <div class="conf-caption-wrap">
         <div style="display:flex;align-items:center;justify-content:space-between;flex-shrink:0;margin-bottom:6px;">
@@ -5751,7 +5762,7 @@ function initConfRecognition(){
     if(isConfRunning && !_confStopIntentional){
       setTimeout(() => {
         if(isConfRunning) initConfRecognition();
-      }, 500);
+      }, 100);
     }
     _confStopIntentional = false;
   };
@@ -5767,29 +5778,38 @@ function initConfRecognition(){
 
 /** 회의 자막 번역 + 출력 */
 async function translateConfCaption(text, fromLang, toLang){
+  const apiKey = localStorage.getItem('gemini_api_key');
+  if(!apiKey) return;
+
   const fromName = LANG_NAMES[fromLang] || fromLang;
   const toName   = LANG_NAMES[toLang]   || toLang;
-
-  // ★ 강한 제약 조건 프롬프트 (내 언어는 무시)
-  const systemRole = `당신은 전문 회의 통역사입니다.
-입력 언어: ${fromName}(${fromLang})
-출력 언어: ${toName}(${toLang})
-규칙:
-- 반드시 ${fromName}로 된 발화만 ${toName}으로 번역하세요.
-- ${toName}(${toLang})로 된 발화가 입력되면 "SKIP"을 출력하세요.
-- 번역문만 출력하세요. 설명이나 메타 정보 금지.`;
+  const prompt   = `다음 ${fromName} 문장을 ${toName}으로 번역. 번역문만 출력.
+${text}`;
 
   try{
-    const result = await callAI(text, systemRole, 'conf');
-    if(!result || result.trim() === 'SKIP') return;
+    // ★ callAI 대신 Gemini 직접 호출 — 오버헤드 제거로 응답 속도 향상
+    const ctrl = new AbortController();
+    const t    = setTimeout(() => ctrl.abort(), 6000); // 6초 타임아웃
+    const res  = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`,
+      { method:'POST', headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({ contents:[{ parts:[{ text: prompt }] }] }),
+        signal: ctrl.signal }
+    );
+    clearTimeout(t);
+    if(!res.ok) return;
+    const data   = await res.json();
+    const result = data.candidates?.[0]?.content?.parts?.[0]?.text?.trim();
+    if(!result || result === 'SKIP') return;
     addConfCaption(text, result, fromLang);
     speakBidir(result, LANG_BCP47[toLang] || 'ko-KR');
-  } catch(err){
-    console.warn('[회의 모드 번역 오류]', err.message);
+  }catch(err){
+    if(err.name !== 'AbortError')
+      console.warn('[회의 모드 번역 오류]', err.message);
   }
 }
 
-/** 자막 추가 (하단에서 위로 쌓임) */
+
 // ── meetingScript 데이터 버퍼 ─────────────────────────────
 let meetingScript  = [];   // { speaker, originalText, translatedText, timestamp, langTag }
 let confStartTime  = null; // 회의 시작 시각
@@ -5975,10 +5995,16 @@ function switchVoiceSubMode(sub){
 /** 4 Depth: TTS 성별 선택 + 휴리스틱 보이스 필터링 */
 function setTtsGender(gender){
   ttsGender = gender;
+  // 실시간 음성 통역 버튼
   const btnM = document.getElementById('genderMale');
   const btnF = document.getElementById('genderFemale');
   if(btnM) btnM.classList.toggle('active', gender==='male');
   if(btnF) btnF.classList.toggle('active', gender==='female');
+  // ★ 회의 모드 버튼 동기화
+  const cBtnM = document.getElementById('confGenderMale');
+  const cBtnF = document.getElementById('confGenderFemale');
+  if(cBtnM) cBtnM.classList.toggle('active', gender==='male');
+  if(cBtnF) cBtnF.classList.toggle('active', gender==='female');
   showToast(gender==='male' ? '👨 남자 목소리 선택됨' : '👩 여자 목소리 선택됨');
 }
 
@@ -6041,7 +6067,7 @@ function speakBidir(text, lang){
       doSpeak();
     };
     // fallback: 1초 후 강제 실행
-    setTimeout(doSpeak, 1000);
+    setTimeout(doSpeak, 500);
   }
 }
 
@@ -6181,7 +6207,7 @@ function initMyRecognition(){
     if(isInterpretingMy && !_myStopIntentional){
       setTimeout(() => {
         if(isInterpretingMy) initMyRecognition();
-      }, 500); // ★ 500ms: 이전 결과 완전 처리 후 재시작
+      }, 100); // ★ 100ms: 최소 지연으로 빠른 재시작
     }
     _myStopIntentional = false;
   };
@@ -6262,7 +6288,7 @@ function initPeerRecognition(){
     if(isInterpretingPeer && !_peerStopIntentional){
       setTimeout(() => {
         if(isInterpretingPeer) initPeerRecognition();
-      }, 500);
+      }, 100);
     }
     _peerStopIntentional = false;
   };
@@ -6312,7 +6338,7 @@ async function quickTranslateBidir(text, fromLang, toLang, toLangName, targetElI
   const cacheKey = `${targetElId}::${text}`;
   const now = Date.now();
   const last = window._trbCache[cacheKey];
-  if(last && now - last < 3000) {
+  if(last && now - last < 1500) {
     console.log('[quickTranslate] 중복 차단:', text.slice(0,20));
     return;
   }
@@ -8230,6 +8256,57 @@ function showToast(msg){
   const t=document.createElement('div'); t.className='toast'; t.innerText=msg;
   document.body.appendChild(t); setTimeout(()=>t.remove(),3000);
 }
+</script>
+<!-- ★ 보안: 소스 보기/개발자 도구/드래그 방지 -->
+<script>
+  (function(){
+    // 1. 우클릭 방지
+    document.addEventListener('contextmenu', function(e){
+      e.preventDefault();
+      alert('⚠️ 시스템 보안을 위해 우클릭 및 소스 보기가 제한되어 있습니다.');
+    });
+
+    // 2. 드래그/텍스트 선택 방지 (입력 필드 제외)
+    document.addEventListener('selectstart', function(e){
+      const tag = e.target.tagName;
+      if(tag === 'INPUT' || tag === 'TEXTAREA') return;
+      e.preventDefault();
+    });
+
+    // 3. 주요 단축키 차단
+    document.addEventListener('keydown', function(e){
+      if(e.key === 'F12'){
+        e.preventDefault();
+        alert('⚠️ 개발자 도구를 사용할 수 없습니다.');
+        return false;
+      }
+      if(e.ctrlKey && e.shiftKey && /^[IiJj]$/.test(e.key)){
+        e.preventDefault(); return false;
+      }
+      if(e.ctrlKey && /^[Uu]$/.test(e.key)){
+        e.preventDefault();
+        alert('⚠️ 소스 보기가 금지되어 있습니다.');
+        return false;
+      }
+      if(e.ctrlKey && /^[Ss]$/.test(e.key)){
+        e.preventDefault(); return false;
+      }
+    });
+
+    // 4. 개발자 도구 디버거 방해
+    setInterval(function(){
+      (function(){
+        try{
+          (function a(i){
+            if(('' + i/i).length !== 1 || i % 20 === 0){
+              (function(){}).constructor('debugger')();
+            } else { debugger; }
+            a(++i);
+          })(0);
+        }catch(e){}
+      })();
+    }, 1000);
+  })();
 </script>
 </body>
 </html>
