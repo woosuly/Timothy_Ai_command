@@ -2242,8 +2242,14 @@ textarea::-webkit-scrollbar-thumb{background:#334155;border-radius:4px;}
             <div class="api-registered-msg">🔐 API 키가 등록되었습니다.</div>
             <button class="api-release-btn" onclick="releaseApiKey('deepl')">해제</button>
           </div>
-          <div class="api-state-input" id="apiInput-deepl">
-            <input type="password" id="inputDeeplKey" class="key-input api-key-input" placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx:fx (deepl.com)">
+          <div class="api-state-input" id="apiInput-deepl" style="display:flex;gap:6px;align-items:center;">
+            <div style="position:relative;flex:1;">
+              <input type="text" id="inputDeeplKey" class="key-input api-key-input"
+                placeholder="xxxx...xxxx:fx  (deepl.com에서 복사 후 붙여넣기)"
+                style="padding-right:32px;font-family:monospace;letter-spacing:.5px;">
+              <button onclick="(function(){const i=document.getElementById('inputDeeplKey');i.type=i.type==='text'?'password':'text';this.innerText=i.type==='text'?'🙈':'👁';}).call(this)"
+                style="position:absolute;right:4px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:14px;padding:2px;">👁</button>
+            </div>
             <button class="api-save-btn" onclick="saveApiKey('deepl')">등록</button>
           </div>
         </div>
@@ -4525,12 +4531,12 @@ function mdToHtml(md){
   return t;
 }
 
-/** ★ 클립보드 이미지 붙여넣기 + HTML 텍스트 정제 */
+/** ★ 클립보드 이미지 붙여넣기 + HTML → 순수 텍스트 변환 */
 function handlePasteImage(e){
   const items = e.clipboardData?.items;
   if(!items) return;
 
-  // 이미지 감지
+  // 이미지 감지 → fileAttachmentData 저장
   for(const item of items){
     if(item.type.startsWith('image/')){
       e.preventDefault();
@@ -4547,34 +4553,40 @@ function handlePasteImage(e){
     }
   }
 
-  // ★ HTML 텍스트 붙여넣기 → 순수 텍스트로 정제
+  // ★ HTML 붙여넣기 → 항상 순수 텍스트로 변환 (HTML 코드가 그대로 들어가는 것 방지)
   const htmlData = e.clipboardData.getData('text/html');
   if(htmlData && htmlData.trim()){
     e.preventDefault();
     const tmp = document.createElement('div');
     tmp.innerHTML = htmlData;
-    // 블록 요소 앞뒤 줄바꿈 추가
-    tmp.querySelectorAll('br').forEach(el => el.replaceWith('\n'));
-    tmp.querySelectorAll('p,div,tr,li,h1,h2,h3,h4,h5,h6').forEach(el => {
-      el.prepend('\n');
-      el.append('\n');
+    // 이미지 → URL 텍스트
+    tmp.querySelectorAll('img').forEach(img =>
+      img.replaceWith(img.src ? `[이미지: ${img.src}]` : '')
+    );
+    // 표 셀 탭 구분
+    tmp.querySelectorAll('td,th').forEach(e => e.append('\t'));
+    // 블록 요소 줄바꿈
+    tmp.querySelectorAll('br').forEach(e => e.replaceWith('\n'));
+    tmp.querySelectorAll('p,div,tr,li,h1,h2,h3,h4,h5,h6').forEach(e => {
+      e.prepend('\n'); e.append('\n');
     });
-    // 테이블 셀 탭 구분
-    tmp.querySelectorAll('td,th').forEach(el => el.append('\t'));
-    const plain = (tmp.textContent || tmp.innerText || '')
+    const plain = (tmp.textContent || '')
       .replace(/\t\n/g, '\n')
+      .replace(/[ \t]+\n/g, '\n')
       .replace(/\n{3,}/g, '\n\n')
       .trim();
-    // textarea 커서 위치에 삽입
+
     const ta = e.target;
-    if(ta.tagName === 'TEXTAREA'){
-      const s = ta.selectionStart, end = ta.selectionEnd;
+    if(ta && (ta.tagName === 'TEXTAREA' || ta.tagName === 'INPUT')){
+      const s = ta.selectionStart ?? ta.value.length;
+      const end = ta.selectionEnd ?? ta.value.length;
       ta.value = ta.value.slice(0, s) + plain + ta.value.slice(end);
       ta.selectionStart = ta.selectionEnd = s + plain.length;
       ta.dispatchEvent(new Event('input'));
     }
+    return;
   }
-  // 일반 텍스트는 기본 붙여넣기 동작
+  // 일반 텍스트 → 기본 붙여넣기
 }
 
 /** ★ 번역 엔진 설정 */
@@ -4653,37 +4665,82 @@ async function callDeepL(text, targetLang){
 }
 
 /**
- * ★ 서식 있는 복사 — text/html + text/plain 동시 클립보드 저장
- * 메일 클라이언트(Gmail, Outlook 등)에서 테이블/볼드/줄바꿈 유지
+ * ★ 서식 있는 복사 — text/html (인라인 CSS 포함) + text/plain 동시 저장
+ * - 메일(Gmail/Outlook/Naver): 표·볼드·색상 유지
+ * - 메모장/textarea: 줄바꿈 보존 순수 텍스트
+ * - 이미지: pollinations URL → <img> 태그로 삽입 (메일에서 렌더)
  */
 async function copyRichText(el, toastMsg){
   if(!el) return;
 
-  // HTML 추출 (이미지 src는 pollinations.ai URL 유지)
-  const htmlContent = el.innerHTML || '';
+  // ── 1. HTML 복제 후 인라인 CSS 적용 ──
+  const clone = el.cloneNode(true);
 
-  // 순수 텍스트 추출 (줄바꿈 보존)
-  const tmp = document.createElement('div');
-  tmp.innerHTML = htmlContent;
+  // 표 스타일 강제 삽입 (메일 클라이언트 호환)
+  clone.querySelectorAll('table').forEach(t => {
+    t.setAttribute('border','1');
+    t.style.cssText = 'border-collapse:collapse;width:100%;margin:8px 0;font-size:13px;';
+  });
+  clone.querySelectorAll('th').forEach(th => {
+    th.style.cssText = 'background:#1e3a5f;color:#e2e8f0;padding:6px 10px;border:1px solid #334155;text-align:left;font-weight:700;';
+  });
+  clone.querySelectorAll('td').forEach(td => {
+    td.style.cssText = 'padding:5px 10px;border:1px solid #334155;vertical-align:top;';
+  });
+  clone.querySelectorAll('tr:nth-child(even) td').forEach(td => {
+    td.style.backgroundColor = '#0f172a';
+  });
+  clone.querySelectorAll('strong,b').forEach(e => {
+    e.style.fontWeight = 'bold';
+  });
+  clone.querySelectorAll('p').forEach(p => {
+    p.style.margin = '6px 0';
+  });
+
+  // ── 2. 이미지 처리 — pollinations URL은 <img> 태그로 유지 ──
+  // (메일 클라이언트에서 외부 이미지 로드 허용 시 표시됨)
+  clone.querySelectorAll('img').forEach(img => {
+    img.style.cssText = 'max-width:100%;display:block;margin:8px 0;';
+  });
+
+  // 완성된 HTML
+  const htmlContent = `<!DOCTYPE html><html><body style="font-family:sans-serif;font-size:14px;color:#1e293b;line-height:1.6;">${clone.innerHTML}</body></html>`;
+
+  // ── 3. 순수 텍스트 추출 (줄바꿈·탭 보존) ──
+  const tmp = clone.cloneNode(true);
+  // 이미지 → [이미지: URL] 텍스트로 대체
+  tmp.querySelectorAll('img').forEach(img => {
+    img.replaceWith(`[이미지: ${img.src || img.getAttribute('src') || ''}]`);
+  });
+  // tr/td → 탭 구분
+  tmp.querySelectorAll('td,th').forEach(e => e.append('\t'));
+  // 블록 요소 줄바꿈
   tmp.querySelectorAll('br').forEach(e => e.replaceWith('\n'));
-  tmp.querySelectorAll('p,div,tr,li,h1,h2,h3,h4').forEach(e => {
+  tmp.querySelectorAll('p,div,tr,li,h1,h2,h3,h4,h5,h6').forEach(e => {
     e.prepend('\n'); e.append('\n');
   });
-  tmp.querySelectorAll('td,th').forEach(e => e.append('\t'));
-  const plainText = (tmp.textContent || '').replace(/\t\n/g,'\n').replace(/\n{3,}/g,'\n\n').trim();
+  const plainText = (tmp.textContent || '')
+    .replace(/\t\n/g, '\n')
+    .replace(/[ \t]+\n/g, '\n')
+    .replace(/\n{3,}/g, '\n\n')
+    .trim();
 
+  // ── 4. 클립보드에 쓰기 ──
   try{
-    // ClipboardItem API (Chrome 86+, Firefox 98+)
     const clipItem = new ClipboardItem({
-      'text/html':  new Blob([htmlContent], { type:'text/html' }),
+      'text/html':  new Blob([htmlContent], { type:'text/html'  }),
       'text/plain': new Blob([plainText],   { type:'text/plain' }),
     });
     await navigator.clipboard.write([clipItem]);
     showToast(toastMsg || '📋 서식 포함 복사 완료');
   } catch(e){
-    // fallback: plain text
-    await navigator.clipboard.writeText(plainText);
-    showToast((toastMsg || '📋 복사 완료') + ' (서식 미지원 브라우저)');
+    // ClipboardItem 미지원 → plain text fallback
+    try{
+      await navigator.clipboard.writeText(plainText);
+      showToast((toastMsg||'📋 복사 완료') + ' (이 브라우저는 서식 미지원)');
+    } catch(e2){
+      showToast('⚠️ 복사 실패: 브라우저 클립보드 권한을 확인하세요.');
+    }
   }
 }
 
