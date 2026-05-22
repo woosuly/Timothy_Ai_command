@@ -545,7 +545,7 @@ main.active-view{display:flex;}
 .trans-lang-row{display:flex;gap:5px;flex-wrap:wrap;}
 .trans-lang-btn{background:none;border:1px solid #334155;color:#64748b;padding:4px 10px;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;transition:.15s;}
 .trans-lang-btn.active{background:rgba(59,130,246,.15);border-color:#3b82f6;color:#3b82f6;}
-.trans-run-btn{width:100%;padding:10px;background:#2563eb;color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;}
+.trans-textarea[contenteditable]:empty:before{content:attr(data-placeholder);color:#475569;pointer-events:none;}
 .trans-run-btn:hover{background:#1d4ed8;}
 .trans-run-btn:disabled{opacity:.5;cursor:default;}
 .trans-copy-row{display:flex;gap:6px;}
@@ -1363,7 +1363,11 @@ textarea::-webkit-scrollbar-thumb{background:#334155;border-radius:4px;}
           <div style="display:flex;align-items:center;justify-content:space-between;flex-shrink:0;">
             <div class="trans-panel-title" id="docSrcTitle">📝 원문 입력</div>
           </div>
-          <textarea id="transInput" class="trans-textarea" placeholder="번역할 텍스트를 입력하세요..." onpaste="handlePasteImage(event)"></textarea>
+          <div id="transInput" class="trans-textarea ai-render-wrap"
+            contenteditable="true"
+            style="overflow-y:auto;min-height:120px;cursor:text;white-space:pre-wrap;outline:none;"
+            onpaste="handleTransInputPaste(event)"
+            data-placeholder="번역할 텍스트를 입력하거나 파일을 첨부하세요..."></div>
         </div>
         <div class="trans-panel">
           <div class="trans-panel-title" id="docDstTitle">🌐 번역 결과</div>
@@ -4531,7 +4535,43 @@ function mdToHtml(md){
   return t;
 }
 
-/** ★ 클립보드 이미지 붙여넣기 + HTML → 순수 텍스트 변환 */
+/** ★ 번역 입력란 붙여넣기 — HTML(표/이미지) 렌더링 지원 */
+function handleTransInputPaste(e){
+  const items = e.clipboardData?.items;
+
+  // 이미지 → transFileData로 처리 (번역 입력란에선 파일로)
+  if(items){
+    for(const item of items){
+      if(item.type.startsWith('image/')){
+        e.preventDefault();
+        const file = item.getAsFile();
+        if(!file) continue;
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          transFileData = { mime: item.type, base64: reader.result.split(',')[1], name:'붙여넣기 이미지' };
+          document.getElementById('transInput').setAttribute('data-placeholder', '🖼️ 이미지 첨부됨 — 번역하기를 눌러 분석하세요.');
+          document.getElementById('transInput').innerHTML = '';
+          showToast('🖼️ 이미지 첨부됨. 번역하기를 누르세요.');
+        };
+        reader.readAsDataURL(file);
+        return;
+      }
+    }
+  }
+
+  // HTML 데이터 → contenteditable에 그대로 렌더링 (표/이미지 유지)
+  const htmlData = e.clipboardData.getData('text/html');
+  if(htmlData && htmlData.trim()){
+    e.preventDefault();
+    // 스크립트 제거 후 삽입
+    const clean = htmlData.replace(/<script[\s\S]*?<\/script>/gi, '');
+    document.execCommand('insertHTML', false, clean);
+    return;
+  }
+  // 일반 텍스트 → 기본 붙여넣기
+}
+
+
 function handlePasteImage(e){
   const items = e.clipboardData?.items;
   if(!items) return;
@@ -5886,7 +5926,7 @@ function handleTransFile(e){
     // 텍스트 파일 → 바로 textarea에 삽입
     const reader = new FileReader();
     reader.onload = ev => {
-      document.getElementById('transInput').value = ev.target.result;
+      const ti=document.getElementById('transInput'); ti.innerText=ev.target.result; ti.dispatchEvent(new Event('input'));
       badge.innerText = `📄 ${f.name} — 텍스트 로드 완료`;
       badge.classList.add('loaded');
       clearBtn.style.display = 'block';
@@ -5907,9 +5947,8 @@ function handleTransFile(e){
       badge.classList.add('loaded');
       clearBtn.style.display = 'block';
       // 입력란 안내 텍스트
-      if(!document.getElementById('transInput').value.trim()){
-        document.getElementById('transInput').placeholder =
-          `${f.name} 파일을 첨부했습니다.\n아래 번역하기를 누르면 파일 내용을 분석·번역합니다.\n추가 지시사항이 있으면 여기에 입력하세요.`;
+      if(!(document.getElementById('transInput').innerText||document.getElementById('transInput').textContent||'').trim()){
+        document.getElementById('transInput').setAttribute('data-placeholder', `${f.name} 파일을 첨부했습니다.\n아래 번역하기를 누르면 파일 내용을 분석·번역합니다.\n추가 지시사항이 있으면 여기에 입력하세요.`);
       }
       showToast(`✅ ${f.name} 첨부 완료. 번역하기를 누르세요.`);
     };
@@ -5933,12 +5972,12 @@ function clearTransFile(){
   badge.innerText = '이미지·PDF·txt·md 업로드 가능';
   badge.classList.remove('loaded');
   document.getElementById('transFileClearBtn').style.display = 'none';
-  document.getElementById('transInput').placeholder = '번역할 텍스트를 입력하거나\n위에서 파일을 첨부하세요.';
+  document.getElementById('transInput').setAttribute('data-placeholder', '번역할 텍스트를 입력하거나\n위에서 파일을 첨부하세요.');
 }
 
 /** ★ 초기화 — 원문·결과 모두 클리어 */
 function clearTrans(){
-  document.getElementById('transInput').value = '';
+  document.getElementById('transInput').innerHTML = '';
   document.getElementById('transResult').innerHTML = '';
   clearTransFile();
   showToast('번역 내용이 초기화됐습니다.');
@@ -5948,7 +5987,7 @@ function clearTrans(){
 async function runTranslate(){
   if(!requireApiKey()) return;
   const k = localStorage.getItem('gemini_api_key');
-  const text = document.getElementById('transInput').value.trim();
+  const text = (document.getElementById('transInput').innerText||document.getElementById('transInput').textContent||'').trim();
   if(!text && !transFileData){ showToast('번역할 내용을 입력하거나 파일을 첨부하세요.'); return; }
 
   const btn = document.getElementById('transRunBtn');
@@ -6017,9 +6056,9 @@ function copyTrans(){
   }
 }
 function swapTrans(){
-  const a = document.getElementById('transInput').value;
+  const a = document.getElementById('transInput').innerText || '';
   const b = document.getElementById('transResult').innerText || '';
-  document.getElementById('transInput').value = b;
+  document.getElementById('transInput').innerHTML = mdToHtml(b)||b;
   renderAiOutput(document.getElementById('transResult'), a);
 }
 
