@@ -545,6 +545,8 @@ main.active-view{display:flex;}
 .trans-lang-row{display:flex;gap:5px;flex-wrap:wrap;}
 .trans-lang-btn{background:none;border:1px solid #334155;color:#64748b;padding:4px 10px;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;transition:.15s;}
 .trans-lang-btn.active{background:rgba(59,130,246,.15);border-color:#3b82f6;color:#3b82f6;}
+.trans-textarea[contenteditable]{outline:none;}
+.trans-textarea[contenteditable]:focus{border-color:#3b82f6 !important;box-shadow:0 0 0 2px rgba(59,130,246,.15);}
 .trans-textarea[contenteditable]:empty:before{content:attr(data-placeholder);color:#475569;pointer-events:none;}
 .trans-run-btn:hover{background:#1d4ed8;}
 .trans-run-btn:disabled{opacity:.5;cursor:default;}
@@ -1530,7 +1532,7 @@ textarea::-webkit-scrollbar-thumb{background:#334155;border-radius:4px;}
       </div>
 
       <!-- 안내 -->
-      <div style="background:rgba(59,130,246,.07);border:1px solid rgba(59,130,246,.2);border-radius:9px;padding:8px 13px;font-size:11px;color:#64748b;line-height:1.7;flex-shrink:0;">
+      <div id="confModeNote" style="background:rgba(59,130,246,.07);border:1px solid rgba(59,130,246,.2);border-radius:9px;padding:8px 13px;font-size:11px;color:#64748b;line-height:1.7;flex-shrink:0;">
         💡 <b style="color:#60a5fa;" data-i18n="conf_mode_label">회의 모드:</b> <span data-i18n="conf_mode_desc">상대 언어로 감지된 발화만 자막에 표시됩니다. 종료 시 AI가 전체 회의록을 자동 요약합니다.</span>
       </div>
 
@@ -3329,87 +3331,133 @@ function wmoToKor(code){
 
 /** Open-Meteo Geocoding → 위경도 획득 */
 async function geocode(locationName){
-  try{
-    const query = locationName.replace(/사업장|지사|공장|본사|지점/g,'').trim();
-    const url = `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(query)}&count=1&language=ko&format=json`;
-    // AbortSignal.timeout 대신 setTimeout + AbortController 사용 (모바일 호환)
-    const controller = new AbortController();
-    const timer = setTimeout(()=>controller.abort(), 5000);
-    const res = await fetch(url, {signal: controller.signal});
-    clearTimeout(timer);
-    const data = await res.json();
-    if(data.results && data.results.length > 0){
-      return {
-        lat:  data.results[0].latitude,
-        lon:  data.results[0].longitude,
-        tz:   data.results[0].timezone || 'Asia/Seoul',
-        name: data.results[0].name
-      };
+  // 한국 주요 도시 좌표 내장 매핑 (open-meteo geocoding 불확실 대비)
+  const KR_CITIES = {
+    '서울':    [37.5665, 126.9780, 'Asia/Seoul'],
+    '부산':    [35.1796, 129.0756, 'Asia/Seoul'],
+    '대구':    [35.8714, 128.6014, 'Asia/Seoul'],
+    '인천':    [37.4563, 126.7052, 'Asia/Seoul'],
+    '광주':    [35.1595, 126.8526, 'Asia/Seoul'],
+    '대전':    [36.3504, 127.3845, 'Asia/Seoul'],
+    '울산':    [35.5384, 129.3114, 'Asia/Seoul'],
+    '세종':    [36.4800, 127.2890, 'Asia/Seoul'],
+    '수원':    [37.2636, 127.0286, 'Asia/Seoul'],
+    '청주':    [36.6424, 127.4890, 'Asia/Seoul'],
+    '전주':    [35.8242, 127.1480, 'Asia/Seoul'],
+    '창원':    [35.2280, 128.6811, 'Asia/Seoul'],
+    '고양':    [37.6584, 126.8320, 'Asia/Seoul'],
+    '용인':    [37.2410, 127.1775, 'Asia/Seoul'],
+    '성남':    [37.4201, 127.1268, 'Asia/Seoul'],
+    '안산':    [37.3219, 126.8309, 'Asia/Seoul'],
+    '천안':    [36.8151, 127.1139, 'Asia/Seoul'],
+    '포항':    [36.0190, 129.3435, 'Asia/Seoul'],
+    '안양':    [37.3943, 126.9568, 'Asia/Seoul'],
+    '평택':    [36.9921, 127.1127, 'Asia/Seoul'],
+    '시흥':    [37.3800, 126.8031, 'Asia/Seoul'],
+    '화성':    [37.1995, 126.8313, 'Asia/Seoul'],
+    '남양주':  [37.6360, 127.2161, 'Asia/Seoul'],
+    '진주':    [35.1798, 128.1076, 'Asia/Seoul'],
+    '원주':    [37.3422, 127.9202, 'Asia/Seoul'],
+    '춘천':    [37.8813, 127.7298, 'Asia/Seoul'],
+    '제주':    [33.4996, 126.5312, 'Asia/Seoul'],
+    '목포':    [34.8118, 126.3922, 'Asia/Seoul'],
+    '여수':    [34.7604, 127.6622, 'Asia/Seoul'],
+    '순천':    [34.9506, 127.4872, 'Asia/Seoul'],
+    '구미':    [36.1196, 128.3440, 'Asia/Seoul'],
+    '경주':    [35.8562, 129.2247, 'Asia/Seoul'],
+    '안동':    [36.5684, 128.7294, 'Asia/Seoul'],
+  };
+
+  // 입력에서 불필요한 단어 제거
+  const query = locationName
+    .replace(/사업장|지사|공장|본사|지점|센터|캠퍼스|오피스|타워/g, '')
+    .trim();
+
+  // 내장 매핑 우선 검색
+  for(const [city, [lat, lon, tz]] of Object.entries(KR_CITIES)){
+    if(query.includes(city)){
+      return { lat, lon, tz, name: city };
     }
-  } catch(e){ console.warn('[Geocoding]', e.message); }
-  return null;
+  }
+
+  // 내장에 없으면 open-meteo geocoding API
+  try{
+    const url = `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(query)}&count=1&language=ko&format=json`;
+    const ctrl = new AbortController();
+    const t = setTimeout(() => ctrl.abort(), 5000);
+    const res = await fetch(url, { signal: ctrl.signal });
+    clearTimeout(t);
+    if(!res.ok) return null;
+    const data = await res.json();
+    if(!data.results?.length) return null;
+    const r = data.results[0];
+    return { lat: r.latitude, lon: r.longitude, tz: r.timezone || 'Asia/Seoul', name: r.name };
+  } catch(e){
+    return null;
+  }
 }
 
-/** Open-Meteo 날씨 API 호출 */
 async function fetchWeather(lat, lon, tz){
   try{
     const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,weathercode,windspeed_10m,relativehumidity_2m&timezone=${encodeURIComponent(tz)}&forecast_days=1`;
-    const controller = new AbortController();
-    const timer = setTimeout(()=>controller.abort(), 6000);
-    const res = await fetch(url, {signal: controller.signal});
-    clearTimeout(timer);
+    const ctrl = new AbortController();
+    const t = setTimeout(() => ctrl.abort(), 6000);
+    const res = await fetch(url, { signal: ctrl.signal });
+    clearTimeout(t);
+    if(!res.ok) return null;
     const data = await res.json();
     return data.current || null;
-  } catch(e){ console.warn('[Weather API]', e.message); return null; }
+  } catch(e){
+    return null;
+  }
 }
 
-/** 날씨 + 시간대 업데이트 — 위치 변경 시 호출 */
 async function updateWeatherAndTime(locationName){
-  const weatherDisp = document.getElementById('weatherDisplay');
+  const weatherDisp  = document.getElementById('weatherDisplay');
   const weatherExtra = document.getElementById('weatherExtra');
   if(weatherDisp) weatherDisp.innerText = '날씨 로딩 중...';
 
-  // 1. 시간대 먼저 설정 (오프라인에서도 동작)
+  // 1. 시간대 즉시 설정 (내장 맵 우선)
   const tzFromMap = getTimezone(locationName);
-  currentTimezone = tzFromMap;
-  startClock(); // 시간대 즉시 반영
+  currentTimezone = tzFromMap || 'Asia/Seoul';
+  startClock();
 
-  // 2. Geocoding으로 정확한 위경도+시간대 획득
+  // 2. 정확한 위경도+시간대 취득
   const geo = await geocode(locationName);
-  if(geo){
-    currentTimezone = geo.tz || tzFromMap;
-    startClock();
-
-    // 3. 날씨 데이터 가져오기
-    const weather = await fetchWeather(geo.lat, geo.lon, currentTimezone);
-    if(weather){
-      const [emoji, desc] = wmoToKor(weather.weathercode);
-      const temp = Math.round(weather.temperature_2m);
-      const humidity = weather.relativehumidity_2m;
-      const wind = Math.round(weather.windspeed_10m);
-      if(weatherDisp) weatherDisp.innerText = `${emoji} ${desc} ${temp}°C`;
-      if(weatherExtra) weatherExtra.innerText = `💧 습도 ${humidity}% · 💨 바람 ${wind}km/h`;
-      // localStorage에 날씨 캐시
-      localStorage.setItem('weather_cache', JSON.stringify({
-        loc:locationName, desc, emoji, temp, humidity, wind,
-        tz:currentTimezone, ts:Date.now()
-      }));
-      return;
-    }
-  }
-
-  // 4. API 실패 시 캐시 사용
-  const cache = localStorage.getItem('weather_cache');
-  if(cache){
-    try{
-      const c = JSON.parse(cache);
-      if(weatherDisp) weatherDisp.innerText = `${c.emoji} ${c.desc} ${c.temp}°C`;
-      if(weatherExtra) weatherExtra.innerText = `캐시 데이터 · ${new Date(c.ts).toLocaleTimeString()}`;
-    } catch{}
-  } else {
+  if(!geo){
     if(weatherDisp) weatherDisp.innerText = '날씨 정보 없음';
+    return;
   }
+  currentTimezone = geo.tz || currentTimezone;
+  startClock();
+
+  // 3. 날씨 가져오기
+  const w = await fetchWeather(geo.lat, geo.lon, currentTimezone);
+  if(!w){
+    if(weatherDisp) weatherDisp.innerText = '날씨 정보 없음';
+    return;
+  }
+
+  // 4. 날씨 코드 → 텍스트 변환
+  const WMO = {
+    0:'☀️ 맑음', 1:'🌤 구름 조금', 2:'⛅ 구름 많음', 3:'☁️ 흐림',
+    45:'🌫 안개', 48:'🌫 안개',
+    51:'🌦 이슬비', 53:'🌦 이슬비', 55:'🌦 이슬비',
+    61:'🌧 비', 63:'🌧 비', 65:'🌧 강한 비',
+    71:'❄️ 눈', 73:'❄️ 눈', 75:'❄️ 폭설',
+    80:'🌦 소나기', 81:'🌦 소나기', 82:'⛈ 강한 소나기',
+    95:'⛈ 뇌우', 96:'⛈ 뇌우', 99:'⛈ 뇌우',
+  };
+  const code   = w.weathercode ?? 0;
+  const desc   = WMO[code] || '날씨 정보';
+  const temp   = Math.round(w.temperature_2m ?? 0);
+  const humid  = w.relativehumidity_2m ?? '--';
+  const wind   = Math.round(w.windspeed_10m ?? 0);
+
+  if(weatherDisp)  weatherDisp.innerText = `${desc} ${temp}°C`;
+  if(weatherExtra) weatherExtra.innerText = `습도 ${humid}% · 바람 ${wind}km/h`;
 }
+
 
 // ══════════════════════════════
 // 4. 로그인 / 로그아웃
@@ -6143,6 +6191,20 @@ function onConfLangChange(){
   const peer = document.getElementById('confPeerLang')?.value || 'en';
   localStorage.setItem('conf_my_lang',   my);
   localStorage.setItem('conf_peer_lang', peer);
+
+  // ★ 모드 안내 뱃지 갱신
+  const modeNote = document.getElementById('confModeNote');
+  const isBilingual = my !== peer;
+  if(modeNote){
+    if(isBilingual){
+      modeNote.innerHTML = `💡 <b style="color:#60a5fa;">통역 모드</b>: 상대방 언어를 인식해 즉시 번역합니다. 이어폰 착용을 권장합니다.`;
+    } else {
+      modeNote.innerHTML = `📋 <b style="color:#34d399;">회의록 모드</b>: 번역 없이 발화 내용을 회의록으로 정리합니다.`;
+    }
+  }
+
+  // 실행 중이면 재시작
+  if(isConfRunning){ stopConfMic(); startConfMic(); }
 }
 
 /** 저장된 언어 설정 복원 */
@@ -6209,39 +6271,92 @@ function initConfRecognition(){
   const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
   if(!SR) return;
 
-  const myLangEl   = document.getElementById('confMyLang');
-  const peerLangEl = document.getElementById('confPeerLang');
-  const myLang     = myLangEl?.value   || 'ko';
-  const peerLang   = peerLangEl?.value || 'en';
+  const myLang   = document.getElementById('confMyLang')?.value   || 'ko';
+  const peerLang = document.getElementById('confPeerLang')?.value || 'en';
+
+  // ★ 단방향(같은 언어) = 회의록 모드, 양방향 = 실시간 통역 모드
+  const isBilingual = (myLang !== peerLang);
 
   confRecognition = new SR();
-  confRecognition.lang         = LANG_BCP47[peerLang] || 'en-US'; // 상대 언어 인식
-  confRecognition.continuous   = false;
-  confRecognition.interimResults = false; // ★ 확정만
+  confRecognition.lang           = isBilingual
+    ? (LANG_BCP47[peerLang] || 'en-US')  // 양방향: 상대방 언어 인식
+    : (LANG_BCP47[myLang]   || 'ko-KR'); // 단방향: 내 언어 인식(회의록)
+  confRecognition.continuous     = true;
+  confRecognition.interimResults = true;
+  confRecognition.maxAlternatives = 1;
 
-  confRecognition.onresult = async (e) => {
-    const result = e.results[e.resultIndex];
-    if(!result || !result.isFinal) return;
-    const text = result[0].transcript.trim();
-    if(!text) return;
-    console.log('[STT Conf] 확정:', text);
+  // ── 번역 큐 ──
+  let _queue = [];
+  let _qRunning = false;
+
+  async function drainQueue(){
+    if(_qRunning) return;
+    _qRunning = true;
+    while(_queue.length > 0){
+      const item = _queue.shift();
+      await translateConfCaption(item.text, item.from, item.to);
+    }
+    _qRunning = false;
+  }
+
+  // ── 즉시 번역 트리거 패턴 (쉼표·마침표·문장부호) ──
+  const INSTANT_PUNCT = /[,.!?;，。！？；、…]\s*$/;
+
+  // 임시 버퍼 (interim 누적용)
+  let _interimBuf = '';
+
+  confRecognition.onresult = (e) => {
     const interimBar = document.getElementById('confInterimBar');
-    if(interimBar) interimBar.innerText = t('status_listening');
-    await translateConfCaption(text, peerLang, myLang);
+
+    for(let i = e.resultIndex; i < e.results.length; i++){
+      const res  = e.results[i];
+      const text = res[0].transcript.trim();
+      if(!text) continue;
+
+      if(res.isFinal){
+        _interimBuf = '';
+        if(interimBar) interimBar.innerText = t('status_listening');
+
+        if(isBilingual){
+          // ★ 양방향: 확정 문장 → 번역 큐에 추가
+          _queue.push({ text, from: peerLang, to: myLang });
+          drainQueue();
+        } else {
+          // ★ 단방향(회의록): 번역 없이 원문 그대로 자막 추가
+          addConfCaption(text, null, myLang);
+        }
+
+      } else {
+        // 임시 결과 처리
+        _interimBuf = text;
+        if(interimBar) interimBar.innerText = `🎙️ ${text}`;
+
+        if(isBilingual && INSTANT_PUNCT.test(text)){
+          // ★ 쉼표·마침표 감지 → 완전한 문장 완성 안 기다리고 즉시 번역
+          const partial = text.replace(INSTANT_PUNCT, '').trim();
+          if(partial.length >= 2){
+            _queue.push({ text: partial, from: peerLang, to: myLang });
+            drainQueue();
+          }
+        }
+      }
+    }
   };
 
   confRecognition.onend = () => {
     if(isConfRunning && !_confStopIntentional){
-      setTimeout(() => {
-        if(isConfRunning) initConfRecognition();
-      }, 100);
+      setTimeout(() => { if(isConfRunning) initConfRecognition(); }, 50);
     }
     _confStopIntentional = false;
   };
 
   confRecognition.onerror = (e) => {
-    if(e.error === 'no-speech' || e.error === 'aborted') return;
-    console.warn('[STT Conf] 오류:', e.error);
+    if(e.error === 'no-speech') return;
+    if(e.error === 'aborted')   return;
+    console.warn('[STT Conf]', e.error);
+    if(isConfRunning && !_confStopIntentional){
+      setTimeout(() => { if(isConfRunning) initConfRecognition(); }, 200);
+    }
   };
 
   try{ confRecognition.start(); }
@@ -6253,31 +6368,46 @@ async function translateConfCaption(text, fromLang, toLang){
   const apiKey = localStorage.getItem('gemini_api_key');
   if(!apiKey) return;
 
-  const fromName = LANG_NAMES[fromLang] || fromLang;
-  const toName   = LANG_NAMES[toLang]   || toLang;
-  const prompt   = `다음 ${fromName} 문장을 ${toName}으로 번역. 번역문만 출력.
-${text}`;
+  // ★ 중복 방지 — 3초 내 동일 텍스트 재번역 차단
+  if(!window._confCache) window._confCache = {};
+  const cacheKey = `${fromLang}:${text}`;
+  const now = Date.now();
+  if(window._confCache[cacheKey] && now - window._confCache[cacheKey] < 3000) return;
+  window._confCache[cacheKey] = now;
+
+  const toName = LANG_NAMES[toLang] || toLang;
+  // ★ 최소 프롬프트 — 토큰 수 최소화로 응답 속도 향상
+  const prompt = `Translate to ${toName}. Output only the translation.\n${text}`;
 
   try{
-    // ★ callAI 대신 Gemini 직접 호출 — 오버헤드 제거로 응답 속도 향상
-    const ctrl = new AbortController();
-    const t    = setTimeout(() => ctrl.abort(), 6000); // 6초 타임아웃
-    const res  = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`,
-      { method:'POST', headers:{'Content-Type':'application/json'},
-        body: JSON.stringify({ contents:[{ parts:[{ text: prompt }] }] }),
-        signal: ctrl.signal }
+    const ctrl  = new AbortController();
+    const timer = setTimeout(() => ctrl.abort(), 4000); // 4초 타임아웃
+
+    // ★ gemini-2.0-flash: 회의 통역용 — 2.5-flash보다 2~3배 빠른 응답
+    const res = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`,
+      {
+        method:  'POST',
+        headers: { 'Content-Type':'application/json' },
+        body: JSON.stringify({
+          contents: [{ parts:[{ text: prompt }] }],
+          generationConfig: { maxOutputTokens: 200, temperature: 0 },
+        }),
+        signal: ctrl.signal,
+      }
     );
-    clearTimeout(t);
+    clearTimeout(timer);
     if(!res.ok) return;
+
     const data   = await res.json();
     const result = data.candidates?.[0]?.content?.parts?.[0]?.text?.trim();
-    if(!result || result === 'SKIP') return;
+    if(!result) return;
+
     addConfCaption(text, result, fromLang);
     speakBidir(result, LANG_BCP47[toLang] || 'ko-KR');
-  }catch(err){
-    if(err.name !== 'AbortError')
-      console.warn('[회의 모드 번역 오류]', err.message);
+
+  } catch(err){
+    if(err.name !== 'AbortError') console.warn('[Conf 번역]', err.message);
   }
 }
 
@@ -6332,32 +6462,42 @@ function addConfCaption(original, translated, lang){
   const emptyEl = log.querySelector('.conf-caption-empty');
   if(emptyEl) emptyEl.remove();
 
-  // langTag CSS 클래스 결정
-  const langCls  = lang==='ko'?'ko':lang==='en'?'en':lang==='zh'?'zh':'ja';
+  const langCls   = lang==='ko'?'ko':lang==='en'?'en':lang==='zh'?'zh':'ja';
   const langLabel = { ko:'KR', en:'EN', zh:'CN', ja:'JP' }[lang] || lang.toUpperCase();
-  const ts = new Date().toLocaleTimeString('ko-KR',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
-
-  // ★ meetingScript 버퍼에 저장
-  meetingScript.push({
-    speaker:       '상대방',
-    originalText:  original,
-    translatedText: translated,
-    timestamp:     ts,
-    langTag:       lang,
-  });
-  updateConfBadge();
+  const timeStr   = new Date().toLocaleTimeString('ko-KR',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
 
   const item = document.createElement('div');
-  item.className = 'conf-caption-item peer';
-  item.innerHTML = `
-    <div class="cap-orig">
-      <span class="cap-lang-tag ${langCls}">${langLabel}</span>
-      ${ts} · ${original}
-    </div>
-    <div class="cap-trans">${translated}</div>
-  `;
+  item.className = 'conf-caption-item';
+
+  if(translated === null){
+    // ★ 회의록 모드 — 번역 없이 원문만 표시 (더 크게, 심플하게)
+    item.innerHTML = `
+      <div class="conf-caption-meta">
+        <span class="conf-lang-badge ${langCls}">${langLabel}</span>
+        <span class="conf-caption-time">${timeStr} · ${original}</span>
+      </div>
+      <div class="conf-caption-text" style="font-size:15px;color:#e2e8f0;padding:4px 0;">${original}</div>`;
+  } else {
+    // ★ 통역 모드 — 원문(작게) + 번역(크게)
+    item.innerHTML = `
+      <div class="conf-caption-meta">
+        <span class="conf-lang-badge ${langCls}">${langLabel}</span>
+        <span class="conf-caption-time">${timeStr} · ${original}</span>
+      </div>
+      <div class="conf-caption-text">${translated}</div>`;
+  }
+
   log.appendChild(item);
   log.scrollTop = log.scrollHeight;
+
+  // meetingScript 저장
+  meetingScript.push({
+    speaker: langLabel,
+    originalText: original,
+    translatedText: translated || '',
+    timestamp: timeStr,
+    langTag: lang,
+  });
 }
 
 function clearConfLog(){
@@ -6815,15 +6955,16 @@ async function quickTranslateBidir(text, fromLang, toLang, toLangName, targetElI
   window._trbCache[cacheKey] = now;
 
   const fromLabel = fromLang==='ko' ? '한국어' : transTargetName;
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
-  const prompt = `다음 ${fromLabel} 문장을 ${toLangName}으로 번역하세요. 번역문만 출력하세요.\n${text}`;
+  // ★ gemini-2.0-flash: 통역용 — 빠른 응답 속도
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+  const prompt = `Translate to ${toLangName}. Output only the translation.\n${text}`;
 
   try{
     const controller = new AbortController();
     const timer = setTimeout(()=>controller.abort(), 8000);
     const res = await fetch(url,{
       method:'POST', headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({contents:[{parts:[{text:prompt}]}]}),
+      body:JSON.stringify({contents:[{parts:[{text:prompt}]}], generationConfig:{maxOutputTokens:200,temperature:0}}),
       signal:controller.signal
     });
     clearTimeout(timer);
@@ -8729,19 +8870,29 @@ function showToast(msg){
   document.body.appendChild(t); setTimeout(()=>t.remove(),3000);
 }
 </script>
-<!-- ★ 보안: 소스 보기/개발자 도구/드래그 방지 -->
+<!-- ★ 보안: 소스 보기/개발자 도구 방지 (입력/붙여넣기 영역 제외) -->
 <script>
   (function(){
-    // 1. 우클릭 방지
+    // 1. 우클릭 방지 — 단, contenteditable·input·textarea는 허용 (붙여넣기 필요)
     document.addEventListener('contextmenu', function(e){
+      const t = e.target;
+      if(t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' ||
+         t.isContentEditable || t.closest('[contenteditable]') ||
+         t.closest('.reply-text') || t.closest('.trans-textarea') ||
+         t.closest('#transInput') || t.closest('#emailPasteInput')){
+        return; // 입력 영역은 우클릭 허용
+      }
       e.preventDefault();
-      alert('⚠️ 시스템 보안을 위해 우클릭 및 소스 보기가 제한되어 있습니다.');
+      // alert 제거 — 모바일에서 붙여넣기 방해하므로 조용히 차단
     });
 
-    // 2. 드래그/텍스트 선택 방지 (입력 필드 제외)
+    // 2. 드래그/텍스트 선택 방지 — 입력 영역 제외
     document.addEventListener('selectstart', function(e){
-      const tag = e.target.tagName;
-      if(tag === 'INPUT' || tag === 'TEXTAREA') return;
+      const t = e.target;
+      if(t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' ||
+         t.isContentEditable || t.closest('[contenteditable]')){
+        return; // 입력 영역 선택 허용
+      }
       e.preventDefault();
     });
 
@@ -8749,18 +8900,21 @@ function showToast(msg){
     document.addEventListener('keydown', function(e){
       if(e.key === 'F12'){
         e.preventDefault();
-        alert('⚠️ 개발자 도구를 사용할 수 없습니다.');
         return false;
       }
       if(e.ctrlKey && e.shiftKey && /^[IiJj]$/.test(e.key)){
         e.preventDefault(); return false;
       }
       if(e.ctrlKey && /^[Uu]$/.test(e.key)){
-        e.preventDefault();
-        alert('⚠️ 소스 보기가 금지되어 있습니다.');
-        return false;
+        e.preventDefault(); return false;
       }
       if(e.ctrlKey && /^[Ss]$/.test(e.key)){
+        // 입력 중 Ctrl+S는 허용
+        if(document.activeElement && (
+          document.activeElement.tagName === 'TEXTAREA' ||
+          document.activeElement.tagName === 'INPUT' ||
+          document.activeElement.isContentEditable
+        )) return;
         e.preventDefault(); return false;
       }
     });
