@@ -1169,7 +1169,8 @@ textarea::-webkit-scrollbar-thumb{background:#334155;border-radius:4px;}
         <!-- 메일 분석 패널 -->
         <div id="panel-mail" class="analyze-panel-wrap">
           <textarea id="emailPasteInput" class="analyze-paste" data-i18n-placeholder="mail_ph"
-            placeholder="메일 텍스트를 붙여넣거나, 이미지/PDF를 업로드하세요.&#10;&#10;여러 메일을 한꺼번에 입력해도 됩니다."></textarea>
+            placeholder="메일 텍스트를 붙여넣거나, 이미지/PDF를 업로드하세요.&#10;&#10;여러 메일을 한꺼번에 입력해도 됩니다."
+            onpaste="handlePasteImage(event)"></textarea>
           <div class="file-upload-row">
             <label for="multimodalFile" class="file-label-btn" data-i18n="file_select">📷 파일 선택</label>
             <input type="file" id="multimodalFile" accept="image/*,application/pdf,.txt,.md,.csv,.xlsx,.xls,.docx" style="display:none;" onchange="handleFileSelection(event)">
@@ -1366,7 +1367,7 @@ textarea::-webkit-scrollbar-thumb{background:#334155;border-radius:4px;}
         </div>
         <div class="trans-panel">
           <div class="trans-panel-title" id="docDstTitle">🌐 번역 결과</div>
-          <textarea id="transResult" class="trans-textarea" placeholder="번역 결과가 여기에 표시됩니다..." readonly></textarea>
+          <div id="transResult" class="trans-textarea ai-render-wrap" style="overflow-y:auto;min-height:120px;cursor:text;white-space:normal;" placeholder="번역 결과가 여기에 표시됩니다..."></div>
         </div>
       </div>
 
@@ -3462,8 +3463,8 @@ function handleFileSelection(e){
   const f = e.target.files[0];
   if(!f) return;
   const badge = document.getElementById('fileNameBadge');
-  badge.innerText = f.name + ' (읽는 중...)';
-  fileAttachmentData = null; // 초기화
+  badge.innerText = f.name + ' 읽는 중...';
+  fileAttachmentData = null;
 
   const ext  = f.name.split('.').pop().toLowerCase();
   const mime = f.type;
@@ -3472,135 +3473,109 @@ function handleFileSelection(e){
   if(mime.startsWith('image/') || mime === 'application/pdf'){
     const r = new FileReader();
     r.onloadend = () => {
-      fileAttachmentData = { mime, base64: r.result.split(',')[1] };
-      badge.innerText = f.name + ' ✅';
+      fileAttachmentData = { mime, base64: r.result.split(',')[1], name: f.name };
+      badge.innerText = '📎 ' + f.name;
+      showToast(`✅ ${f.name} 첨부 완료. 분석 시작하세요.`);
     };
     r.readAsDataURL(f);
     return;
   }
 
-  // ── CSV → 텍스트로 변환 ──
+  // ── Excel (.xlsx / .xls) → SheetJS → 텍스트로 변환 후 fileAttachmentData에 저장 ──
+  if(ext === 'xlsx' || ext === 'xls'){
+    const loadAndRead = () => {
+      const r = new FileReader();
+      r.onloadend = () => {
+        try{
+          const wb    = XLSX.read(new Uint8Array(r.result), { type:'array' });
+          let text    = `[Excel: ${f.name}]\n`;
+          wb.SheetNames.forEach(sn => {
+            const rows = XLSX.utils.sheet_to_json(wb.Sheets[sn], { header:1, defval:'' });
+            if(!rows.length) return;
+            text += `\n[시트: ${sn}]\n`;
+            rows.forEach((row, ri) => {
+              const cols = row.map(c => String(c ?? '').trim());
+              text += cols.join('\t') + '\n';
+              if(ri === 0) text += cols.map(() => '---').join('\t') + '\n';
+            });
+          });
+          if(text.length > 15000) text = text.slice(0, 15000) + '\n...(생략)';
+          // ★ 입력란에 넣지 않고 fileAttachmentData에 텍스트로 저장
+          fileAttachmentData = { mime:'text/plain', text, name: f.name, isText: true };
+          badge.innerText = '📊 ' + f.name;
+          showToast(`✅ Excel "${f.name}" 읽기 완료. 분석 시작하세요.`);
+        }catch(err){
+          badge.innerText = f.name + ' ❌';
+          showToast('⚠️ Excel 파싱 오류: ' + err.message);
+        }
+      };
+      r.readAsArrayBuffer(f);
+    };
+    if(typeof XLSX === 'undefined'){
+      badge.innerText = f.name + ' 로딩...';
+      const scr = document.createElement('script');
+      scr.src = 'https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js';
+      scr.onload  = loadAndRead;
+      scr.onerror = () => { badge.innerText = f.name + ' ❌'; showToast('⚠️ Excel 파서 로드 실패'); };
+      document.head.appendChild(scr);
+    } else { loadAndRead(); }
+    return;
+  }
+
+  // ── CSV → 텍스트 ──
   if(ext === 'csv'){
     const r = new FileReader();
     r.onloadend = () => {
-      const text = r.result;
-      document.getElementById('emailPasteInput').value =
-        `【CSV 파일: ${f.name}】\n${text.slice(0, 8000)}`;
-      fileAttachmentData = null;
-      badge.innerText = f.name + ' ✅ (CSV 텍스트 변환됨)';
-      showToast('📊 CSV → 텍스트 변환 완료. 분석 시작하세요.');
+      const text = `[CSV: ${f.name}]\n${r.result.slice(0, 15000)}`;
+      fileAttachmentData = { mime:'text/plain', text, name: f.name, isText: true };
+      badge.innerText = '📊 ' + f.name;
+      showToast(`✅ CSV "${f.name}" 읽기 완료. 분석 시작하세요.`);
     };
     r.readAsText(f, 'UTF-8');
     return;
   }
 
-  // ── TXT / MD → 텍스트로 직접 읽기 ──
+  // ── TXT / MD ──
   if(ext === 'txt' || ext === 'md'){
     const r = new FileReader();
     r.onloadend = () => {
-      document.getElementById('emailPasteInput').value =
-        `【파일: ${f.name}】\n${r.result.slice(0, 8000)}`;
-      fileAttachmentData = null;
-      badge.innerText = f.name + ' ✅';
+      const text = `[${f.name}]\n${r.result.slice(0, 15000)}`;
+      fileAttachmentData = { mime:'text/plain', text, name: f.name, isText: true };
+      badge.innerText = '📄 ' + f.name;
+      showToast(`✅ "${f.name}" 읽기 완료. 분석 시작하세요.`);
     };
     r.readAsText(f, 'UTF-8');
     return;
   }
 
-  // ── Excel (.xlsx / .xls) → SheetJS로 파싱 ──
-  if(ext === 'xlsx' || ext === 'xls'){
-    if(typeof XLSX === 'undefined'){
-      // SheetJS 동적 로드
-      const scr = document.createElement('script');
-      scr.src = 'https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js';
-      scr.onload = () => readExcel(f, badge);
-      scr.onerror = () => {
-        badge.innerText = f.name + ' ❌';
-        showToast('⚠️ Excel 파서 로드 실패. 네트워크를 확인하세요.');
-      };
-      document.head.appendChild(scr);
-    } else {
-      readExcel(f, badge);
-    }
-    return;
-  }
-
-  // ── DOCX → mammoth.js로 텍스트 추출 ──
+  // ── DOCX → mammoth.js ──
   if(ext === 'docx'){
+    const loadAndRead = () => {
+      const r = new FileReader();
+      r.onloadend = () => {
+        mammoth.extractRawText({ arrayBuffer: r.result })
+          .then(result => {
+            const text = `[Word: ${f.name}]\n${result.value.slice(0, 15000)}`;
+            fileAttachmentData = { mime:'text/plain', text, name: f.name, isText: true };
+            badge.innerText = '📄 ' + f.name;
+            showToast(`✅ Word "${f.name}" 읽기 완료. 분석 시작하세요.`);
+          })
+          .catch(err => { badge.innerText = f.name + ' ❌'; showToast('⚠️ DOCX 오류: ' + err.message); });
+      };
+      r.readAsArrayBuffer(f);
+    };
     if(typeof mammoth === 'undefined'){
       const scr = document.createElement('script');
       scr.src = 'https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js';
-      scr.onload = () => readDocx(f, badge);
-      scr.onerror = () => {
-        badge.innerText = f.name + ' ❌';
-        showToast('⚠️ DOCX 파서 로드 실패. 네트워크를 확인하세요.');
-      };
+      scr.onload  = loadAndRead;
+      scr.onerror = () => { badge.innerText = f.name + ' ❌'; showToast('⚠️ DOCX 파서 로드 실패'); };
       document.head.appendChild(scr);
-    } else {
-      readDocx(f, badge);
-    }
+    } else { loadAndRead(); }
     return;
   }
 
-  // ── 지원하지 않는 형식 ──
   badge.innerText = f.name + ' ⚠️';
-  showToast(`⚠️ 지원하지 않는 파일 형식입니다. (지원: 이미지, PDF, Excel, CSV, DOCX, TXT)`);
-}
-
-/** Excel → 텍스트 테이블 변환 */
-function readExcel(file, badge){
-  const r = new FileReader();
-  r.onloadend = () => {
-    try{
-      const data  = new Uint8Array(r.result);
-      const wb    = XLSX.read(data, { type: 'array' });
-      let allText = `【Excel 파일: ${file.name}】\n`;
-
-      wb.SheetNames.forEach(sheetName => {
-        const ws   = wb.Sheets[sheetName];
-        const rows = XLSX.utils.sheet_to_json(ws, { header:1, defval:'' });
-        if(rows.length === 0) return;
-        allText += `\n[시트: ${sheetName}]\n`;
-        // 마크다운 표 형식으로 변환
-        rows.forEach((row, ri) => {
-          const line = row.map(c => String(c).trim()).join(' | ');
-          allText += `| ${line} |\n`;
-          if(ri === 0) allText += '|' + row.map(() => '---|').join('') + '\n';
-        });
-      });
-
-      if(allText.length > 12000) allText = allText.slice(0, 12000) + '\n...(이하 생략)';
-      document.getElementById('emailPasteInput').value = allText;
-      fileAttachmentData = null;
-      badge.innerText = file.name + ' ✅ (Excel 변환됨)';
-      showToast(`📊 Excel "${file.name}" → 텍스트 변환 완료. 분석 시작하세요.`);
-    }catch(err){
-      badge.innerText = file.name + ' ❌';
-      showToast('⚠️ Excel 파싱 오류: ' + err.message);
-    }
-  };
-  r.readAsArrayBuffer(file);
-}
-
-/** DOCX → 텍스트 추출 */
-function readDocx(file, badge){
-  const r = new FileReader();
-  r.onloadend = () => {
-    mammoth.extractRawText({ arrayBuffer: r.result })
-      .then(result => {
-        const text = result.value.slice(0, 8000);
-        document.getElementById('emailPasteInput').value =
-          `【Word 문서: ${file.name}】\n${text}`;
-        fileAttachmentData = null;
-        badge.innerText = file.name + ' ✅ (DOCX 변환됨)';
-        showToast(`📄 Word "${file.name}" → 텍스트 추출 완료. 분석 시작하세요.`);
-      })
-      .catch(err => {
-        badge.innerText = file.name + ' ❌';
-        showToast('⚠️ DOCX 파싱 오류: ' + err.message);
-      });
-  };
-  r.readAsArrayBuffer(file);
+  showToast('⚠️ 지원하지 않는 형식입니다. (이미지·PDF·Excel·CSV·Word·TXT)');
 }
 
 // ══════════════════════════════
@@ -3667,20 +3642,27 @@ ${langOut}
   try{
     let raw;
     if(fileAttachmentData){
-      // 파일 첨부 포함 → Gemini multimodal 직접 호출
-      const parts=[{text:systemPrompt}];
-      if(text) parts.push({text:`【메일 본문】\n${text}`});
-      if(sc)   parts.push({text:`【참고 문체】\n${sc}`});
-      parts.push({inlineData:{mimeType:fileAttachmentData.mime,data:fileAttachmentData.base64}});
-      const mUrl=`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
-      const ctl=new AbortController(); const t=setTimeout(()=>ctl.abort(),30000);
-      const res=await fetch(mUrl,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({contents:[{parts}]}),signal:ctl.signal});
-      clearTimeout(t);
-      if(!res.ok){ const eb=await res.text(); throw new Error(`API HTTP ${res.status}: ${eb.substring(0,200)}`); }
-      const d=await res.json();
-      if(d.error) throw new Error(`API 오류: ${d.error.message||JSON.stringify(d.error)}`);
-      if(!d.candidates?.[0]) throw new Error(`AI 응답 없음 (사유: ${d.promptFeedback?.blockReason||'없음'})`);
-      raw=d.candidates[0]?.content?.parts?.[0]?.text||'';
+      if(fileAttachmentData.isText){
+        // ★ 텍스트 변환 파일 (Excel/CSV/DOCX/TXT) → 텍스트에 합쳐서 callAI
+        const combined = fileAttachmentData.text + (text ? `\n\n【추가 입력】\n${text}` : '');
+        const fullPrompt = `${systemPrompt}\n【파일 내용】\n${combined}${sc?'\n'+sc:''}`;
+        raw = await callAI(fullPrompt, `${aiRole}\n${langOut}`, 'analyze');
+      } else {
+        // 이미지/PDF → Gemini multimodal 직접 호출
+        const parts=[{text:systemPrompt}];
+        if(text) parts.push({text:`【메일 본문】\n${text}`});
+        if(sc)   parts.push({text:`【참고 문체】\n${sc}`});
+        parts.push({inlineData:{mimeType:fileAttachmentData.mime,data:fileAttachmentData.base64}});
+        const mUrl=`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
+        const ctl=new AbortController(); const t=setTimeout(()=>ctl.abort(),30000);
+        const res=await fetch(mUrl,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({contents:[{parts}]}),signal:ctl.signal});
+        clearTimeout(t);
+        if(!res.ok){ const eb=await res.text(); throw new Error(`API HTTP ${res.status}: ${eb.substring(0,200)}`); }
+        const d=await res.json();
+        if(d.error) throw new Error(`API 오류: ${d.error.message||JSON.stringify(d.error)}`);
+        if(!d.candidates?.[0]) throw new Error(`AI 응답 없음 (사유: ${d.promptFeedback?.blockReason||'없음'})`);
+        raw=d.candidates[0]?.content?.parts?.[0]?.text||'';
+      }
     } else {
       // ★ 텍스트 전용 → callAI (analyze 태스크 → Gemini 1.5 Pro 기본)
       const fullPrompt=`${systemPrompt}${text?'\n【메일 본문】\n'+text:''}${sc?'\n【참고 문체】\n'+sc:''}`;
@@ -4485,7 +4467,27 @@ function mdToHtml(md){
   return t;
 }
 
-/** ★ 마크다운 표 파서 — 구분선 유무/형식 무관하게 처리 */
+/** ★ 클립보드 이미지 붙여넣기 처리 */
+function handlePasteImage(e){
+  const items = e.clipboardData?.items;
+  if(!items) return;
+  for(const item of items){
+    if(item.type.startsWith('image/')){
+      e.preventDefault(); // textarea에 텍스트로 삽입되는 것 방지
+      const file = item.getAsFile();
+      if(!file) continue;
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        fileAttachmentData = { mime: item.type, base64: reader.result.split(',')[1], name: '붙여넣기 이미지' };
+        document.getElementById('fileNameBadge').innerText = '🖼️ 클립보드 이미지';
+        showToast('🖼️ 이미지가 첨부됐습니다. 분석 시작하세요.');
+      };
+      reader.readAsDataURL(file);
+      return; // 이미지 하나만 처리
+    }
+  }
+  // 이미지 아닌 경우(텍스트) → 기본 붙여넣기 동작
+}
 function parseMarkdownTables(text){
   const lines = text.split('\n');
   const out = [];
@@ -5666,7 +5668,7 @@ function clearTransFile(){
 /** ★ 초기화 — 원문·결과 모두 클리어 */
 function clearTrans(){
   document.getElementById('transInput').value = '';
-  document.getElementById('transResult').value = '';
+  document.getElementById('transResult').innerHTML = '';
   clearTransFile();
   showToast('번역 내용이 초기화됐습니다.');
 }
@@ -5706,7 +5708,7 @@ async function runTranslate(){
     } else {
       translated = await callAI(prompt, sysRole, 'translate');
     }
-    document.getElementById('transResult').value = translated;
+    document.getElementById('transResult') && renderAiOutput(document.getElementById('transResult'), translated);
     showToast('✅ 번역 완료');
   } catch(err){
     showToast('⚠️ 번역 실패: ' + err.message);
@@ -5716,15 +5718,15 @@ async function runTranslate(){
 }
 
 function copyTrans(){
-  const t = document.getElementById('transResult').value;
+  const t = document.getElementById('transResult').innerText || document.getElementById('transResult').textContent;
   if(t) navigator.clipboard.writeText(t).then(()=>showToast('번역 결과 복사 완료'));
   else showToast('복사할 내용이 없습니다.');
 }
 function swapTrans(){
   const a = document.getElementById('transInput').value;
-  const b = document.getElementById('transResult').value;
+  const b = document.getElementById('transResult').innerText || '';
   document.getElementById('transInput').value = b;
-  document.getElementById('transResult').value = a;
+  renderAiOutput(document.getElementById('transResult'), a);
 }
 
 // ══════════════════════════════
@@ -6230,14 +6232,12 @@ function appendToResultArea(text){
       return;
     }
   }
-  // 문서 번역 모드에서는 transResult에 누적
+  // 문서 번역 모드 — transResult는 div이므로 innerHTML 누적
   const el = document.getElementById('transResult');
   if(!el) return;
-  el.removeAttribute('readonly');
-  if(el.value && !el.value.endsWith('\n')) el.value += '\n';
-  el.value += text;
+  if(el.innerHTML && el.innerHTML.trim()) el.innerHTML += '<br>';
+  el.innerHTML += mdToHtml(text);
   el.scrollTop = el.scrollHeight;
-  el.setAttribute('readonly','');
 }
 
 /** appendToTextarea — interpLogKo도 함께 지원 */
