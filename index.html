@@ -548,6 +548,7 @@ main.active-view{display:flex;}
 .trans-textarea[contenteditable]{outline:none;}
 .trans-textarea[contenteditable]:focus{border-color:#3b82f6 !important;box-shadow:0 0 0 2px rgba(59,130,246,.15);}
 .trans-textarea[contenteditable]:empty:before{content:attr(data-placeholder);color:#475569;pointer-events:none;}
+.trans-run-btn{width:100%;padding:10px;background:#2563eb;color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;letter-spacing:.3px;}
 .trans-run-btn:hover{background:#1d4ed8;}
 .trans-run-btn:disabled{opacity:.5;cursor:default;}
 .trans-copy-row{display:flex;gap:6px;}
@@ -2188,7 +2189,7 @@ textarea::-webkit-scrollbar-thumb{background:#334155;border-radius:4px;}
           </div>
           <div style="display:grid;grid-template-columns:80px 1fr 80px;gap:6px;align-items:center;">
             <div style="font-size:11px;font-weight:600;color:#e2e8f0;">🌐 번역/통역</div>
-            <select id="taskModelSel-translate" class="field-input" style="font-size:11px;cursor:pointer;" onchange="setModelForTask('translate',this.value)"></select>
+            <select id="taskModelSel-translate" class="field-input" style="font-size:11px;cursor:pointer;" onchange="setModelForTask('translate',this.value);updateTransEngineBadge()"></select>
             <div style="display:flex;gap:3px;align-items:center;">
               <span id="taskModelBadge-translate" style="font-size:9px;padding:2px 5px;border-radius:3px;"></span>
               <button onclick="resetModelForTask('translate')" style="padding:2px 6px;background:rgba(30,41,59,.6);border:1px solid #334155;color:#64748b;border-radius:4px;font-size:10px;cursor:pointer;" title="기본값 복원">↩</button>
@@ -2262,45 +2263,13 @@ textarea::-webkit-scrollbar-thumb{background:#334155;border-radius:4px;}
       </div>
 
       <!-- ★ 번역 엔진 선택 -->
-      <div class="settings-section-hdr" style="margin-top:12px;">🌐 문서 번역 엔진</div>
-      <div style="background:rgba(0,180,120,.06);border:1px solid rgba(0,180,120,.2);border-radius:10px;padding:12px 14px;">
-        <div style="font-size:11px;color:#94a3b8;margin-bottom:10px;">문서/텍스트 번역 탭에서 사용할 번역 엔진을 선택하세요.</div>
-        <div style="display:flex;flex-direction:column;gap:8px;">
-
-          <label style="display:flex;align-items:center;gap:10px;cursor:pointer;padding:8px 10px;border-radius:8px;border:1px solid #334155;background:rgba(30,41,59,.4);" id="engLabel-gemini">
-            <input type="radio" name="transEngine" value="gemini" id="eng-gemini" style="accent-color:#3b82f6;" onchange="setTransEngine('gemini')">
-            <div>
-              <div style="font-size:12px;font-weight:700;color:#e2e8f0;">🟦 Gemini (기본)</div>
-              <div style="font-size:10px;color:#64748b;">Google Gemini 2.5 Flash · 문맥 이해 우수 · Gemini 키 필요</div>
-            </div>
-          </label>
-
-          <label style="display:flex;align-items:center;gap:10px;cursor:pointer;padding:8px 10px;border-radius:8px;border:1px solid #334155;background:rgba(30,41,59,.4);" id="engLabel-gpt">
-            <input type="radio" name="transEngine" value="gpt" id="eng-gpt" style="accent-color:#10b981;" onchange="setTransEngine('gpt')">
-            <div>
-              <div style="font-size:12px;font-weight:700;color:#e2e8f0;">🟩 GPT-4o</div>
-              <div style="font-size:10px;color:#64748b;">OpenAI GPT-4o · 자연스러운 번역 · OpenAI 키 필요</div>
-            </div>
-          </label>
-
-          <label style="display:flex;align-items:center;gap:10px;cursor:pointer;padding:8px 10px;border-radius:8px;border:1px solid rgba(0,180,120,.4);background:rgba(0,180,120,.06);" id="engLabel-deepl">
-            <input type="radio" name="transEngine" value="deepl" id="eng-deepl" style="accent-color:#00b478;" onchange="setTransEngine('deepl')">
-            <div>
-              <div style="font-size:12px;font-weight:700;color:#e2e8f0;">🌿 DeepL <span style="font-size:9px;background:rgba(0,180,120,.2);color:#34d399;padding:1px 5px;border-radius:3px;margin-left:4px;">고품질</span></div>
-              <div style="font-size:10px;color:#64748b;">DeepL API · 정확도 최고 수준 · 한/영/중/일 지원 · DeepL 키 필요</div>
-            </div>
-          </label>
-
-        </div>
-        <div id="deeplEngineNote" style="font-size:10px;color:#34d399;margin-top:8px;display:none;">
-          ✅ DeepL 선택됨 — 통역/회의 모드는 Gemini를 계속 사용합니다.
-        </div>
       </div>
 
       <div style="font-size:10px;color:#475569;margin-top:6px;line-height:1.6;">
         * Gemini 키 없으면 분석·번역 기능이 비활성화됩니다.<br>
         * OpenAI·Claude 키 없으면 Gemini로 자동 대체 실행됩니다.<br>
-        * DeepL Free 키는 끝에 <code style="color:#34d399;">:fx</code> 가 붙습니다.</div>
+        * DeepL Free 키는 끝에 <code style="color:#34d399;">:fx</code> 가 붙습니다.<br>
+        * 번역 엔진을 DeepL로 쓰려면: DeepL 키 등록 → 위 <b>번역/통역</b> 모델 선택란에서 <b style="color:#34d399;">🌿 DeepL</b> 선택</div>
 
       <!-- 장소 설정 -->
       <div class="settings-section-hdr" style="margin-top:12px;">📍 장소 및 날씨</div>
@@ -4696,17 +4665,21 @@ function setTransEngine(engine){
 }
 
 function initTransEngineUI(){
-  const saved = localStorage.getItem('trans_engine') || 'gemini';
-  setTransEngine(saved);
+  // ★ 라디오 섹션 제거됨 — 모델 드롭다운 동기화만
+  syncModelSelectsToKeys();
+  updateTransEngineBadge();
 }
 
 function updateTransEngineBadge(){
-  const engine = localStorage.getItem('trans_engine') || 'gemini';
-  const badge  = document.getElementById('transEngineBadge');
+  // ★ model_task_translate 우선, 없으면 trans_engine 참조
+  const taskModel = localStorage.getItem('model_task_translate') || '';
+  const engine    = taskModel === 'deepl' ? 'deepl'
+                  : (localStorage.getItem('trans_engine') || 'gemini');
+  const badge = document.getElementById('transEngineBadge');
   if(!badge) return;
-  const labels = { gemini:'🟦 Gemini', gpt:'🟩 GPT-4o', deepl:'🌿 DeepL' };
-  badge.innerText = labels[engine] || 'Gemini';
-  badge.style.color = engine==='deepl' ? '#34d399' : engine==='gpt' ? '#10b981' : '#60a5fa';
+  const labels = { deepl:'🌿 DeepL', 'gemini-2.5-flash':'🟦 Gemini', 'gpt-4o':'🟩 GPT-4o' };
+  badge.innerText = labels[engine] || labels[taskModel] || '🟦 Gemini';
+  badge.style.color = engine==='deepl' ? '#34d399' : taskModel.startsWith('gpt') ? '#10b981' : '#60a5fa';
 }
 
 /** ★ DeepL API 직접 호출 */
@@ -5213,22 +5186,45 @@ function renderEmails(){
 }
 
 function cpReply(i){
-  const el = document.getElementById(`reply-text-${i}`);
-  if(el){
-    copyRichText(el, '📋 회신 초안 복사 완료 (메일에 붙여넣기 시 서식 유지)');
-  } else {
-    // fallback: localStorage에서 텍스트
-    const m = lsArr('emails')[i];
-    if(!m) return;
-    let text = m.reply_draft || '';
-    if(text.trim().startsWith('<')){
-      const tmp = document.createElement('div');
-      tmp.innerHTML = text;
-      tmp.querySelectorAll('br,p,tr,li').forEach(el => { el.prepend('\n'); el.append('\n'); });
-      text = (tmp.textContent || '').replace(/\n{3,}/g,'\n\n').trim();
-    }
-    navigator.clipboard.writeText(text).then(() => showToast('📋 복사 완료'));
+  const m = lsArr('emails')[i];
+  if(!m) return;
+
+  // reply_draft에서 순수 텍스트 추출 (HTML 태그 제거)
+  let text = m.reply_draft || '';
+  if(text.trim()){
+    const tmp = document.createElement('div');
+    tmp.innerHTML = text;
+    // 이미지 → URL 텍스트로 대체
+    tmp.querySelectorAll('img').forEach(img =>
+      img.replaceWith(img.src ? `[이미지: ${img.src}]\n` : '')
+    );
+    // 표 → 탭 구분 텍스트
+    tmp.querySelectorAll('td,th').forEach(el => el.append('\t'));
+    // 블록 요소 → 줄바꿈
+    tmp.querySelectorAll('br').forEach(el => el.replaceWith('\n'));
+    tmp.querySelectorAll('p,div,tr,li,h1,h2,h3,h4,h5,h6,hr').forEach(el => {
+      el.prepend('\n'); el.append('\n');
+    });
+    text = (tmp.textContent || tmp.innerText || '')
+      .replace(/\t\n/g, '\n')
+      .replace(/[ \t]+\n/g, '\n')
+      .replace(/\n{3,}/g, '\n\n')
+      .trim();
   }
+
+  if(!text){ showToast('복사할 내용이 없습니다.'); return; }
+
+  navigator.clipboard.writeText(text)
+    .then(() => showToast('📋 복사 완료'))
+    .catch(() => {
+      // 폴백: textarea로 복사
+      const ta = document.createElement('textarea');
+      ta.value = text;
+      document.body.appendChild(ta);
+      ta.select(); document.execCommand('copy');
+      document.body.removeChild(ta);
+      showToast('📋 복사 완료');
+    });
 }
 function toggleMail(e, i){
   // ★ reply-feedback, mail-accordion 내부 클릭은 무시
@@ -6048,7 +6044,10 @@ async function runTranslate(){
   const sysRole = `당신은 전문 번역가입니다. 입력 언어: ${docMyName}, 출력 언어: ${docPeerName}. 번역문만 출력하세요.`;
 
   // ★ 번역 엔진 선택
-  const engine = localStorage.getItem('trans_engine') || 'gemini';
+  // ★ 번역 엔진: model_task_translate=deepl이면 DeepL, 아니면 trans_engine 참조
+  const taskModel = localStorage.getItem('model_task_translate') || '';
+  const engine = taskModel === 'deepl' ? 'deepl'
+               : (localStorage.getItem('trans_engine') || 'gemini');
 
   try{
     let translated = '';
@@ -7147,15 +7146,24 @@ async function genCollabMail(){
   };
 
   const chosen = STYLE_PROMPTS[styleKey] || STYLE_PROMPTS.formal_bilingual;
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
-  const prompt = `부서장 보좌 AI 비서입니다.
-${chosen.guide}
-
-핵심 요청 내용: ${content}`;
+  // ★ 항상 Gemini 직접 fetch — callAI의 Claude/OpenAI는 모바일 CORS 차단됨
+  const gemUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
+  const prompt = `부서장 보좌 AI 비서입니다.\n${chosen.guide}\n\n핵심 요청 내용: ${content}`;
 
   try{
-    // 협조 메일 → callAI (write 태스크 → 설정에서 선택한 모델 사용)
-    const text = await callAI(prompt, '부서장 보좌 AI 비서입니다.', 'write');
+    const ctrl  = new AbortController();
+    const timer = setTimeout(() => ctrl.abort(), 30000);
+    const res   = await fetch(gemUrl, {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body:    JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] }),
+      signal:  ctrl.signal,
+    });
+    clearTimeout(timer);
+    if(!res.ok) throw new Error(`API 오류 ${res.status}`);
+    const data = await res.json();
+    const text = data.candidates?.[0]?.content?.parts?.[0]?.text?.trim();
+    if(!text) throw new Error('AI 응답 없음');
     renderAiOutput(resultEl, text);
     // 복사 버튼 추가
     const copyBtn = resultEl.nextElementSibling;
@@ -8437,35 +8445,36 @@ function syncModelSelectsToKeys(){
   const hasGemini    = !!localStorage.getItem('gemini_api_key');
   const hasOpenai    = !!localStorage.getItem('openai_api_key');
   const hasAnthropic = !!localStorage.getItem('anthropic_api_key');
+  const hasDeepL     = !!localStorage.getItem('deepl_api_key');
 
-  // 대상 셀렉트 ID 목록
   const selIds = ['aiModelSelect','taskModelSel-analyze','taskModelSel-write','taskModelSel-translate'];
   selIds.forEach(selId=>{
     const sel = document.getElementById(selId);
     if(!sel) return;
     Array.from(sel.options).forEach(opt=>{
-      const model = AI_MODELS.find(m=>m.id===opt.value);
-      if(!model) return;
-      let disabled = false;
-      let hint = '';
-      if(model.provider==='openai' && !hasOpenai){
-        disabled = true; hint = ' (키 미등록)';
-      }
-      if(model.provider==='anthropic' && !hasAnthropic){
-        disabled = true; hint = ' (키 미등록)';
-      }
-      if(model.provider==='gemini' && !hasGemini){
-        disabled = true; hint = ' (Gemini 키 필요)';
-      }
-      opt.disabled = disabled;
-      // 레이블에 힌트 표시 (기존 힌트 제거 후 재부착)
-      opt.textContent = model.label.replace(/ \(키 미등록\)| \(Gemini 키 필요\)/g,'') + hint;
+      const meta = AI_MODELS.find(m=>m.id===opt.value);
+      if(!meta) return;
+      const hasKey = meta.provider==='openai'     ? hasOpenai
+                   : meta.provider==='anthropic'  ? hasAnthropic
+                   : true;
+      opt.disabled = !hasKey;
+      opt.style.color = hasKey ? '' : '#64748b';
     });
 
-    // 현재 선택된 값이 disabled면 첫 번째 활성 옵션으로 이동
-    if(sel.options[sel.selectedIndex]?.disabled){
-      const firstEnabled = Array.from(sel.options).find(o=>!o.disabled);
-      if(firstEnabled) sel.value = firstEnabled.value;
+    // ★ 번역/통역 셀렉트에만 DeepL 옵션 추가
+    if(selId === 'taskModelSel-translate'){
+      // 기존 deepl 옵션 제거 후 재추가 (중복 방지)
+      Array.from(sel.options).forEach(o=>{ if(o.value==='deepl') o.remove(); });
+      const deeplOpt = document.createElement('option');
+      deeplOpt.value = 'deepl';
+      deeplOpt.textContent = hasDeepL ? '🌿 DeepL (고품질)' : '🌿 DeepL (키 미등록)';
+      deeplOpt.disabled = !hasDeepL;
+      deeplOpt.style.color = hasDeepL ? '#34d399' : '#64748b';
+      sel.appendChild(deeplOpt);
+
+      // 현재 저장된 trans_engine이 deepl이면 선택 상태 복원
+      const savedEngine = localStorage.getItem('trans_engine') || 'gemini';
+      if(savedEngine === 'deepl' && hasDeepL) sel.value = 'deepl';
     }
   });
 }
@@ -8525,9 +8534,20 @@ function getModelForTask(taskType){
 /** 태스크별 기본 모델 저장 */
 function setModelForTask(taskType, modelId){
   localStorage.setItem(`model_task_${taskType}`, modelId);
+  // ★ 번역 태스크에서 DeepL 선택 시 trans_engine 동기화
+  if(taskType === 'translate'){
+    if(modelId === 'deepl'){
+      localStorage.setItem('trans_engine', 'deepl');
+    } else {
+      if(localStorage.getItem('trans_engine') === 'deepl')
+        localStorage.setItem('trans_engine', 'gemini');
+    }
+    updateTransEngineBadge();
+  }
   // 설정 배지 업데이트
   renderTaskModelBadges();
-  showToast(`✅ [${TASK_LABELS[taskType]}] 기본 모델: ${AI_MODELS.find(m=>m.id===modelId)?.label || modelId}`);
+  const label = modelId === 'deepl' ? '🌿 DeepL' : (AI_MODELS.find(m=>m.id===modelId)?.label || modelId);
+  showToast(`✅ [${TASK_LABELS[taskType]}] 기본 모델: ${label}`);
 }
 
 /** 태스크별 기본값 리셋 */
@@ -8870,53 +8890,62 @@ function showToast(msg){
   document.body.appendChild(t); setTimeout(()=>t.remove(),3000);
 }
 </script>
-<!-- ★ 보안: 소스 보기/개발자 도구 방지 (입력/붙여넣기 영역 제외) -->
+<!-- ★ 보안: 소스 보기/개발자 도구 방지 (입력/붙여넣기 영역 완전 허용) -->
 <script>
   (function(){
-    // 1. 우클릭 방지 — 단, contenteditable·input·textarea는 허용 (붙여넣기 필요)
+    // ── 붙여넣기/입력 가능 영역 판별 함수 ──
+    function isEditableArea(target){
+      if(!target) return false;
+      const tag = target.tagName;
+      if(tag === 'INPUT' || tag === 'TEXTAREA') return true;
+      if(target.isContentEditable) return true;
+      // 조상 중 하나라도 편집 가능하면 허용
+      let el = target;
+      while(el && el !== document.body){
+        if(el.isContentEditable) return true;
+        if(el.tagName === 'TEXTAREA' || el.tagName === 'INPUT') return true;
+        if(el.id === 'transInput' || el.id === 'emailPasteInput') return true;
+        if(el.classList && (
+          el.classList.contains('trans-textarea') ||
+          el.classList.contains('ai-render-wrap') ||
+          el.classList.contains('reply-text') ||
+          el.classList.contains('reply-feedback') ||
+          el.classList.contains('key-input') ||
+          el.classList.contains('api-key-input') ||
+          el.classList.contains('reply-feedback-input') ||
+          el.classList.contains('field-input') ||
+          el.classList.contains('field-textarea') ||
+          el.classList.contains('analyze-paste')
+        )) return true;
+        el = el.parentElement;
+      }
+      return false;
+    }
+
+    // 1. 우클릭 — 입력 영역은 완전 허용 (alert 없음)
     document.addEventListener('contextmenu', function(e){
-      const t = e.target;
-      if(t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' ||
-         t.isContentEditable || t.closest('[contenteditable]') ||
-         t.closest('.reply-text') || t.closest('.trans-textarea') ||
-         t.closest('#transInput') || t.closest('#emailPasteInput')){
-        return; // 입력 영역은 우클릭 허용
-      }
-      e.preventDefault();
-      // alert 제거 — 모바일에서 붙여넣기 방해하므로 조용히 차단
+      if(isEditableArea(e.target)) return; // 허용
+      e.preventDefault(); // 그 외 영역만 차단 (알림 없이 조용히)
     });
 
-    // 2. 드래그/텍스트 선택 방지 — 입력 영역 제외
+    // 2. 텍스트 선택 — 입력 영역은 허용
     document.addEventListener('selectstart', function(e){
-      const t = e.target;
-      if(t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' ||
-         t.isContentEditable || t.closest('[contenteditable]')){
-        return; // 입력 영역 선택 허용
-      }
+      if(isEditableArea(e.target)) return;
       e.preventDefault();
     });
 
-    // 3. 주요 단축키 차단
+    // 3. 단축키 차단 (입력 중에는 허용)
     document.addEventListener('keydown', function(e){
-      if(e.key === 'F12'){
-        e.preventDefault();
-        return false;
-      }
-      if(e.ctrlKey && e.shiftKey && /^[IiJj]$/.test(e.key)){
-        e.preventDefault(); return false;
-      }
-      if(e.ctrlKey && /^[Uu]$/.test(e.key)){
-        e.preventDefault(); return false;
-      }
-      if(e.ctrlKey && /^[Ss]$/.test(e.key)){
-        // 입력 중 Ctrl+S는 허용
-        if(document.activeElement && (
-          document.activeElement.tagName === 'TEXTAREA' ||
-          document.activeElement.tagName === 'INPUT' ||
-          document.activeElement.isContentEditable
-        )) return;
-        e.preventDefault(); return false;
-      }
+      const active = document.activeElement;
+      const typing = active && (
+        active.tagName === 'TEXTAREA' ||
+        active.tagName === 'INPUT' ||
+        active.isContentEditable
+      );
+      if(e.key === 'F12'){ e.preventDefault(); return false; }
+      if(e.ctrlKey && e.shiftKey && /^[IiJj]$/.test(e.key)){ e.preventDefault(); return false; }
+      if(e.ctrlKey && /^[Uu]$/.test(e.key)){ e.preventDefault(); return false; }
+      if(e.ctrlKey && /^[Ss]$/.test(e.key) && !typing){ e.preventDefault(); return false; }
     });
 
     // 4. 개발자 도구 디버거 방해
