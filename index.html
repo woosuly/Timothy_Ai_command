@@ -1172,7 +1172,7 @@ textarea::-webkit-scrollbar-thumb{background:#334155;border-radius:4px;}
             placeholder="메일 텍스트를 붙여넣거나, 이미지/PDF를 업로드하세요.&#10;&#10;여러 메일을 한꺼번에 입력해도 됩니다."></textarea>
           <div class="file-upload-row">
             <label for="multimodalFile" class="file-label-btn" data-i18n="file_select">📷 파일 선택</label>
-            <input type="file" id="multimodalFile" accept="image/*,application/pdf" style="display:none;" onchange="handleFileSelection(event)">
+            <input type="file" id="multimodalFile" accept="image/*,application/pdf,.txt,.md,.csv,.xlsx,.xls,.docx" style="display:none;" onchange="handleFileSelection(event)">
             <span id="fileNameBadge" style="font-size:10px;color:#64748b;" data-i18n="no_file">선택된 파일 없음</span>
           </div>
           <button id="analyzeBtn" class="analyze-run-btn" data-i18n="btn_start_analyze" onclick="analyzeMail()">▶ 분석 시작</button>
@@ -1351,7 +1351,7 @@ textarea::-webkit-scrollbar-thumb{background:#334155;border-radius:4px;}
         <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
           <label for="transFileInput" class="trans-file-btn">📎 파일 선택</label>
           <input type="file" id="transFileInput" accept="image/*,application/pdf,.txt,.md,.docx,audio/*" style="display:none;" onchange="handleTransFile(event)">
-          <span id="transFileBadge" class="trans-file-badge" style="flex:1;" data-i18n="trans_file_hint">이미지·PDF·txt·md·음성 파일 업로드 가능</span>
+          <span id="transFileBadge" class="trans-file-badge" style="flex:1;" data-i18n="trans_file_hint">Excel·Word·CSV·이미지·PDF·txt 업로드 가능</span>
           <button id="transFileClearBtn" onclick="clearTransFile()" style="display:none;background:none;border:none;color:#f43f5e;cursor:pointer;font-size:14px;">✕</button>
         </div>
       </div>
@@ -2508,7 +2508,7 @@ const LANG_PACKS = {
     browser_only_save:'브라우저에만 저장',
     collab_content_label:'핵심 요청 내용',
     collab_gen_btn:'▶ 맞춤형 초안 생성',
-    trans_file_hint:'이미지·PDF·txt·md·음성 파일 업로드 가능',
+    trans_file_hint:'Excel·Word·CSV·이미지·PDF·txt 업로드 가능',
     conf_mode_label:'💡 회의 모드:',
     conf_mode_desc:'상대 언어로 감지된 발화만 자막에 표시됩니다. 종료 시 AI가 전체 회의록을 자동 요약합니다.',
     conf_caption_title:'📋 실시간 회의 자막',
@@ -2661,7 +2661,7 @@ const LANG_PACKS = {
     browser_only_save:'仅保存在浏览器中',
     collab_content_label:'核心请求内容',
     collab_gen_btn:'▶ 生成定制草稿',
-    trans_file_hint:'可上传图片·PDF·txt·md·音频文件',
+    trans_file_hint:'可上传 Excel·Word·CSV·图片·PDF·txt 文件',
     conf_mode_label:'💡 会议模式:',
     conf_mode_desc:'仅显示以对方语言检测到的发言字幕。结束时AI会自动摘要整个会议记录。',
     conf_caption_title:'📋 实时会议字幕',
@@ -2858,7 +2858,7 @@ const LANG_PACKS = {
     browser_only_save:'Stored in browser only',
     collab_content_label:'Key Request Content',
     collab_gen_btn:'▶ Generate Custom Draft',
-    trans_file_hint:'Upload image·PDF·txt·md·audio files',
+    trans_file_hint:'Upload Excel·Word·CSV·Image·PDF·TXT files',
     conf_mode_label:'💡 Conference Mode:',
     conf_mode_desc:'Only captions detected in the peer language are shown. AI auto-summarizes the meeting when done.',
     conf_caption_title:'📋 Live Meeting Captions',
@@ -3011,7 +3011,7 @@ const LANG_PACKS = {
     browser_only_save:'ブラウザにのみ保存',
     collab_content_label:'核心リクエスト内容',
     collab_gen_btn:'▶ カスタム草稿生成',
-    trans_file_hint:'画像·PDF·txt·md·音声ファイルのアップロード可',
+    trans_file_hint:'Excel·Word·CSV·画像·PDFのアップロード可',
     conf_mode_label:'💡 会議モード:',
     conf_mode_desc:'相手言語で検出された発話のみ字幕表示。終了時AIが議事録を自動要約します。',
     conf_caption_title:'📋 リアルタイム会議字幕',
@@ -3459,11 +3459,148 @@ function confirmDelete(type, idx, id){
 // 8. 파일 선택
 // ══════════════════════════════
 function handleFileSelection(e){
-  const f=e.target.files[0]; if(!f) return;
-  document.getElementById('fileNameBadge').innerText=f.name;
-  const r=new FileReader();
-  r.onloadend=()=>{fileAttachmentData={mime:f.type,base64:r.result.split(',')[1]};};
-  r.readAsDataURL(f);
+  const f = e.target.files[0];
+  if(!f) return;
+  const badge = document.getElementById('fileNameBadge');
+  badge.innerText = f.name + ' (읽는 중...)';
+  fileAttachmentData = null; // 초기화
+
+  const ext  = f.name.split('.').pop().toLowerCase();
+  const mime = f.type;
+
+  // ── 이미지 / PDF → Gemini inlineData 직접 전달 ──
+  if(mime.startsWith('image/') || mime === 'application/pdf'){
+    const r = new FileReader();
+    r.onloadend = () => {
+      fileAttachmentData = { mime, base64: r.result.split(',')[1] };
+      badge.innerText = f.name + ' ✅';
+    };
+    r.readAsDataURL(f);
+    return;
+  }
+
+  // ── CSV → 텍스트로 변환 ──
+  if(ext === 'csv'){
+    const r = new FileReader();
+    r.onloadend = () => {
+      const text = r.result;
+      document.getElementById('emailPasteInput').value =
+        `【CSV 파일: ${f.name}】\n${text.slice(0, 8000)}`;
+      fileAttachmentData = null;
+      badge.innerText = f.name + ' ✅ (CSV 텍스트 변환됨)';
+      showToast('📊 CSV → 텍스트 변환 완료. 분석 시작하세요.');
+    };
+    r.readAsText(f, 'UTF-8');
+    return;
+  }
+
+  // ── TXT / MD → 텍스트로 직접 읽기 ──
+  if(ext === 'txt' || ext === 'md'){
+    const r = new FileReader();
+    r.onloadend = () => {
+      document.getElementById('emailPasteInput').value =
+        `【파일: ${f.name}】\n${r.result.slice(0, 8000)}`;
+      fileAttachmentData = null;
+      badge.innerText = f.name + ' ✅';
+    };
+    r.readAsText(f, 'UTF-8');
+    return;
+  }
+
+  // ── Excel (.xlsx / .xls) → SheetJS로 파싱 ──
+  if(ext === 'xlsx' || ext === 'xls'){
+    if(typeof XLSX === 'undefined'){
+      // SheetJS 동적 로드
+      const scr = document.createElement('script');
+      scr.src = 'https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js';
+      scr.onload = () => readExcel(f, badge);
+      scr.onerror = () => {
+        badge.innerText = f.name + ' ❌';
+        showToast('⚠️ Excel 파서 로드 실패. 네트워크를 확인하세요.');
+      };
+      document.head.appendChild(scr);
+    } else {
+      readExcel(f, badge);
+    }
+    return;
+  }
+
+  // ── DOCX → mammoth.js로 텍스트 추출 ──
+  if(ext === 'docx'){
+    if(typeof mammoth === 'undefined'){
+      const scr = document.createElement('script');
+      scr.src = 'https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js';
+      scr.onload = () => readDocx(f, badge);
+      scr.onerror = () => {
+        badge.innerText = f.name + ' ❌';
+        showToast('⚠️ DOCX 파서 로드 실패. 네트워크를 확인하세요.');
+      };
+      document.head.appendChild(scr);
+    } else {
+      readDocx(f, badge);
+    }
+    return;
+  }
+
+  // ── 지원하지 않는 형식 ──
+  badge.innerText = f.name + ' ⚠️';
+  showToast(`⚠️ 지원하지 않는 파일 형식입니다. (지원: 이미지, PDF, Excel, CSV, DOCX, TXT)`);
+}
+
+/** Excel → 텍스트 테이블 변환 */
+function readExcel(file, badge){
+  const r = new FileReader();
+  r.onloadend = () => {
+    try{
+      const data  = new Uint8Array(r.result);
+      const wb    = XLSX.read(data, { type: 'array' });
+      let allText = `【Excel 파일: ${file.name}】\n`;
+
+      wb.SheetNames.forEach(sheetName => {
+        const ws   = wb.Sheets[sheetName];
+        const rows = XLSX.utils.sheet_to_json(ws, { header:1, defval:'' });
+        if(rows.length === 0) return;
+        allText += `\n[시트: ${sheetName}]\n`;
+        // 마크다운 표 형식으로 변환
+        rows.forEach((row, ri) => {
+          const line = row.map(c => String(c).trim()).join(' | ');
+          allText += `| ${line} |\n`;
+          if(ri === 0) allText += '|' + row.map(() => '---|').join('') + '\n';
+        });
+      });
+
+      if(allText.length > 12000) allText = allText.slice(0, 12000) + '\n...(이하 생략)';
+      document.getElementById('emailPasteInput').value = allText;
+      fileAttachmentData = null;
+      badge.innerText = file.name + ' ✅ (Excel 변환됨)';
+      showToast(`📊 Excel "${file.name}" → 텍스트 변환 완료. 분석 시작하세요.`);
+    }catch(err){
+      badge.innerText = file.name + ' ❌';
+      showToast('⚠️ Excel 파싱 오류: ' + err.message);
+    }
+  };
+  r.readAsArrayBuffer(file);
+}
+
+/** DOCX → 텍스트 추출 */
+function readDocx(file, badge){
+  const r = new FileReader();
+  r.onloadend = () => {
+    mammoth.extractRawText({ arrayBuffer: r.result })
+      .then(result => {
+        const text = result.value.slice(0, 8000);
+        document.getElementById('emailPasteInput').value =
+          `【Word 문서: ${file.name}】\n${text}`;
+        fileAttachmentData = null;
+        badge.innerText = file.name + ' ✅ (DOCX 변환됨)';
+        showToast(`📄 Word "${file.name}" → 텍스트 추출 완료. 분석 시작하세요.`);
+      })
+      .catch(err => {
+        badge.innerText = file.name + ' ❌';
+        showToast('⚠️ DOCX 파싱 오류: ' + err.message);
+      });
+  };
+  r.readAsArrayBuffer(file);
 }
 
 // ══════════════════════════════
