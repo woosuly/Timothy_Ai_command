@@ -33,6 +33,34 @@ aside{width:240px;background:#020617;padding:13px 12px;display:flex;flex-directi
 .user-login-form{display:block;}
 .form-label{font-size:11px;color:#94a3b8;margin-bottom:3px;display:block;font-weight:600;}
 .key-input{width:100%;background:#0a1120;border:1px solid #3b5280;border-radius:8px;padding:9px 11px;color:#f1f5f9;font-size:12px;outline:none;margin-bottom:5px;}
+/* ── API 키 입력창 + 눈모양 아이콘 ── */
+.api-input-wrapper{
+  position:relative;
+  display:flex;
+  align-items:center;
+  width:100%;
+}
+.api-input-wrapper input{
+  width:100%!important;
+  padding-right:40px!important;
+}
+.api-input-wrapper .toggle-password{
+  position:absolute;
+  right:12px;
+  cursor:pointer;
+  color:#64748b;
+  transition:color 0.2s;
+  z-index:10;
+  background:none;
+  border:none;
+  font-size:14px;
+  padding:2px;
+  line-height:1;
+}
+.api-input-wrapper .toggle-password:hover{
+  color:#94a3b8;
+}
+
 .key-input:focus{border-color:#60a5fa;}
 .login-btn{width:100%;padding:10px 0;font-size:13px;font-weight:700;background:linear-gradient(135deg,#2563eb,#1d4ed8);color:#fff;border:none;border-radius:8px;cursor:pointer;margin-top:3px;letter-spacing:.3px;}
 .login-btn:hover{background:linear-gradient(135deg,#1d4ed8,#1e40af);}
@@ -284,6 +312,48 @@ main.active-view{display:flex;}
     border-radius:18px 18px 0 0!important;
     max-height:88dvh!important;
     padding:20px 16px!important;
+  }
+  /* ★ aside 모바일: transform이 작동 안 할 때 대비 — width 0으로 강제 숨김 */
+  aside:not(.mob-open){
+    width:0!important;
+    min-width:0!important;
+    padding:0!important;
+    overflow:hidden!important;
+    border:none!important;
+    opacity:0!important;
+    pointer-events:none!important;
+  }
+  aside.mob-open{
+    width:260px!important;
+    opacity:1!important;
+    pointer-events:all!important;
+  }
+  /* ★ 설정 모달 — 사이드바 위에 항상 표시, 중앙 정렬 */
+  #settingsModal{
+    align-items:center!important;
+    padding:12px!important;
+    z-index:99999!important;
+  }
+  #settingsModal .settings-modal-box{
+    border-radius:14px!important;
+    max-height:90dvh!important;
+    width:calc(100vw - 24px)!important;
+    max-width:100%!important;
+    overflow-y:auto!important;
+  }
+  #settingsModal .stab-bar{
+    display:flex!important;
+    flex-direction:row!important;
+    flex-wrap:nowrap!important;
+    overflow-x:auto!important;
+    gap:4px!important;
+    -webkit-overflow-scrolling:touch;
+  }
+  #settingsModal .stab-btn{
+    flex-shrink:0!important;
+    font-size:11px!important;
+    padding:7px 10px!important;
+    white-space:nowrap!important;
   }
   .seg-row{gap:5px!important;}
   .seg-btn{padding:8px 12px!important;font-size:12px!important;}
@@ -1066,14 +1136,14 @@ textarea::-webkit-scrollbar-thumb{background:#334155;border-radius:4px;}
 <div class="mob-overlay" id="mobOverlay" onclick="closeMobSidebar()"></div>
 
 <!-- ★ 모바일 상단 헤더 -->
-<div class="mob-header" style="display:none;">
+<div class="mob-header">
   <button class="mob-menu-btn" onclick="toggleMobSidebar()" id="mobMenuBtn">☰</button>
   <span class="mob-title">🤖 Timothy AI 비서</span>
   <span class="mob-status-dot" id="mobStatusDot"></span>
 </div>
 
 <!-- ★ 모바일 하단 탭 바 -->
-<div class="mob-tab-bar" style="display:none;">
+<div class="mob-tab-bar">
   <button class="mob-tab active" id="mobtab-dashboard" onclick="switchViewMob('dashboard')">
     <span class="tab-icon">📊</span><span>AI 분석</span>
   </button>
@@ -2214,9 +2284,9 @@ textarea::-webkit-scrollbar-thumb{background:#334155;border-radius:4px;}
             <button class="api-release-btn" onclick="releaseApiKey('gemini')">해제</button>
           </div>
           <div class="api-state-input" id="apiInput-gemini" style="display:flex;gap:6px;align-items:center;">
-            <div style="position:relative;flex:1;">
-              <input type="password" id="inputGeminiKey" class="key-input api-key-input" placeholder="AIza... (aistudio.google.com)" style="padding-right:32px;">
-              <button onclick="toggleApiKeyVisibility('inputGeminiKey',this)" style="position:absolute;right:4px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:14px;padding:2px;">👁</button>
+            <div class="api-input-wrapper">
+              <input type="password" id="inputGeminiKey" class="key-input api-key-input" placeholder="AIza... (aistudio.google.com)">
+              <button class="toggle-password" onclick="toggleApiKeyVisibility('inputGeminiKey',this)">👁</button>
             </div>
             <button class="api-save-btn" onclick="saveApiKey('gemini')">등록</button>
           </div>
@@ -2230,9 +2300,9 @@ textarea::-webkit-scrollbar-thumb{background:#334155;border-radius:4px;}
             <button class="api-release-btn" onclick="releaseApiKey('openai')">해제</button>
           </div>
           <div class="api-state-input" id="apiInput-openai" style="display:flex;gap:6px;align-items:center;">
-            <div style="position:relative;flex:1;">
-              <input type="password" id="inputOpenaiKey" class="key-input api-key-input" placeholder="sk-... (platform.openai.com)" style="padding-right:32px;">
-              <button onclick="toggleApiKeyVisibility('inputOpenaiKey',this)" style="position:absolute;right:4px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:14px;padding:2px;">👁</button>
+            <div class="api-input-wrapper">
+              <input type="password" id="inputOpenaiKey" class="key-input api-key-input" placeholder="sk-... (platform.openai.com)">
+              <button class="toggle-password" onclick="toggleApiKeyVisibility('inputOpenaiKey',this)">👁</button>
             </div>
             <button class="api-save-btn" onclick="saveApiKey('openai')">등록</button>
           </div>
@@ -2246,9 +2316,9 @@ textarea::-webkit-scrollbar-thumb{background:#334155;border-radius:4px;}
             <button class="api-release-btn" onclick="releaseApiKey('anthropic')">해제</button>
           </div>
           <div class="api-state-input" id="apiInput-anthropic" style="display:flex;gap:6px;align-items:center;">
-            <div style="position:relative;flex:1;">
-              <input type="password" id="inputAnthropicKey" class="key-input api-key-input" placeholder="sk-ant-... (console.anthropic.com)" style="padding-right:32px;">
-              <button onclick="toggleApiKeyVisibility('inputAnthropicKey',this)" style="position:absolute;right:4px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:14px;padding:2px;">👁</button>
+            <div class="api-input-wrapper">
+              <input type="password" id="inputAnthropicKey" class="key-input api-key-input" placeholder="sk-ant-... (console.anthropic.com)">
+              <button class="toggle-password" onclick="toggleApiKeyVisibility('inputAnthropicKey',this)">👁</button>
             </div>
             <button class="api-save-btn" onclick="saveApiKey('anthropic')">등록</button>
           </div>
@@ -2262,13 +2332,14 @@ textarea::-webkit-scrollbar-thumb{background:#334155;border-radius:4px;}
             <button class="api-release-btn" onclick="releaseApiKey('deepl')">해제</button>
           </div>
           <div class="api-state-input" id="apiInput-deepl" style="display:flex;gap:6px;align-items:center;">
-            <div style="position:relative;flex:1;">
+            <div class="api-input-wrapper">
               <input type="text" id="inputDeeplKey" class="key-input api-key-input"
                 placeholder="xxxx...xxxx:fx  (deepl.com에서 복사 후 붙여넣기)"
-                style="padding-right:32px;font-family:monospace;letter-spacing:.5px;">
-              <button onclick="(function(){const i=document.getElementById('inputDeeplKey');i.type=i.type==='text'?'password':'text';this.innerText=i.type==='text'?'🙈':'👁';}).call(this)"
-                style="position:absolute;right:4px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:14px;padding:2px;">👁</button>
+                style="font-family:monospace;letter-spacing:.5px;">
+              <button class="toggle-password" onclick="toggleApiKeyVisibility('inputDeeplKey',this)">👁</button>
             </div>
+            <button class="api-save-btn" onclick="saveApiKey('deepl')">등록</button>
+          </div>
             <button class="api-save-btn" onclick="saveApiKey('deepl')">등록</button>
           </div>
         </div>
@@ -2522,60 +2593,6 @@ const LANG_PACKS = {
     btn_end_meeting:'⏹ 종료 및 요약',
     btn_summarizing:'요약 중...',
     msg_speech_cnt:'발화 ${n}건',
-    learning_guide_text:'우측 상단 <b style="color:#3b82f6;">+ 스타일 저장</b> 버튼을 눌러<br>부서장의 고유 문체를 학습시키세요.',
-    lbl_id:'아이디', lbl_pw:'비밀번호', ph_id:'아이디를 입력하세요',
-    link_register:'회원가입', link_find_id:'아이디 찾기', link_find_pw:'비밀번호 찾기',
-    year_suffix:'년', mon_jan:'1월', mon_feb:'2월', mon_mar:'3월', mon_apr:'4월', mon_may:'5월', mon_jun:'6월', mon_jul:'7월', mon_aug:'8월', mon_sep:'9월', mon_oct:'10월', mon_nov:'11월', mon_dec:'12월',
-    lbl_location:'장소 및 날씨', lbl_current_loc:'현재 위치', btn_change:'변경',
-    // ─── 글로벌 표준 키 (요청 기반) ───
-    nav_analyze:'📊 AI 분석', nav_calendar:'📅 캘린더/일정', nav_settings:'⚙️ 설정',
-    sun:'일', mon:'월', tue:'화', wed:'수', thu:'목', fri:'금', sat:'토',
-    modal_title:'일정 등록', btn_save:'💾 저장', btn_close:'닫기',
-    placeholder_input:'분석할 내용을 입력하세요...',
-    btn_start_analyze:'▶ 분석 시작',
-    status_ready:'● 대기 중', status_processing:'처리 중...',
-    nav_no_file:'선택된 파일 없음',
-    stt_analyze_btn:'▶ STT/회의록 분석', tab_stt:'🎙️ STT(음성) 분석',
-    nav_schedule:'📅 업무 Schedule', nav_translate:'🎙️ AI 통역/번역',
-    no_mail_data:'분석된 메일이 없습니다.', no_learning:'아직 저장된 문체 스타일이 없습니다.',
-    weekly_report_btn:'📋 주간 보고서 생성', weekly_title:'📆 주간 일정',
-    lbl_start_date:'시작일', lbl_due_date:'납기일', lbl_place:'장소', lbl_meet_time:'회의 시간',
-    btn_no:'취소', btn_copy_all:'📄 전체 복사', btn_register:'💾 등록',
-    btn_ai_save:'💾 AI 학습 저장', lbl_font_tone:'폰트/어조', lbl_work_directive:'⚡ 지시',
-    lbl_work_request:'📋 요청', scope_body_desc:'AI 요약 내용', scope_all_desc:'제목+발신자+본문',
-    scope_sender_desc:'발신자/부서명', scope_subject_desc:'메일 제목 기준',
-    btn_apply_sel:'적용', no_file:'선택된 파일 없음',
-    guest_name:'Guest', status_active:'Timothy AI 가동 중',
-    learn_off:'학습 꺼짐', lbl_work_type_val:'업무 유형',
-    ph_event_title:'일정 제목', ph_place:'예: 3층 회의실', ph_worker:'담당자 이름',
-
-    // ─── 추가 키 ───
-    settings_title:'환경설정',
-    stab_account:'👤 사용자 계정',
-    stab_api:'🔑 API 설정',
-    stab_appear:'🎨 화면/테마',
-    ai_model_section:'🎯 기능별 기본 AI 모델',
-    api_key_section:'🔑 API 키 관리',
-    browser_only_save:'브라우저에만 저장',
-    trans_file_hint:'Excel·Word·CSV·이미지·PDF·txt 업로드 가능',
-    conf_mode_label:'💡 회의 모드:',
-    conf_mode_desc:'상대 언어로 감지된 발화만 자막에 표시됩니다. 종료 시 AI가 전체 회의록을 자동 요약합니다.',
-    conf_caption_title:'📋 실시간 회의 자막',
-    theme_skin_title:'🎨 테마 스킨',
-    font_settings_title:'🔤 폰트 설정',
-    lang_settings_title:'🌐 언어 설정',
-    voice_my_title:'🇰🇷 내 발화',
-    voice_male:'👦 남자',
-    voice_female:'👧 여자',
-    voice_one_way:'➡️ 단방향 (내 말만 번역)',
-    voice_two_way:'↔️ 양방향 (티키타카)',
-    voice_start_my:'🎙️ 내 음성 통역 시작',
-    trans_src_title_tpl:'📝 원문 ({lang})',
-    trans_dst_title_tpl:'🌐 번역 결과 ({lang})',
-    api_default_btn:'⚙️ 기본값',
-    api_register_btn:'등록',
-    interp_log_ph:'통역 시작 후 내 음성이 기록됩니다...',
-    interp_start_btn:'🎙️ 내 음성 통역 시작',
   },
   ZH: {
     tab_mail:'📩 邮件分析', tab_stt:'🎙️ STT语音分析',
@@ -2654,32 +2671,6 @@ const LANG_PACKS = {
     status_loading:'加载中...',
     msg_no_deadline:'没有有截止日期的邮件。',
     msg_no_task:'暂无登记的任务。',
-    learning_guide_text:'请点击右上角 <b style="color:#3b82f6;">+ 保存风格</b> 按钮，学习部门长的独特文体风格。',
-    lbl_id:'账号', lbl_pw:'密码', ph_id:'请输入账号',
-    link_register:'注册', link_find_id:'找账号', link_find_pw:'找密码',
-    year_suffix:'年', mon_jan:'1月', mon_feb:'2月', mon_mar:'3月', mon_apr:'4月', mon_may:'5月', mon_jun:'6月', mon_jul:'7月', mon_aug:'8月', mon_sep:'9月', mon_oct:'10月', mon_nov:'11月', mon_dec:'12月',
-    lbl_location:'地点及天气', lbl_current_loc:'当前位置', btn_change:'更改',
-    status_done:'完成', msg_speech_cnt:'发话 ${n}件', btn_apply_sel:'应用',
-    // ─── 글로벌 표준 키 ───
-    nav_analyze:'📊 AI分析', nav_calendar:'📅 日历/日程', nav_settings:'⚙️ 设置',
-    sun:'日', mon:'月', tue:'火', wed:'水', thu:'木', fri:'金', sat:'土',
-    modal_title:'添加日程', btn_save:'💾 保存', btn_close:'关闭',
-    placeholder_input:'请输入要分析的内容...',
-    btn_start_analyze:'▶ 开始分析',
-    status_ready:'● 待机中', status_processing:'处理中...',
-    no_file:'未选择文件', nav_no_file:'未选择文件',
-    stt_analyze_btn:'▶ 开始STT/会议分析', tab_stt:'🎙️ STT语音分析',
-    nav_schedule:'📅 工作日程', nav_translate:'🎙️ AI通译/翻译',
-    no_mail_data:'暂无分析邮件。', no_learning:'尚无保存的文体风格。',
-    weekly_report_btn:'📋 生成周报', weekly_title:'📆 周计划',
-    lbl_start_date:'开始日', lbl_due_date:'截止日', lbl_place:'场所', lbl_meet_time:'会议时间',
-    btn_no:'取消', btn_copy_all:'📄 全部复制', btn_register:'💾 登记',
-    btn_ai_save:'💾 AI学习保存', lbl_font_tone:'字体/语调', lbl_work_directive:'⚡ 指示',
-    lbl_work_request:'📋 请求', scope_body_desc:'AI摘要内容', scope_all_desc:'标题+发件人+正文',
-    scope_sender_desc:'发件人/部门', scope_subject_desc:'邮件标题基准',
-    guest_name:'Guest', status_active:'Timothy AI 运行中',
-    learn_off:'学习已关闭', ph_event_title:'日程标题', ph_place:'例：3楼会议室', ph_worker:'负责人姓名',
-
     msg_no_style:'尚无保存的学习数据。请先保存样式。',
     msg_edit_style:'✏️ 样式修改',
     msg_reg_style:'✍️ 文体样式注册',
@@ -2693,79 +2684,6 @@ const LANG_PACKS = {
     btn_translate:'▶ 翻译',
     btn_end_meeting:'⏹ 结束并摘要',
     btn_summarizing:'摘要中...',
-    // ─── 추가 키 ───
-
-    // ─── 추가 키 ───
-    settings_title:'环境设置',
-    stab_account:'👤 用户账户',
-    stab_api:'🔑 API设置',
-    stab_appear:'🎨 界面/主题',
-    ai_model_section:'🎯 按功能的默认AI模型',
-    api_key_section:'🔑 API密钥管理',
-    browser_only_save:'仅保存在浏览器中',
-    trans_file_hint:'可上传 Excel·Word·CSV·图片·PDF·txt 文件',
-    conf_mode_label:'💡 会议模式:',
-    conf_mode_desc:'仅显示以对方语言检测到的发言字幕。结束时AI会自动摘要整个会议记录。',
-    conf_caption_title:'📋 实时会议字幕',
-    theme_skin_title:'🎨 主题皮肤',
-    font_settings_title:'🔤 字体设置',
-    lang_settings_title:'🌐 语言设置',
-    voice_my_title:'🇰🇷 我的发言',
-    voice_male:'👦 男声',
-    voice_female:'👧 女声',
-    voice_one_way:'➡️ 单向 (只翻译我的话)',
-    voice_two_way:'↔️ 双向 (互动)',
-    voice_start_my:'🎙️ 开始我的语音翻译',
-    trans_src_title_tpl:'📝 原文 ({lang})',
-    trans_dst_title_tpl:'🌐 翻译结果 ({lang})',
-    api_default_btn:'⚙️ 默认值',
-    api_register_btn:'注册',
-    interp_log_ph:'通译开始后将记录我的语音...',
-    interp_start_btn:'🎙️ 开始我的语音通译',
-    mon:'月',
-    tue:'火',
-    wed:'水',
-    thu:'木',
-    fri:'金',
-    sat:'土',
-    mon_jan:'1月',
-    mon_feb:'2月',
-    mon_mar:'3月',
-    mon_apr:'4月',
-    mon_may:'5月',
-    mon_jun:'6月',
-    mon_jul:'7月',
-    mon_aug:'8月',
-    mon_sep:'9月',
-    mon_oct:'10月',
-    mon_nov:'11月',
-    mon_dec:'12月',
-    lbl_memo:'备注',
-    lbl_place:'场所',
-    lbl_meet_time:'会议时间',
-    lbl_due_date:'截止日',
-    lbl_current_loc:'当前位置',
-    lbl_font_tone:'字体/语调',
-    lbl_work_directive:'⚡ 指示',
-    lbl_pick_time:'选择时间',
-    btn_save:'💾 保存',
-    btn_register:'💾 登记',
-    btn_copy_all:'📄 全部复制',
-    btn_delete:'🗑 删除',
-    settings_save_btn:'✅ 保存设置',
-    tab_stt:'🎙️ STT语音分析',
-    nav_translate:'🎙️ AI通译/翻译',
-    next_week:'下周',
-    weekly_title:'📆 周计划',
-    scope_all_desc:'标题+发件人+正文',
-    scope_body_desc:'AI摘要内容',
-    scope_subject_desc:'邮件标题基准',
-    status_active:'Timothy AI 运行中',
-    no_learning:'尚无保存的文体风格。',
-    ph_event_title:'日程标题',
-    btn_apply_sel:'应用',
-    msg_speech_cnt:'发话 ${n}件',
-    nav_no_file:'未选择文件',
   },
   EN: {
     tab_mail:'📩 Mail Analysis', tab_stt:'🎙️ STT Analysis',
@@ -2844,32 +2762,6 @@ const LANG_PACKS = {
     status_loading:'Loading...',
     msg_no_deadline:'No emails with deadlines.',
     msg_no_task:'No tasks registered.',
-    learning_guide_text:'Click the <b style="color:#3b82f6;">+ Save Style</b> button at the top right to teach the AI your writing style.',
-    lbl_id:'ID', lbl_pw:'Password', ph_id:'Enter your ID',
-    link_register:'Sign Up', link_find_id:'Find ID', link_find_pw:'Find Password',
-    year_suffix:'', mon_jan:'January', mon_feb:'February', mon_mar:'March', mon_apr:'April', mon_may:'May', mon_jun:'June', mon_jul:'July', mon_aug:'August', mon_sep:'September', mon_oct:'October', mon_nov:'November', mon_dec:'December',
-    lbl_location:'Location & Weather', lbl_current_loc:'Current Location', btn_change:'Change',
-    status_done:'Done', msg_speech_cnt:'${n} utterances', btn_apply_sel:'Apply',
-    // ─── Global standard keys ───
-    nav_analyze:'📊 AI Analysis', nav_calendar:'📅 Calendar', nav_settings:'⚙️ Settings',
-    sun:'Sun', mon:'Mon', tue:'Tue', wed:'Wed', thu:'Thu', fri:'Fri', sat:'Sat',
-    modal_title:'Add Schedule', btn_save:'💾 Save', btn_close:'Close',
-    placeholder_input:'Enter content to analyze...',
-    btn_start_analyze:'▶ Start Analysis',
-    status_ready:'● Ready', status_processing:'Processing...',
-    no_file:'No file selected', nav_no_file:'No file selected',
-    stt_analyze_btn:'▶ Analyze STT/Meeting', tab_stt:'🎙️ STT Analysis',
-    nav_schedule:'📅 Work Schedule', nav_translate:'🎙️ AI Interpret/Translate',
-    no_mail_data:'No analyzed emails.', no_learning:'No style data saved yet.',
-    weekly_report_btn:'📋 Generate Weekly Report', weekly_title:'📆 Weekly Schedule',
-    lbl_start_date:'Start Date', lbl_due_date:'Due Date', lbl_place:'Location', lbl_meet_time:'Meeting Time',
-    btn_no:'Cancel', btn_copy_all:'📄 Copy All', btn_register:'💾 Register',
-    btn_ai_save:'💾 AI Learn & Save', lbl_font_tone:'Font/Tone', lbl_work_directive:'⚡ Directive',
-    lbl_work_request:'📋 Request', scope_body_desc:'AI summary content', scope_all_desc:'Title+Sender+Body',
-    scope_sender_desc:'Sender/Department', scope_subject_desc:'By mail subject',
-    guest_name:'Guest', status_active:'Timothy AI Active',
-    learn_off:'Learning Off', ph_event_title:'Event title', ph_place:'e.g. Meeting Room 3F', ph_worker:'Assignee name',
-
     msg_no_style:'No style data saved yet. Please save a style first.',
     msg_edit_style:'✏️ Edit Style',
     msg_reg_style:'✍️ Register Style',
@@ -2883,35 +2775,6 @@ const LANG_PACKS = {
     btn_translate:'▶ Translate',
     btn_end_meeting:'⏹ End & Summarize',
     btn_summarizing:'Summarizing...',
-    // ─── Additional keys ───
-
-    // ─── 추가 키 ───
-    settings_title:'Settings',
-    stab_account:'👤 Account',
-    stab_api:'🔑 API Settings',
-    stab_appear:'🎨 Appearance',
-    ai_model_section:'🎯 Default AI Model by Function',
-    api_key_section:'🔑 API Key Management',
-    browser_only_save:'Stored in browser only',
-    trans_file_hint:'Upload Excel·Word·CSV·Image·PDF·TXT files',
-    conf_mode_label:'💡 Conference Mode:',
-    conf_mode_desc:'Only captions detected in the peer language are shown. AI auto-summarizes the meeting when done.',
-    conf_caption_title:'📋 Live Meeting Captions',
-    theme_skin_title:'🎨 Theme Skin',
-    font_settings_title:'🔤 Font Settings',
-    lang_settings_title:'🌐 Language Settings',
-    voice_my_title:'🇰🇷 My Speech',
-    voice_male:'👦 Male',
-    voice_female:'👧 Female',
-    voice_one_way:'➡️ One-way (my speech only)',
-    voice_two_way:'↔️ Two-way (tiki-taka)',
-    voice_start_my:'🎙️ Start My Voice Interpretation',
-    trans_src_title_tpl:'📝 Source ({lang})',
-    trans_dst_title_tpl:'🌐 Translation ({lang})',
-    api_default_btn:'⚙️ Default',
-    api_register_btn:'Register',
-    interp_log_ph:'My voice will be recorded after starting...',
-    interp_start_btn:'🎙️ Start My Voice Interpretation',
   },
   JA: {
     tab_mail:'📩 メール分析', tab_stt:'🎙️ STT音声分析',
@@ -2990,32 +2853,6 @@ const LANG_PACKS = {
     status_loading:'読み込み中...',
     msg_no_deadline:'納期のあるメールがありません。',
     msg_no_task:'登録された業務がありません。',
-    learning_guide_text:'右上の <b style="color:#3b82f6;">+ スタイル保存</b> ボタンをクリックして、部門長の文体を学習させてください。',
-    lbl_id:'アカウント', lbl_pw:'パスワード', ph_id:'アカウントを入力してください',
-    link_register:'会員登録', link_find_id:'ID検索', link_find_pw:'パスワード検索',
-    year_suffix:'年', mon_jan:'1月', mon_feb:'2月', mon_mar:'3月', mon_apr:'4月', mon_may:'5月', mon_jun:'6月', mon_jul:'7月', mon_aug:'8月', mon_sep:'9月', mon_oct:'10月', mon_nov:'11月', mon_dec:'12月',
-    lbl_location:'場所・天気', lbl_current_loc:'現在地', btn_change:'変更',
-    status_done:'完了', msg_speech_cnt:'発話 ${n}件', btn_apply_sel:'適用',
-    // ─── グローバル標準キー ───
-    nav_analyze:'📊 AI分析', nav_calendar:'📅 カレンダー/日程', nav_settings:'⚙️ 設定',
-    sun:'日', mon:'月', tue:'火', wed:'水', thu:'木', fri:'金', sat:'土',
-    modal_title:'予定登録', btn_save:'💾 保存', btn_close:'閉じる',
-    placeholder_input:'分析する内容を入力してください...',
-    btn_start_analyze:'▶ 分析開始',
-    status_ready:'● 待機中', status_processing:'処理中...',
-    no_file:'ファイル未選択', nav_no_file:'ファイル未選択',
-    stt_analyze_btn:'▶ STT/議事録分析', tab_stt:'🎙️ STT音声分析',
-    nav_schedule:'📅 業務スケジュール', nav_translate:'🎙️ AI通訳/翻訳',
-    no_mail_data:'分析されたメールがありません。', no_learning:'まだスタイルデータがありません。',
-    weekly_report_btn:'📋 週次レポート生成', weekly_title:'📆 週間スケジュール',
-    lbl_start_date:'開始日', lbl_due_date:'納期日', lbl_place:'場所', lbl_meet_time:'会議時間',
-    btn_no:'キャンセル', btn_copy_all:'📄 全件コピー', btn_register:'💾 登録',
-    btn_ai_save:'💾 AI学習保存', lbl_font_tone:'フォント/語調', lbl_work_directive:'⚡ 指示',
-    lbl_work_request:'📋 リクエスト', scope_body_desc:'AI要約内容', scope_all_desc:'件名+送信者+本文',
-    scope_sender_desc:'送信者/部署名', scope_subject_desc:'メール件名基準',
-    guest_name:'Guest', status_active:'Timothy AI 稼働中',
-    learn_off:'学習オフ', ph_event_title:'予定タイトル', ph_place:'例：3F会議室', ph_worker:'担当者名',
-
     msg_no_style:'まだ学習データがありません。スタイルを保存してください。',
     msg_edit_style:'✏️ スタイル修正',
     msg_reg_style:'✍️ 文体スタイル登録',
@@ -3029,35 +2866,6 @@ const LANG_PACKS = {
     btn_translate:'▶ 翻訳',
     btn_end_meeting:'⏹ 終了して要約',
     btn_summarizing:'要約中...',
-    // ─── 追加キー ───
-
-    // ─── 추가 키 ───
-    settings_title:'環境設定',
-    stab_account:'👤 ユーザーアカウント',
-    stab_api:'🔑 API設定',
-    stab_appear:'🎨 画面/テーマ',
-    ai_model_section:'🎯 機能別デフォルトAIモデル',
-    api_key_section:'🔑 APIキー管理',
-    browser_only_save:'ブラウザにのみ保存',
-    trans_file_hint:'Excel·Word·CSV·画像·PDFのアップロード可',
-    conf_mode_label:'💡 会議モード:',
-    conf_mode_desc:'相手言語で検出された発話のみ字幕表示。終了時AIが議事録を自動要約します。',
-    conf_caption_title:'📋 リアルタイム会議字幕',
-    theme_skin_title:'🎨 テーマスキン',
-    font_settings_title:'🔤 フォント設定',
-    lang_settings_title:'🌐 言語設定',
-    voice_my_title:'🇰🇷 自分の発話',
-    voice_male:'👦 男性',
-    voice_female:'👧 女性',
-    voice_one_way:'➡️ 一方向 (自分の話のみ翻訳)',
-    voice_two_way:'↔️ 双方向 (ティキタカ)',
-    voice_start_my:'🎙️ 自分の音声通訳開始',
-    trans_src_title_tpl:'📝 原文 ({lang})',
-    trans_dst_title_tpl:'🌐 翻訳結果 ({lang})',
-    api_default_btn:'⚙️ デフォルト',
-    api_register_btn:'登録',
-    interp_log_ph:'通訳開始後に自分の音声が記録されます...',
-    interp_start_btn:'🎙️ 自分の音声通訳開始',
   }
 };
 
@@ -3110,19 +2918,7 @@ let tpTargetField=null, tpTargetBtn=null;
 // 1-b. 다국어 헬퍼
 // ══════════════════════════════
 /** 현재 언어 팩에서 키로 텍스트 가져오기 */
-/**
- * t(key) — 글로벌 다국어 번역 함수 (Global i18n)
- * 우선순위: app_language > ui_lang > currentLang > KO(폴백)
- * LANG_PACKS 키 기반, 누락 시 key 그대로 반환
- */
-function t(key){
-  const lang = localStorage.getItem('app_language')
-             || localStorage.getItem('ui_lang')
-             || currentLang
-             || 'KO';
-  const pack = LANG_PACKS[lang] || LANG_PACKS.KO;
-  return pack[key] !== undefined ? pack[key] : key;
-}
+function t(key){ return (LANG_PACKS[currentLang]||LANG_PACKS.KO)[key] || key; }
 
 /** 언어 전환 — data-i18n 속성 가진 요소 전체 업데이트 */
 function setLanguage(lang){
@@ -3184,7 +2980,6 @@ document.addEventListener('DOMContentLoaded',()=>{
     updateUI(); // ★ 중앙 언어 상태 최종 동기화
     syncFunctionLockState();
     syncModelSelectsToKeys();
-    updateTransEngineBadge(); // ★ 번역 엔진 뱃지 초기화
     console.log('[Timothy] switchMainMode 호출');
     switchMainMode('doc');
     restoreLangSettings();
@@ -3355,6 +3150,7 @@ async function geocode(locationName){
   }
 }
 
+/** Open-Meteo 날씨 API 호출 */
 async function fetchWeather(lat, lon, tz){
   try{
     const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,weathercode,windspeed_10m,relativehumidity_2m&timezone=${encodeURIComponent(tz)}&forecast_days=1`;
@@ -3370,6 +3166,7 @@ async function fetchWeather(lat, lon, tz){
   }
 }
 
+/** 날씨 + 시간대 업데이트 — 위치 변경 시 호출 */
 async function updateWeatherAndTime(locationName){
   const weatherDisp  = document.getElementById('weatherDisplay');
   const weatherExtra = document.getElementById('weatherExtra');
@@ -3415,7 +3212,6 @@ async function updateWeatherAndTime(locationName){
   if(weatherDisp)  weatherDisp.innerText = `${desc} ${temp}°C`;
   if(weatherExtra) weatherExtra.innerText = `습도 ${humid}% · 바람 ${wind}km/h`;
 }
-
 
 // ══════════════════════════════
 // 4. 로그인 / 로그아웃
@@ -3470,8 +3266,20 @@ function switchView(v){
 // ══════════════════════════════
 // 6. 모달 공통
 // ══════════════════════════════
-function openModal(id){document.getElementById(id).classList.add('open');}
-function closeModal(id){document.getElementById(id).classList.remove('open');}
+function openModal(id){
+  const aside = document.querySelector('aside');
+  if(aside) aside.style.display = 'none';
+  const ov = document.getElementById('mobOverlay');
+  if(ov) ov.style.display = 'none';
+  document.getElementById(id).classList.add('open');
+}
+function closeModal(id){
+  document.getElementById(id).classList.remove('open');
+  const aside = document.querySelector('aside');
+  if(aside) aside.style.display = '';
+  const ov = document.getElementById('mobOverlay');
+  if(ov) ov.style.display = '';
+}
 
 // ══════════════════════════════
 // 7. 삭제 확인 모달
@@ -4020,13 +3828,13 @@ function buildSttAccordion(m, gi){
 
   // ── ④ 추천 회신 초안 (reply_draft)
   const replyHtml = m.reply_draft
-    ? `<div class="acc-sec" onclick="event.stopPropagation()" style="border-color:rgba(16,185,129,.25);background:rgba(16,185,129,.03);">
+    ? `<div class="acc-sec" style="border-color:rgba(16,185,129,.25);background:rgba(16,185,129,.03);">
          <div class="acc-lbl green">✉️ 추천 회신 / 후속 안내 초안
            <button class="small-copy-btn" onclick="event.stopPropagation();cpSttReply(${gi})">📄 복사</button>
          </div>
          <p id="stt-reply-text-${gi}" style="white-space:pre-wrap;font-size:10px;color:#a7f3d0;line-height:1.75;">${m.reply_draft}</p>
          <!-- 피드백 루프 -->
-         <div class="reply-feedback" style="margin-top:8px;" onclick="event.stopPropagation()">
+         <div class="reply-feedback" style="margin-top:8px;">
            <textarea class="reply-feedback-input" id="stt-fb-input-${gi}" rows="2"
              placeholder="수정 요청, 논리 보강, 검색 등을 자유롭게 입력하세요. (Shift+Enter: 줄바꿈)"
              onclick="event.stopPropagation()"
@@ -4044,16 +3852,16 @@ function buildSttAccordion(m, gi){
        </div>`
     : '';
 
-  return `<div class="mail-accordion" onclick="event.stopPropagation()">
+  return `<div class="mail-accordion">
 
     <!-- ① 핵심 결론 상세 -->
-    <div class="acc-sec" onclick="event.stopPropagation()" style="border-color:rgba(168,85,247,.25);">
+    <div class="acc-sec" style="border-color:rgba(168,85,247,.25);">
       <div class="acc-lbl" style="color:#a855f7;">🎙️ 회의 핵심 결론 및 결정사항</div>
       ${summaryHtml || '<p style="color:#64748b;font-size:11px;">결론 없음</p>'}
     </div>
 
     <!-- ② 지시 가이드 + Action Items -->
-    <div class="acc-sec" onclick="event.stopPropagation()" style="border-color:rgba(168,85,247,.3);background:rgba(168,85,247,.02);">
+    <div class="acc-sec" style="border-color:rgba(168,85,247,.3);background:rgba(168,85,247,.02);">
       <div class="acc-lbl" style="color:#a855f7;">📋 지시 가이드
         ${items.length ? `<button class="sync-btn" style="background:rgba(168,85,247,.15);color:#a855f7;border-color:rgba(168,85,247,.35);"
           onclick="event.stopPropagation();registerMeetingActions(JSON.parse(decodeURIComponent('${encodedItems}')))">트래커 등록 (${items.length}건)</button>` : ''}
@@ -4068,7 +3876,7 @@ function buildSttAccordion(m, gi){
 
     <!-- ③ 유관부서 협조 -->
     ${deptReqs.length ? `
-    <div class="acc-sec" onclick="event.stopPropagation()" style="border-color:rgba(168,85,247,.2);">
+    <div class="acc-sec" style="border-color:rgba(168,85,247,.2);">
       <div class="acc-lbl" style="color:#a855f7;">🏢 유관부서별 대응방안</div>
       ${deptHtml}
     </div>` : ''}
@@ -4394,85 +4202,63 @@ function classifyIntent(text){
  */
 async function handleAnalysisFeedback(mode, card, idx){
   if(!requireApiKey()) return;
+  const apiKey   = localStorage.getItem('gemini_api_key');
+  const inputId  = card==='stt' ? `stt-fb-input-${idx}` : `fb-input-${idx}`;
+  const textId   = card==='stt' ? `stt-reply-text-${idx}` : `reply-text-${idx}`;
+  const sagPfx   = card==='stt' ? 'stt-sag' : 'sag';
 
-  // ★ 중복 호출 방지
-  const lockKey = `_sagLock_${card}_${idx}`;
-  if(window[lockKey]){ return; }
-  window[lockKey] = true;
+  const fbEl     = document.getElementById(inputId);
+  const feedback = fbEl ? fbEl.value.trim() : '';
+  if(!feedback){ showToast('명령창에 내용을 입력하세요.'); return; }
 
-  try{
-    const apiKey  = localStorage.getItem('gemini_api_key');
-    const inputId = card==='stt' ? `stt-fb-input-${idx}` : `fb-input-${idx}`;
-    const textId  = card==='stt' ? `stt-reply-text-${idx}` : `reply-text-${idx}`;
-    const sagPfx  = card==='stt' ? 'stt-sag' : 'sag';
+  const mails    = lsArr('emails');
+  const mailData = mails[idx];
+  if(!mailData) return;
 
-    const fbEl    = document.getElementById(inputId);
-    const feedback = fbEl ? fbEl.value.trim() : '';
-    if(!feedback){ showToast('명령창에 내용을 입력하세요.'); return; }
+  const replyTextEl = document.getElementById(textId);
 
-    const mails   = lsArr('emails');
-    const mailData = mails[idx];
-    if(!mailData){ showToast('⚠️ 메일 데이터를 찾을 수 없습니다.'); return; }
+  // 자동 의도 분류 ('auto' 모드일 때)
+  const resolvedMode = mode === 'auto' ? classifyIntent(feedback) : mode;
 
-    const replyTextEl = document.getElementById(textId);
-
-    // 의도 분류
-    const resolvedMode = mode === 'auto' ? classifyIntent(feedback) : mode;
-
-    // 검색 모드 키 사전 확인
-    if(resolvedMode === 'search'){
-      if(!localStorage.getItem('gemini_api_key')){
-        showToast('🔍 실시간 검색은 Google API 키가 필요합니다.');
-        setTimeout(()=>{ openSettingsModal(); switchSettingsTab('api'); }, 700);
-        return;
-      }
+  // ★ 검색 모드: Gemini 키 사전 검증 (Smart Engine Routing)
+  if(resolvedMode === 'search'){
+    const gemKey = localStorage.getItem('gemini_api_key');
+    if(!gemKey){
+      showToast('🔍 실시간 인터넷 검색 기능은 Google API 키가 필요합니다. 설정에서 구글 키를 먼저 등록해 주세요.');
+      setTimeout(()=>{ openSettingsModal(); switchSettingsTab('api'); }, 700);
+      return;
     }
+  }
 
-    // ★ 버튼 참조 — 클릭된 버튼만 정확히 찾기
-    const feedbackWrap = fbEl?.closest('.reply-feedback');
-    let btnEl = null;
-    if(resolvedMode === 'logic'){
-      btnEl = feedbackWrap?.querySelector('.logic-boost-btn');
-    } else {
-      btnEl = feedbackWrap?.querySelector('.reply-feedback-btn');
-    }
-    // 초기 버튼 레이블 저장 (원래 텍스트로 복원용)
-    const originalBtnText = btnEl ? btnEl.innerText : '';
+  // 버튼 참조
+  const btnSel = resolvedMode === 'logic' ? '.logic-boost-btn' : '.reply-feedback-btn';
+  const btnEl  = fbEl?.closest('.reply-feedback')?.querySelector(btnSel)
+              || fbEl?.closest('.reply-feedback')?.querySelector('.reply-feedback-btn');
 
-    const modeLabel = { fix:'🔄 수정', logic:'🧠 논리 보강', search:'🌐 검색 반영' };
-    showToast(`${modeLabel[resolvedMode] || '🔄'} 처리 중...`);
+  // 분류 배지 표시 (사용자에게 어떤 모드인지 알려줌)
+  const modeLabel = { fix:'🔄 수정', logic:'🧠 논리 보강', search:'🌐 검색' };
+  showToast(`${modeLabel[resolvedMode] || '🔄'} 모드로 처리합니다...`);
 
-    if(resolvedMode === 'logic'){
-      const logicSystemRole = `당신은 전략적 업무 커뮤니케이션 전문가 AI입니다.
-사용자의 요구사항을 분석하고 아래 형식으로 출력하세요:
+  if(resolvedMode === 'logic'){
+    const logicSystemRole = `사용자가 '상황 설명'을 입력했음.
+이는 메일 내용 수정 요청이 아니라 '전략적 대응 방안'을 요구하는 것임.
+상황을 분석하고 인프라부 부서장으로서 취해야 할 논리적 근거와 대응 문구를 작성할 것.
+기존 회신 초안이 있다면 전략적으로 보강하거나, 강한 어조의 스크립트로 재작성할 것.
+출력은 즉시 사용 가능한 메일/메신저 본문 형태로 작성할 것.`;
 
-1. 논리 구조 강화: 기존 회신의 논거를 더 강력하게 재구성
-2. 데이터/근거 제시: 수치, 사례, 근거를 포함하여 설득력 강화
-3. 필요 시 표(Table) 사용: 비교, 현황, 계획 등은 마크다운 표로 작성
-4. 실행 가능한 문체: 즉시 사용 가능한 업무 메일/보고서 형태
-5. 이미지가 필요하다면: ![설명](https://image.pollinations.ai/prompt/{검색어}?width=800&height=400&nologo=true) 형식으로 삽입
-
-회신 본문만 출력 (메타 정보 없이).`;
-
-      await sagReplyFix({
-        mailData, feedback, apiKey,
-        replyTextEl, fbInputEl:fbEl, btnEl,
-        sagPrefix:sagPfx, sagIdx:idx,
-        forceSystemRole: logicSystemRole,
-        originalBtnText,
-        resolvedMode,
-      });
-    } else {
-      await sagReplyFix({
-        mailData, feedback, apiKey,
-        replyTextEl, fbInputEl:fbEl, btnEl,
-        sagPrefix:sagPfx, sagIdx:idx,
-        originalBtnText,
-        resolvedMode,
-      });
-    }
-  } finally {
-    window[lockKey] = false;
+    await sagReplyFix({
+      mailData, feedback, apiKey,
+      replyTextEl, fbInputEl:fbEl, btnEl,
+      sagPrefix:sagPfx, sagIdx:idx,
+      forceSystemRole: logicSystemRole,
+    });
+  } else {
+    // fix 또는 search — sagReplyFix가 검색 여부를 내부에서 판단
+    await sagReplyFix({
+      mailData, feedback, apiKey,
+      replyTextEl, fbInputEl:fbEl, btnEl,
+      sagPrefix:sagPfx, sagIdx:idx,
+    });
   }
 }
 
@@ -4483,65 +4269,7 @@ async function handleAnalysisFeedback(mode, card, idx){
  * AI 출력 마크다운을 HTML로 변환
  * 지원: 표(|), 이미지(![]()), 볼드, 이탤릭, 헤더, 목록, 코드, 링크, 수평선, 인용
  */
-function mdToHtml(md){
-  if(!md) return '';
 
-  // 이미 HTML인 경우 그대로 반환 (이중 변환 방지)
-  if(md.trim().startsWith('<') && /<(table|div|p|ul|ol|h[1-6])\b/.test(md)) return md;
-
-  // 0. 줄바꿈 정규화 (\r\n → \n)
-  let t = md.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
-
-  // 1. XSS 방어
-  t = t.replace(/<script[\s\S]*?<\/script>/gi, '');
-
-  // 2. 이미지 ![alt](url)
-  t = t.replace(/!\[([^\]]*)\]\((https?:\/\/[^\s)]+)\)/g,
-    (_, alt, url) => `<img src="${url}" alt="${alt}" loading="lazy" onerror="this.style.display='none'" style="max-width:100%;border-radius:6px;margin:8px 0;">`);
-
-  // 3. 마크다운 표 — 완전 재작성 (구분선 유무, \r\n 모두 처리)
-  t = parseMarkdownTables(t);
-
-  // 4. 헤더
-  t = t.replace(/^#### (.+)$/gm, '<h4>$1</h4>');
-  t = t.replace(/^### (.+)$/gm,  '<h3>$1</h3>');
-  t = t.replace(/^## (.+)$/gm,   '<h2>$1</h2>');
-  t = t.replace(/^# (.+)$/gm,    '<h1>$1</h1>');
-
-  // 5. 수평선
-  t = t.replace(/^[-*]{3,}$/gm, '<hr>');
-
-  // 6. 볼드·이탤릭
-  t = t.replace(/\*\*\*(.+?)\*\*\*/g, '<strong><em>$1</em></strong>');
-  t = t.replace(/\*\*(.+?)\*\*/g,     '<strong>$1</strong>');
-  t = t.replace(/\*(.+?)\*/g,         '<em>$1</em>');
-  t = t.replace(/__(.+?)__/g,         '<strong>$1</strong>');
-
-  // 7. 인라인 코드
-  t = t.replace(/`([^`]+)`/g, '<code>$1</code>');
-
-  // 8. 링크
-  t = t.replace(/\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g, '<a href="$2" target="_blank" rel="noopener">$1</a>');
-
-  // 9. 인용
-  t = t.replace(/^> (.+)$/gm, '<blockquote>$1</blockquote>');
-
-  // 10. 목록
-  t = t.replace(/^[-*+] (.+)$/gm, '<li>$1</li>');
-  t = t.replace(/^\d+\. (.+)$/gm,  '<li>$1</li>');
-  t = t.replace(/(<li>[\s\S]*?<\/li>\n?)+/g, m => `<ul>${m}</ul>`);
-
-  // 11. 단락
-  t = t.replace(/\n\n+/g, '</p><p>');
-  t = '<p>' + t + '</p>';
-  t = t.replace(/<p>\s*<\/p>/g, '');
-  t = t.replace(/<p>(<(?:table|ul|ol|h[1-6]|hr|blockquote|img)[^>]*>)/g, '$1');
-  t = t.replace(/(<\/(?:table|ul|ol|h[1-6]|hr|blockquote)>)<\/p>/g, '$1');
-
-  return t;
-}
-
-/** ★ 번역 입력란 붙여넣기 — HTML(표/이미지) 렌더링 지원 */
 function handleTransInputPaste(e){
   const items = e.clipboardData?.items;
 
@@ -4576,7 +4304,6 @@ function handleTransInputPaste(e){
   }
   // 일반 텍스트 → 기본 붙여넣기
 }
-
 
 function handlePasteImage(e){
   const items = e.clipboardData?.items;
@@ -4635,7 +4362,6 @@ function handlePasteImage(e){
   // 일반 텍스트 → 기본 붙여넣기
 }
 
-/** ★ API 키 입력창 표시/숨기기 토글 */
 function toggleApiKeyVisibility(inputId, btn){
   const inp = document.getElementById(inputId);
   if(!inp) return;
@@ -4644,7 +4370,6 @@ function toggleApiKeyVisibility(inputId, btn){
   btn.innerText = isText ? '👁' : '🙈';
 }
 
-/** ★ 번역 엔진 설정 */
 function setTransEngine(engine){
   localStorage.setItem('trans_engine', engine);
   ['gemini','gpt','deepl'].forEach(e => {
@@ -4680,7 +4405,6 @@ function updateTransEngineBadge(){
   badge.style.color = engine==='deepl' ? '#34d399' : taskModel.startsWith('gpt') ? '#10b981' : '#60a5fa';
 }
 
-/** ★ DeepL API 직접 호출 */
 async function callDeepL(text, targetLang){
   const key = localStorage.getItem('deepl_api_key');
   if(!key){ showToast('⚠️ DeepL API 키가 없습니다. 설정에서 등록하세요.'); return null; }
@@ -4723,12 +4447,6 @@ async function callDeepL(text, targetLang){
   }
 }
 
-/**
- * ★ 서식 있는 복사 — text/html (인라인 CSS 포함) + text/plain 동시 저장
- * - 메일(Gmail/Outlook/Naver): 표·볼드·색상 유지
- * - 메모장/textarea: 줄바꿈 보존 순수 텍스트
- * - 이미지: pollinations URL → <img> 태그로 삽입 (메일에서 렌더)
- */
 async function copyRichText(el, toastMsg){
   if(!el) return;
 
@@ -4803,7 +4521,6 @@ async function copyRichText(el, toastMsg){
   }
 }
 
-
 function parseMarkdownTables(text){
   const lines = text.split('\n');
   const out = [];
@@ -4856,6 +4573,75 @@ function parseMarkdownTables(text){
   }
 
   return out.join('\n');
+}
+function mdToHtml(md){
+  if(!md) return '';
+  let html = md;
+
+  // 0. XSS 방어 (스크립트 태그 제거)
+  html = html.replace(/<script[\s\S]*?<\/script>/gi, '');
+
+  // 1. 이미지 ![alt](url) — 표보다 먼저 처리
+  html = html.replace(/!\[([^\]]*)\]\((https?:\/\/[^\s)]+)\)/g,
+    (_, alt, url) => `<img src="${url}" alt="${alt}" loading="lazy" onerror="this.style.display='none'">`);
+
+  // 2. 마크다운 표 파싱 (| col1 | col2 | 형식)
+  html = html.replace(/(\|[^\n]+\|\n)((?:\|[-:\s|]+\|\n))((?:\|[^\n]+\|\n?)*)/g, (match, header, sep, body)=>{
+    const parseRow = (row) => row.trim().replace(/^\||\|$/g,'').split('|').map(c=>c.trim());
+    const heads = parseRow(header);
+    const rows  = body.trim().split('\n').filter(r=>r.trim().startsWith('|'));
+    const th = heads.map(h=>`<th>${h}</th>`).join('');
+    const tr = rows.map(r=>`<tr>${parseRow(r).map(c=>`<td>${c}</td>`).join('')}</tr>`).join('');
+    return `<table><thead><tr>${th}</tr></thead><tbody>${tr}</tbody></table>`;
+  });
+
+  // 3. 헤더 ### ## #
+  html = html.replace(/^### (.+)$/gm, '<h3>$1</h3>');
+  html = html.replace(/^## (.+)$/gm,  '<h2>$1</h2>');
+  html = html.replace(/^# (.+)$/gm,   '<h1>$1</h1>');
+
+  // 4. 수평선
+  html = html.replace(/^[-*]{3,}$/gm, '<hr>');
+
+  // 5. 볼드·이탤릭
+  html = html.replace(/\*\*\*(.+?)\*\*\*/g, '<strong><em>$1</em></strong>');
+  html = html.replace(/\*\*(.+?)\*\*/g,     '<strong>$1</strong>');
+  html = html.replace(/\*(.+?)\*/g,         '<em>$1</em>');
+  html = html.replace(/__(.+?)__/g,         '<strong>$1</strong>');
+  html = html.replace(/_(.+?)_/g,           '<em>$1</em>');
+
+  // 6. 인라인 코드
+  html = html.replace(/`([^`]+)`/g, '<code>$1</code>');
+
+  // 7. 링크 [text](url)
+  html = html.replace(/\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g, '<a href="$2" target="_blank" rel="noopener">$1</a>');
+
+  // 8. 인용 >
+  html = html.replace(/^> (.+)$/gm, '<blockquote>$1</blockquote>');
+  html = html.replace(/<\/blockquote>\n<blockquote>/g, '\n');
+
+  // 9. 순서없는 목록 (- * +)
+  html = html.replace(/^[-*+] (.+)$/gm, '<li>$1</li>');
+  html = html.replace(/(<li>.*<\/li>\n?)+/g, m=>`<ul>${m}</ul>`);
+
+  // 10. 순서있는 목록 (1. 2. ...)
+  html = html.replace(/^\d+\. (.+)$/gm, '<li>$1</li>');
+  // 이미 ul 처리된 것 제외
+  html = html.replace(/(?<!<ul>)(<li>(?:(?!<\/ul>)[\s\S])*?<\/li>\n?)+(?!<\/ul>)/g, m=>{
+    if(m.includes('<ul>')) return m;
+    return `<ol>${m}</ol>`;
+  });
+
+  // 11. 단락 (빈 줄 기준)
+  html = html.replace(/\n\n+/g, '</p><p>');
+  html = '<p>' + html + '</p>';
+
+  // 12. 불필요한 빈 <p></p> 정리
+  html = html.replace(/<p>\s*<\/p>/g, '');
+  html = html.replace(/<p>(<(?:table|ul|ol|h[1-6]|hr|blockquote|img)[^>]*>)/g, '$1');
+  html = html.replace(/(<\/(?:table|ul|ol|h[1-6]|hr|blockquote)>)<\/p>/g, '$1');
+
+  return html;
 }
 
 /**
@@ -4957,110 +4743,96 @@ async function sagSearch(query, _ignored){
  * ★ SAG 통합 회신 수정 핵심 함수
  * 두 함수(requestReplyFix, requestSttReplyFix) 공통 로직
  */
-async function sagReplyFix({ mailData, feedback, apiKey, replyTextEl, fbInputEl, btnEl, sagPrefix, sagIdx, forceSystemRole, originalBtnText, resolvedMode }){
+async function sagReplyFix({ mailData, feedback, apiKey, replyTextEl, fbInputEl, btnEl, sagPrefix, sagIdx, forceSystemRole }){
   const needSearch = isSearchRequest(feedback);
-  console.log('[Timothy] sagReplyFix — mode:', resolvedMode, 'search:', needSearch);
+  console.log('[Timothy] sagReplyFix 시작 — mode:', needSearch?'search':'text', 'card:', sagPrefix);
 
-  // 버튼 잠금
-  if(btnEl){ btnEl.disabled=true; btnEl.innerText='처리 중...'; }
   sagSetStep(sagPrefix, sagIdx, 1);
+  if(btnEl){ btnEl.disabled=true; btnEl.innerText='처리 중...'; }
 
   let searchContext = '';
   if(needSearch){
     sagSetStep(sagPrefix, sagIdx, 2);
+    // 검색어 추출 (피드백에서 명사구 추출)
     const searchQuery = feedback
       .replace(/검색해서|찾아서|조사해서|추가해줘|넣어줘|반영해줘/g,'')
       .replace(/관련|관한|대한|에 대해|를|을|이|가/g,' ')
       .trim() || feedback;
 
-    showToast(`🌐 "${searchQuery}" 검색 중...`);
+    showToast(`🌐 "${searchQuery}" 검색 중... (Google Gemini Grounding)`);
+    // ★ Smart Engine Routing: apiKey 파라미터 무시, 내부에서 Gemini Key 자동 사용
     const searchResult = await sagSearch(searchQuery, apiKey);
+
+    // 검색 실패 시 (키 없음 등) — 진행 중단
     if(!searchResult.success){
       sagSetStep(sagPrefix, sagIdx, 0);
-      if(btnEl){ btnEl.disabled=false; btnEl.innerText = originalBtnText||'🔄 수정 요청'; }
+      if(btnEl){ btnEl.disabled=false; btnEl.innerText='🔄 수정 요청'; }
       return;
     }
     searchContext = searchResult.text;
-    if(searchContext) showToast('✅ 검색 완료 — 본문 반영 중...');
+    if(searchContext) showToast(`✅ 검색 완료 — 본문 반영 중...`);
   }
 
   sagSetStep(sagPrefix, sagIdx, 3);
 
-  // ★ 강화된 systemRole — 검색/테이블/이미지 모두 지원
+  // ★ forceSystemRole 있으면 우선 사용 (논리 보강 모드), 없으면 기본 수정 모드
   const systemRole = forceSystemRole || `당신은 전문 업무 메일 작성 AI입니다.
-
-[출력 규칙]
-1. 수정 요구사항을 정확히 반영하되, 메일의 업무 목적에서 벗어나지 말 것
-2. 검색된 자료가 있으면 핵심만 자연스럽게 삽입할 것
-3. **표(Table)** 요청 시: 반드시 마크다운 표(| 헤더 | 헤더 |) 형식으로 작성
-4. **그래프/차트** 요청 시: 데이터를 표로 정리하고 추세를 텍스트로 설명
-5. **이미지** 요청 시: ![이미지설명](https://image.pollinations.ai/prompt/{영문검색어}?width=800&height=400&nologo=true) 형식 삽입
-6. **flow/흐름도** 요청 시: 화살표(→)와 번호를 활용한 텍스트 플로우차트 작성
-7. 회신 본문만 출력 (제목·설명 없이)`;
+1. 수정 요구사항을 정확히 반영하되, 메일의 본래 업무 목적에서 벗어나지 않을 것
+2. 검색된 자료가 있다면 핵심 위주로 요약하여 자연스럽게 삽입할 것
+3. 회신 메일 본문만 출력할 것 (설명·제목·메타 정보 불포함)
+4. 격식 있는 업무 문체 유지`;
 
   const searchSection = searchContext
-    ? `\n\n【Google 실시간 검색 결과】\n${searchContext}\n\n▶ 위 검색 결과를 기존 회신에 자연스럽게 통합하세요.\n`
+    ? `\n\n【Google 실시간 검색 결과】\n${searchContext}\n\n▶ 위 검색 결과를 기존 회신 초안에 자연스럽게 통합하세요. 검색 내용은 메일 신뢰도와 논거 강화에만 활용하고, 핵심 위주로 간결하게 삽입하세요.\n`
     : '';
 
   const prompt = `메일 회신 수정 요청입니다.
 【메일 요약】${(mailData.summary||[]).join(' ')}
 【기존 회신 초안】${mailData.reply_draft||'(없음)'}${searchSection}
-【수정/보강 요구사항】${feedback}
-
-위 요구사항을 반영하여 개선된 회신 초안만 출력하세요.`;
+【수정 요구사항】${feedback}
+개선된 회신 초안만 출력하세요.`;
 
   try{
     let newDraft = '';
+    // ★ callAI 실패 시 Gemini 직접 호출로 폴백 (모바일 네트워크 간헐적 실패 대비)
     try{
       newDraft = await callAI(prompt, systemRole, 'write');
     }catch(callErr){
-      console.warn('[sagReplyFix] callAI 실패, Gemini 직접 폴백:', callErr.message);
+      console.warn('[Timothy] callAI 실패, Gemini 직접 폴백:', callErr.message);
       const gKey = localStorage.getItem('gemini_api_key');
       if(!gKey) throw callErr;
       const gUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${gKey}`;
-      const ctrl = new AbortController();
-      const t = setTimeout(()=>ctrl.abort(), 30000);
-      const gRes = await fetch(gUrl, {
+      const controller = new AbortController();
+      const timer = setTimeout(()=>controller.abort(), 25000);
+      const gRes = await fetch(gUrl,{
         method:'POST', headers:{'Content-Type':'application/json'},
-        body: JSON.stringify({contents:[{parts:[{text: systemRole+'\n\n'+prompt}]}]}),
-        signal: ctrl.signal
+        body: JSON.stringify({contents:[{parts:[{text:systemRole+'\n\n'+prompt}]}]}),
+        signal: controller.signal
       });
-      clearTimeout(t);
-      if(!gRes.ok) throw new Error(`Gemini ${gRes.status}`);
+      clearTimeout(timer);
+      if(!gRes.ok) throw new Error(`Gemini ${gRes.status}: ${gRes.statusText}`);
       const gData = await gRes.json();
       newDraft = gData.candidates?.[0]?.content?.parts?.[0]?.text?.trim() || '';
     }
-
     if(!newDraft) throw new Error('AI 응답 없음');
 
-    // ★ 마크다운 → HTML 변환 후 저장 (재렌더 시에도 표 유지)
-    const renderedDraft = mdToHtml(newDraft);
-
-    // 저장
+    // 저장 & UI 업데이트
     const mails = lsArr('emails');
     const m = mails.find(x=>x===mailData) || mails.find(x=>x.subject===mailData.subject);
-    if(m){ m.reply_draft = renderedDraft; lsSet('emails', mails); }
-
-    // ★ renderAiOutput으로 마크다운 렌더링 (표/이미지 표시)
+    if(m){ m.reply_draft = newDraft; lsSet('emails', mails); }
     if(replyTextEl) renderAiOutput(replyTextEl, newDraft);
     if(fbInputEl)   fbInputEl.value = '';
 
     sagSetStep(sagPrefix, sagIdx, 0);
-    const successMsg = needSearch
-      ? '✅ 검색 자료 반영 완료'
-      : (resolvedMode==='logic' ? '✅ 논리 보강 완료' : '✅ 수정 완료');
-    showToast(successMsg);
-
+    showToast(needSearch
+      ? '✅ 검색 자료를 반영하여 회신 초안을 수정했습니다.'
+      : '✅ 회신 초안이 수정됐습니다.');
   }catch(err){
     sagSetStep(sagPrefix, sagIdx, 0);
-    showToast('⚠️ 처리 실패: ' + err.message);
-    console.error('[sagReplyFix]', err);
+    showToast('⚠️ 수정 실패: ' + err.message);
+    console.error('[SAG ReplyFix]', err);
   }finally{
-    // ★ 원래 버튼 레이블로 정확히 복원
-    if(btnEl){
-      btnEl.disabled = false;
-      btnEl.innerText = originalBtnText || (resolvedMode==='logic' ? '🧠 논리 보강' : '🔄 수정 요청');
-    }
+    if(btnEl){ btnEl.disabled=false; btnEl.innerText='🔄 수정 요청'; }
   }
 }
 
@@ -5121,7 +4893,7 @@ function renderEmails(){
       .map(r=>`<div style="background:rgba(30,41,59,.4);border:1px solid #1e293b;border-radius:4px;padding:4px 7px;font-size:10px;margin-top:3px;"><span style="font-size:8px;font-weight:bold;color:#3b82f6;background:rgba(59,130,246,.1);padding:1px 4px;border-radius:2px;margin-right:3px;">${r.dept}</span>${r.task}</div>`).join('');
     // ★ 통합 피드백 UI (수정요청 + 논리보강 통합)
     const feedbackHtml=`
-      <div class="reply-feedback" onclick="event.stopPropagation()">
+      <div class="reply-feedback">
         <textarea class="reply-feedback-input" id="fb-input-${i}" rows="2"
           placeholder="수정 요청, 논리 보강, 검색 등을 자유롭게 입력하세요. (Shift+Enter: 줄바꿈)"
           onclick="event.stopPropagation()"
@@ -5138,23 +4910,19 @@ function renderEmails(){
       </div>`;
     // ★ STT 카드이면 전용 아코디언 사용, 일반 메일이면 기존 아코디언
     const sttAcc = buildSttAccordion(m, i);
-    const acc = sttAcc || `<div class="mail-accordion" onclick="event.stopPropagation()">
-      <div class="acc-sec" onclick="event.stopPropagation()"><div class="acc-lbl">💡 Timothy AI 핵심 요약</div>${bullets}</div>
-      <div class="acc-sec" onclick="event.stopPropagation()" style="border-color:rgba(245,158,11,.3);background:rgba(245,158,11,.02);">
+    const acc = sttAcc || `<div class="mail-accordion">
+      <div class="acc-sec"><div class="acc-lbl">💡 Timothy AI 핵심 요약</div>${bullets}</div>
+      <div class="acc-sec" style="border-color:rgba(245,158,11,.3);background:rgba(245,158,11,.02);">
         <div class="acc-lbl orange">📋 지시 가이드
           <button class="sync-btn" onclick="event.stopPropagation();syncTracker('${b64}','${(m.category||'').replace(/'/g,"\\'")}','${(m.subject||'').replace(/'/g,"\\'")}')">트래커 연동</button>
         </div>
         <p style="font-weight:600;color:#f59e0b;font-size:10px;margin-bottom:2px;">[${(m.guide||{}).worker||'-'} / ${(m.guide||{}).due||'-'}]</p>
         <p style="color:#e2e8f0;font-style:italic;font-size:10px;">"${(m.guide||{}).instruction||''}"</p>
       </div>
-      ${deptR?`<div class="acc-sec" onclick="event.stopPropagation()"><div class="acc-lbl">🏢 유관 부서</div>${deptR}</div>`:''}
-      <div class="acc-sec" onclick="event.stopPropagation()" style="border-color:rgba(16,185,129,.25);background:rgba(16,185,129,.03);">
+      ${deptR?`<div class="acc-sec"><div class="acc-lbl">🏢 유관 부서</div>${deptR}</div>`:''}
+      <div class="acc-sec" style="border-color:rgba(16,185,129,.25);background:rgba(16,185,129,.03);">
         <div class="acc-lbl green">✉️ 추천 회신 초안</div>
-        <div id="reply-text-${i}" class="ai-render-wrap" style="font-size:10px;color:#a7f3d0;min-height:20px;">${
-          m.reply_draft
-            ? (m.reply_draft.trim().startsWith('<') ? m.reply_draft : mdToHtml(m.reply_draft))
-            : '(없음)'
-        }</div>
+        <p id="reply-text-${i}" style="white-space:pre-wrap;font-size:10px;color:#a7f3d0;">${m.reply_draft||'(없음)'}</p>
         <button class="small-copy-btn" onclick="event.stopPropagation();cpReply(${i})">📄 복사</button>
         ${feedbackHtml}
       </div>
@@ -5163,8 +4931,8 @@ function renderEmails(){
     const sttBadgeColor = isStt ? 'background:rgba(168,85,247,.2);color:#a855f7;' : '';
     const sttRowStyle = isStt ? 'border-left-color:#a855f7;background:rgba(168,85,247,.04);' : '';
     c.insertAdjacentHTML('beforeend',`
-      <div class="mail-row ${urgent?'urgent-row':''} ${isOpen?'open':''}" data-idx="${i}" style="${sttRowStyle}" onclick="toggleMail(event,${i})">
-        <div class="mail-row-hdr">
+      <div class="mail-row ${urgent?'urgent-row':''} ${isOpen?'open':''}" data-idx="${i}" style="${sttRowStyle}">
+        <div class="mail-row-hdr" onclick="toggleMail(${i})">
           <span class="mail-badge" style="${sttBadgeColor}">${isStt?'🎙️ STT':(m.category||'-')}</span>
           <span class="mail-subj">${m.subject||'(제목없음)'}</span>
           <span class="mail-sender-sm">${m.sender||'-'}</span>
@@ -5224,23 +4992,7 @@ function cpReply(i){
       showToast('📋 복사 완료');
     });
 }
-function toggleMail(e, i){
-  // ★ reply-feedback, mail-accordion 내부 클릭은 무시
-  if(e && e.target){
-    const t = e.target;
-    if(t.closest('.reply-feedback') ||
-       t.closest('.mail-accordion') ||
-       t.closest('.acc-sec') ||
-       t.closest('button') ||
-       t.closest('textarea') ||
-       t.tagName === 'BUTTON' ||
-       t.tagName === 'TEXTAREA') {
-      return;
-    }
-  }
-  openMailIdx=(openMailIdx===i)?null:i;
-  renderEmails();
-}
+function toggleMail(i){openMailIdx=(openMailIdx===i)?null:i; renderEmails();}
 function goPage(p){
   const tot=Math.ceil(lsArr('emails').filter(m=>(currentDomainFilter==='전체'||m.category===currentDomainFilter)&&mailMatch(m)).length/PAGE_SIZE);
   if(p<1||p>tot) return;
@@ -5468,12 +5220,11 @@ function renderCalendar(){
   if(!g) return; // 다른 뷰면 배너만
 
   g.innerHTML='';
-  // ★ 요일 레이블 — t() 기반 다국어 지원
-  const labels=[t('sun'),t('mon'),t('tue'),t('wed'),t('thu'),t('fri'),t('sat')];
+  const labels=['일','월','화','수','목','금','토'];
   const labelCls=['sun','','','','','','sat'];
   labels.forEach((w,i)=>g.insertAdjacentHTML('beforeend',`<div class="cal-day-label ${labelCls[i]}">${w}</div>`));
   const ml=document.getElementById('calMonthLabel');
-  if(ml){ const mo=[t("mon_jan")||"1월",t("mon_feb")||"2월",t("mon_mar")||"3월",t("mon_apr")||"4월",t("mon_may")||"5월",t("mon_jun")||"6월",t("mon_jul")||"7월",t("mon_aug")||"8월",t("mon_sep")||"9월",t("mon_oct")||"10월",t("mon_nov")||"11월",t("mon_dec")||"12월"]; ml.innerText=`${calYear}${t("year_suffix")||"년"} ${mo[calMonth]}`; }
+  if(ml) ml.innerText=`${calYear}년 ${calMonth+1}월`;
 
   const first=new Date(calYear,calMonth,1).getDay();
   const total=new Date(calYear,calMonth+1,0).getDate();
@@ -5968,7 +5719,7 @@ function handleTransFile(e){
     // 텍스트 파일 → 바로 textarea에 삽입
     const reader = new FileReader();
     reader.onload = ev => {
-      const ti=document.getElementById('transInput'); ti.innerText=ev.target.result; ti.dispatchEvent(new Event('input'));
+      document.getElementById('transInput').value = ev.target.result;
       badge.innerText = `📄 ${f.name} — 텍스트 로드 완료`;
       badge.classList.add('loaded');
       clearBtn.style.display = 'block';
@@ -5989,8 +5740,9 @@ function handleTransFile(e){
       badge.classList.add('loaded');
       clearBtn.style.display = 'block';
       // 입력란 안내 텍스트
-      if(!(document.getElementById('transInput').innerText||document.getElementById('transInput').textContent||'').trim()){
-        document.getElementById('transInput').setAttribute('data-placeholder', `${f.name} 파일을 첨부했습니다.\n아래 번역하기를 누르면 파일 내용을 분석·번역합니다.\n추가 지시사항이 있으면 여기에 입력하세요.`);
+      if(!document.getElementById('transInput').value.trim()){
+        document.getElementById('transInput').placeholder =
+          `${f.name} 파일을 첨부했습니다.\n아래 번역하기를 누르면 파일 내용을 분석·번역합니다.\n추가 지시사항이 있으면 여기에 입력하세요.`;
       }
       showToast(`✅ ${f.name} 첨부 완료. 번역하기를 누르세요.`);
     };
@@ -6014,13 +5766,13 @@ function clearTransFile(){
   badge.innerText = '이미지·PDF·txt·md 업로드 가능';
   badge.classList.remove('loaded');
   document.getElementById('transFileClearBtn').style.display = 'none';
-  document.getElementById('transInput').setAttribute('data-placeholder', '번역할 텍스트를 입력하거나\n위에서 파일을 첨부하세요.');
+  document.getElementById('transInput').placeholder = '번역할 텍스트를 입력하거나\n위에서 파일을 첨부하세요.';
 }
 
 /** ★ 초기화 — 원문·결과 모두 클리어 */
 function clearTrans(){
-  document.getElementById('transInput').innerHTML = '';
-  document.getElementById('transResult').innerHTML = '';
+  document.getElementById('transInput').value = '';
+  document.getElementById('transResult').value = '';
   clearTransFile();
   showToast('번역 내용이 초기화됐습니다.');
 }
@@ -6101,10 +5853,10 @@ function copyTrans(){
   }
 }
 function swapTrans(){
-  const a = document.getElementById('transInput').innerText || '';
-  const b = document.getElementById('transResult').innerText || '';
-  document.getElementById('transInput').innerHTML = mdToHtml(b)||b;
-  renderAiOutput(document.getElementById('transResult'), a);
+  const a = document.getElementById('transInput').value;
+  const b = document.getElementById('transResult').value;
+  document.getElementById('transInput').value = b;
+  document.getElementById('transResult').value = a;
 }
 
 // ══════════════════════════════
@@ -6127,10 +5879,6 @@ let isInterpretingMy   = false;
 let isInterpretingPeer = false;
 let myRecognition      = null;
 let peerRecognition    = null;
-let confRecognition    = null;
-let _myStopIntentional   = false; // ★ 싱글톤 의도적 중지 플래그
-let _peerStopIntentional = false;
-let _confStopIntentional = false;
 let interpMode         = 'one';  // 'one' | 'both'
 
 // ══════════════════════════════
@@ -6160,8 +5908,8 @@ function onDocLangChange(){
   localStorage.setItem('doc_peer_lang', peer);
   const srcTitle = document.getElementById('docSrcTitle');
   const dstTitle = document.getElementById('docDstTitle');
-  if(srcTitle) srcTitle.innerText = t("trans_src_title_tpl").replace("{lang}", LANG_NAMES[my]||my)||`📝 원문 (${LANG_NAMES[my]||my})`;
-  if(dstTitle) dstTitle.innerText = t("trans_dst_title_tpl").replace("{lang}", LANG_NAMES[peer]||peer)||`🌐 번역 결과 (${LANG_NAMES[peer]||peer})`;
+  if(srcTitle) srcTitle.innerText = `📝 원문 (${LANG_NAMES[my]||my})`;
+  if(dstTitle) dstTitle.innerText = `🌐 번역 결과 (${LANG_NAMES[peer]||peer})`;
   // 기존 transTargetLang 변수도 동기화 (runTranslate 호환)
   transTargetLang = peer;
   transTargetName = LANG_NAMES[peer] || peer;
@@ -6247,7 +5995,6 @@ async function startConfMic(){
 }
 
 function stopConfMic(){
-  _confStopIntentional = true; // ★ 의도적 중지
   isConfRunning = false; _isConfRunning = false;
   onConfStop(); // ★ 타이머 + 버튼 정리
   if(confRecognition){ try{confRecognition.stop();}catch{} confRecognition=null; }
@@ -6256,7 +6003,7 @@ function stopConfMic(){
   if(btn){ btn.innerText='🎤 회의 시작'; btn.style.background='rgba(16,185,129,.15)'; btn.style.borderColor='rgba(16,185,129,.4)'; btn.style.color='#10b981'; }
   if(status) status.innerText='● 대기 중';
   const interim = document.getElementById('confInterimBar');
-  if(interim) interim.innerText = t('status_listening');
+  if(interim) interim.innerText = '인식 중...';
   window.speechSynthesis.cancel();
   showToast('⏹ 회의 모드 중지');
 }
@@ -6409,7 +6156,7 @@ async function translateConfCaption(text, fromLang, toLang){
   }
 }
 
-
+/** 자막 추가 (하단에서 위로 쌓임) */
 // ── meetingScript 데이터 버퍼 ─────────────────────────────
 let meetingScript  = [];   // { speaker, originalText, translatedText, timestamp, langTag }
 let confStartTime  = null; // 회의 시작 시각
@@ -6605,16 +6352,10 @@ function switchVoiceSubMode(sub){
 /** 4 Depth: TTS 성별 선택 + 휴리스틱 보이스 필터링 */
 function setTtsGender(gender){
   ttsGender = gender;
-  // 실시간 음성 통역 버튼
   const btnM = document.getElementById('genderMale');
   const btnF = document.getElementById('genderFemale');
   if(btnM) btnM.classList.toggle('active', gender==='male');
   if(btnF) btnF.classList.toggle('active', gender==='female');
-  // ★ 회의 모드 버튼 동기화
-  const cBtnM = document.getElementById('confGenderMale');
-  const cBtnF = document.getElementById('confGenderFemale');
-  if(cBtnM) cBtnM.classList.toggle('active', gender==='male');
-  if(cBtnF) cBtnF.classList.toggle('active', gender==='female');
   showToast(gender==='male' ? '👨 남자 목소리 선택됨' : '👩 여자 목소리 선택됨');
 }
 
@@ -6627,58 +6368,36 @@ function getVoiceForGender(lang){
   const voices = window.speechSynthesis.getVoices();
   if(!voices || voices.length === 0) return null;
 
-  const ttsLang  = TTS_LANG_MAP[lang] || 'en-US';
+  // 타겟 언어 코드 매핑
+  const ttsLang = TTS_LANG_MAP[lang] || 'en-US';
   const baseLang = ttsLang.split('-')[0].toLowerCase();
-  const isMale   = ttsGender === 'male';
 
   // 성별 키워드 패턴
-  const maleKw   = /\b(male|man|남성|남자|guy|eric|david|george|daniel|fred|james|john|tom)\b/i;
-  const femaleKw = /\b(female|woman|여성|여자|zira|samantha|victoria|kate|alice|karen|lisa|emma|amy)\b/i;
-  const kw       = isMale ? maleKw : femaleKw;
-  const oppKw    = isMale ? femaleKw : maleKw;
+  const maleKw   = /male|man|남성|남자|guy|eric|david|george|daniel|fred/i;
+  const femaleKw = /female|woman|여성|여자|zira|samantha|victoria|kate|alice|karen/i;
+  const kw = ttsGender === 'male' ? maleKw : femaleKw;
 
-  // 해당 언어 목소리 필터
-  const langVoices = voices.filter(v => v.lang.toLowerCase().startsWith(baseLang));
-
-  // 1차: 언어 + 성별 키워드 정확 매칭
-  let v = langVoices.find(v => kw.test(v.name));
-  // 2차: 언어 목소리 중 반대 성별 아닌 것 (neutral)
-  if(!v) v = langVoices.find(v => !oppKw.test(v.name));
-  // 3차: 전체에서 성별 키워드
+  // 1차: 타겟 언어 + 성별 키워드 매칭
+  let v = voices.find(v => v.lang.toLowerCase().startsWith(baseLang) && kw.test(v.name));
+  // 2차: 전체 언어 중 성별 키워드만 매칭
   if(!v) v = voices.find(v => kw.test(v.name));
-  // 4차: 해당 언어 첫 번째
-  if(!v) v = langVoices[0];
-  // 5차: 전체 첫 번째
+  // 3차: 타겟 언어 첫 번째
+  if(!v) v = voices.find(v => v.lang.toLowerCase().startsWith(baseLang));
+  // 4차: 기본값
   return v || voices[0];
 }
 
 /** speakBidir 오버라이드 — 성별 선택 반영 */
 function speakBidir(text, lang){
   if(!text || !window.speechSynthesis) return;
-
-  const doSpeak = () => {
-    const utter = new SpeechSynthesisUtterance(text);
-    const voice = getVoiceForGender(lang.replace(/-.*/,''));
-    if(voice) utter.voice = voice;
-    utter.lang   = lang;
-    utter.rate   = 1.0;
-    utter.pitch  = ttsGender === 'male' ? 0.9 : 1.1;
-    utter.volume = 1.0;
-    window.speechSynthesis.speak(utter);
-  };
-
-  // ★ getVoices가 아직 로드 안 된 경우 이벤트 후 재시도
-  const voices = window.speechSynthesis.getVoices();
-  if(voices && voices.length > 0){
-    doSpeak();
-  } else {
-    window.speechSynthesis.onvoiceschanged = () => {
-      window.speechSynthesis.onvoiceschanged = null;
-      doSpeak();
-    };
-    // fallback: 1초 후 강제 실행
-    setTimeout(doSpeak, 500);
-  }
+  const utter = new SpeechSynthesisUtterance(text);
+  const voice = getVoiceForGender(lang.replace(/-.*/,'')); // 'en-US' → 'en'
+  if(voice) utter.voice = voice;
+  utter.lang   = lang;
+  utter.rate   = 1.0;
+  utter.pitch  = 1.0;
+  utter.volume = 1.0;
+  window.speechSynthesis.speak(utter);
 }
 
 /** 통역 로그 초기화 */
@@ -6703,12 +6422,14 @@ function appendToResultArea(text){
       return;
     }
   }
-  // 문서 번역 모드 — transResult는 div이므로 innerHTML 누적
+  // 문서 번역 모드에서는 transResult에 누적
   const el = document.getElementById('transResult');
   if(!el) return;
-  if(el.innerHTML && el.innerHTML.trim()) el.innerHTML += '<br>';
-  el.innerHTML += mdToHtml(text);
+  el.removeAttribute('readonly');
+  if(el.value && !el.value.endsWith('\n')) el.value += '\n';
+  el.value += text;
   el.scrollTop = el.scrollHeight;
+  el.setAttribute('readonly','');
 }
 
 /** appendToTextarea — interpLogKo도 함께 지원 */
@@ -6774,7 +6495,6 @@ async function startMyMic(){
 }
 
 function stopMyMic(){
-  _myStopIntentional = true; // ★ 의도적 중지
   isInterpretingMy = false;
   updateMicBtn('my', false);
   if(myRecognition){ try{ myRecognition.stop(); }catch{} myRecognition=null; }
@@ -6859,7 +6579,6 @@ async function startPeerMic(){
 }
 
 function stopPeerMic(){
-  _peerStopIntentional = true; // ★ 의도적 중지
   isInterpretingPeer = false;
   updateMicBtn('peer', false);
   if(peerRecognition){ try{ peerRecognition.stop(); }catch{} peerRecognition=null; }
@@ -6915,25 +6634,8 @@ function initPeerRecognition(){
 // ────────────────────────────────
 
 /** textarea에 텍스트 누적 (자동 스크롤) */
-function appendToTextarea(id, text){
-  const el = document.getElementById(id);
-  if(!el) return;
-  if(el.value && !el.value.endsWith('\n')) el.value += '\n';
-  el.value += text;
-  el.scrollTop = el.scrollHeight;
-}
 
 /** transResult는 readonly라 value 직접 조작 */
-function appendToResultArea(text){
-  const el = document.getElementById('transResult');
-  if(!el) return;
-  // readonly 속성 임시 해제 후 누적
-  el.removeAttribute('readonly');
-  if(el.value && !el.value.endsWith('\n')) el.value += '\n';
-  el.value += text;
-  el.scrollTop = el.scrollHeight;
-  el.setAttribute('readonly','');
-}
 
 /** 양방향 빠른 번역 */
 async function quickTranslateBidir(text, fromLang, toLang, toLangName, targetElId, ttsLang){
@@ -6941,46 +6643,61 @@ async function quickTranslateBidir(text, fromLang, toLang, toLangName, targetElI
   const apiKey = localStorage.getItem('gemini_api_key');
   if(!apiKey) return;
 
-  // ★ 강력한 중복 방지 — 채널별 최근 번역 텍스트 추적 (3초 TTL)
+  // ★ 강력한 중복 방지 — 채널별 최근 번역 텍스트 추적 (1.5초 TTL)
   if(!window._trbCache) window._trbCache = {};
   const cacheKey = `${targetElId}::${text}`;
   const now = Date.now();
   const last = window._trbCache[cacheKey];
-  if(last && now - last < 1500) {
-    console.log('[quickTranslate] 중복 차단:', text.slice(0,20));
-    return;
-  }
+  if(last && now - last < 1500) return;
   window._trbCache[cacheKey] = now;
 
-  const fromLabel = fromLang==='ko' ? '한국어' : transTargetName;
-  // ★ gemini-2.0-flash: 통역용 — 빠른 응답 속도
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
-  const prompt = `Translate to ${toLangName}. Output only the translation.\n${text}`;
+  const toLangLabel = toLangName || toLang;
+  const prompt = `Translate to ${toLangLabel}. Output only the translation.\n${text}`;
 
-  try{
-    const controller = new AbortController();
-    const timer = setTimeout(()=>controller.abort(), 8000);
-    const res = await fetch(url,{
-      method:'POST', headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({contents:[{parts:[{text:prompt}]}], generationConfig:{maxOutputTokens:200,temperature:0}}),
-      signal:controller.signal
-    });
-    clearTimeout(timer);
-    if(!res.ok) return;
-    const data = await res.json();
-    const translated = data.candidates?.[0]?.content?.parts?.[0]?.text?.trim();
-    if(!translated) return;
+  // ★ gemini-2.5-flash (안정적) → gemini-2.0-flash (빠름) 순서로 시도
+  const MODELS = ['gemini-2.5-flash', 'gemini-2.0-flash'];
 
-    if(targetElId === 'transResult'){
-      appendToResultArea(translated);
-    } else {
-      appendToTextarea(targetElId, translated);
+  let translated = '';
+  for(const model of MODELS){
+    try{
+      const controller = new AbortController();
+      const timer = setTimeout(() => controller.abort(), 6000);
+      const res = await fetch(
+        `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            contents: [{ parts: [{ text: prompt }] }],
+            generationConfig: { maxOutputTokens: 200, temperature: 0 },
+          }),
+          signal: controller.signal,
+        }
+      );
+      clearTimeout(timer);
+      if(!res.ok){
+        console.warn(`[통역] ${model} HTTP ${res.status}`);
+        continue;
+      }
+      const data = await res.json();
+      translated = data.candidates?.[0]?.content?.parts?.[0]?.text?.trim() || '';
+      if(translated) break;
+    } catch(e){
+      if(e.name !== 'AbortError') console.warn(`[통역] ${model}:`, e.message);
     }
-    speakBidir(translated, ttsLang);
-
-  } catch(e){
-    if(e.name !== 'AbortError') console.warn('[quickTranslateBidir]', e.message);
   }
+
+  if(!translated){
+    console.warn('[통역] 모든 모델 번역 실패:', text.slice(0,30));
+    return;
+  }
+
+  if(targetElId === 'transResult'){
+    appendToResultArea(translated);
+  } else {
+    appendToTextarea(targetElId, translated);
+  }
+  speakBidir(translated, ttsLang);
 }
 
 
@@ -8010,9 +7727,6 @@ document.getElementById('calDetailOverlay')?.addEventListener('click', function(
 });
 
 // 구버전 호환 함수 (기존 toggleProc은 캘린더 메일 이벤트가 직접 호출)
-function toggleProc(mi){
-  openMailEventPopup(mi);
-}
 // closeCEP, cepEdit, cepDelete 구버전 호환
 function closeCEP(){ closeCalDetail(); }
 function cepEdit(){ calDetailEdit(); }
@@ -8809,14 +8523,21 @@ function betaAlert(){ alert('현재 베타 서비스 중입니다.\n\n정식 출
 
 /** 설정 모달 열기 — 항상 account 탭으로 시작 */
 function openSettingsModal(){
+  /* ★ 사이드바를 display:none으로 완전 제거 — content:// 환경 z-index 충돌 방지 */
+  const _aside = document.querySelector('aside');
+  if(_aside){ _aside.classList.remove('mob-open'); _aside.style.display = 'none'; }
+  const _ov = document.getElementById('mobOverlay');
+  if(_ov){ _ov.classList.remove('show'); _ov.style.display = 'none'; }
+
   switchSettingsTab('account');
-  const curLoc=localStorage.getItem('user_location')||'청주 사업장';
-  const li=document.getElementById('settingsLocInput'); if(li) li.value=curLoc;
-  const ld=document.getElementById('currentLocDisplay'); if(ld) ld.innerText=`📍 ${curLoc}`;
+  const curLoc = localStorage.getItem('user_location') || '청주 사업장';
+  const li = document.getElementById('settingsLocInput'); if(li) li.value = curLoc;
+  const ld = document.getElementById('currentLocDisplay'); if(ld) ld.innerText = '📍 ' + curLoc;
   renderAiModelSelect();
-  const ms=document.getElementById('aiModelSelect'); if(ms) ms.value=currentAiModel;
-  initTransEngineUI(); // ★ 번역 엔진 라디오 초기화
-  openModal('settingsModal');
+  const ms = document.getElementById('aiModelSelect'); if(ms) ms.value = currentAiModel;
+  initTransEngineUI();
+  /* openModal 내부에서도 aside를 숨기지만 이중 보장 */
+  document.getElementById('settingsModal').classList.add('open');
 }
 
 /** ★ 장소 변경 — 완전 연동 */
@@ -8879,11 +8600,6 @@ document.addEventListener('DOMContentLoaded', ()=>{
   updateWeatherAndTime(savedLoc);
 });
 
-function changeLocation(){
-  const l=document.getElementById('weatherLocInput')||document.getElementById('settingsLocInput');
-  const val=l?l.value.trim():'';
-  if(val){ localStorage.setItem('user_location',val); const el=document.getElementById('currentLocLabel'); if(el) el.innerText=`📍 ${val}`; closeModal('weatherModal'); showToast(`✅ 위치 변경: ${val}`); }
-}
 function showToast(msg){
   const t=document.createElement('div'); t.className='toast'; t.innerText=msg;
   document.body.appendChild(t); setTimeout(()=>t.remove(),3000);
