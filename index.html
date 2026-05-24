@@ -1368,6 +1368,9 @@ textarea::-webkit-scrollbar-thumb{background:#334155;border-radius:4px;}
           </div>
           <div id="transInput" class="trans-textarea ai-render-wrap"
             contenteditable="true"
+            role="textbox"
+            aria-multiline="true"
+            aria-label="번역할 텍스트 입력"
             style="overflow-y:auto;min-height:120px;cursor:text;white-space:pre-wrap;outline:none;"
             onpaste="handleTransInputPaste(event)"
             data-placeholder="번역할 텍스트를 입력하거나 파일을 첨부하세요..."></div>
@@ -2210,8 +2213,11 @@ textarea::-webkit-scrollbar-thumb{background:#334155;border-radius:4px;}
             <div class="api-registered-msg">🔐 API 키가 등록되었습니다.</div>
             <button class="api-release-btn" onclick="releaseApiKey('gemini')">해제</button>
           </div>
-          <div class="api-state-input" id="apiInput-gemini">
-            <input type="password" id="inputGeminiKey" class="key-input api-key-input" placeholder="AIza... (aistudio.google.com)">
+          <div class="api-state-input" id="apiInput-gemini" style="display:flex;gap:6px;align-items:center;">
+            <div style="position:relative;flex:1;">
+              <input type="password" id="inputGeminiKey" class="key-input api-key-input" placeholder="AIza... (aistudio.google.com)" style="padding-right:32px;">
+              <button onclick="toggleApiKeyVisibility('inputGeminiKey',this)" style="position:absolute;right:4px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:14px;padding:2px;">👁</button>
+            </div>
             <button class="api-save-btn" onclick="saveApiKey('gemini')">등록</button>
           </div>
         </div>
@@ -2223,8 +2229,11 @@ textarea::-webkit-scrollbar-thumb{background:#334155;border-radius:4px;}
             <div class="api-registered-msg">🔐 API 키가 등록되었습니다.</div>
             <button class="api-release-btn" onclick="releaseApiKey('openai')">해제</button>
           </div>
-          <div class="api-state-input" id="apiInput-openai">
-            <input type="password" id="inputOpenaiKey" class="key-input api-key-input" placeholder="sk-... (platform.openai.com)">
+          <div class="api-state-input" id="apiInput-openai" style="display:flex;gap:6px;align-items:center;">
+            <div style="position:relative;flex:1;">
+              <input type="password" id="inputOpenaiKey" class="key-input api-key-input" placeholder="sk-... (platform.openai.com)" style="padding-right:32px;">
+              <button onclick="toggleApiKeyVisibility('inputOpenaiKey',this)" style="position:absolute;right:4px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:14px;padding:2px;">👁</button>
+            </div>
             <button class="api-save-btn" onclick="saveApiKey('openai')">등록</button>
           </div>
         </div>
@@ -2236,8 +2245,11 @@ textarea::-webkit-scrollbar-thumb{background:#334155;border-radius:4px;}
             <div class="api-registered-msg">🔐 API 키가 등록되었습니다.</div>
             <button class="api-release-btn" onclick="releaseApiKey('anthropic')">해제</button>
           </div>
-          <div class="api-state-input" id="apiInput-anthropic">
-            <input type="password" id="inputAnthropicKey" class="key-input api-key-input" placeholder="sk-ant-... (console.anthropic.com)">
+          <div class="api-state-input" id="apiInput-anthropic" style="display:flex;gap:6px;align-items:center;">
+            <div style="position:relative;flex:1;">
+              <input type="password" id="inputAnthropicKey" class="key-input api-key-input" placeholder="sk-ant-... (console.anthropic.com)" style="padding-right:32px;">
+              <button onclick="toggleApiKeyVisibility('inputAnthropicKey',this)" style="position:absolute;right:4px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:14px;padding:2px;">👁</button>
+            </div>
             <button class="api-save-btn" onclick="saveApiKey('anthropic')">등록</button>
           </div>
         </div>
@@ -2545,8 +2557,6 @@ const LANG_PACKS = {
     ai_model_section:'🎯 기능별 기본 AI 모델',
     api_key_section:'🔑 API 키 관리',
     browser_only_save:'브라우저에만 저장',
-    collab_content_label:'핵심 요청 내용',
-    collab_gen_btn:'▶ 맞춤형 초안 생성',
     trans_file_hint:'Excel·Word·CSV·이미지·PDF·txt 업로드 가능',
     conf_mode_label:'💡 회의 모드:',
     conf_mode_desc:'상대 언어로 감지된 발화만 자막에 표시됩니다. 종료 시 AI가 전체 회의록을 자동 요약합니다.',
@@ -2684,11 +2694,6 @@ const LANG_PACKS = {
     btn_end_meeting:'⏹ 结束并摘要',
     btn_summarizing:'摘要中...',
     // ─── 추가 키 ───
-    year_suffix:'年', mon_jan:'1月', mon_feb:'2月', mon_mar:'3月', mon_apr:'4月', mon_may:'5月', mon_jun:'6月', mon_jul:'7月', mon_aug:'8月', mon_sep:'9月', mon_oct:'10月', mon_nov:'11月', mon_dec:'12月',
-    lbl_location:'地点及天气', lbl_current_loc:'当前位置', btn_change:'更改',
-    lbl_id:'账号', lbl_pw:'密码', ph_id:'请输入账号',
-    link_register:'注册', link_find_id:'找账号', link_find_pw:'找密码',
-    status_done:'完成', btn_apply_sel:'应用',
 
     // ─── 추가 키 ───
     settings_title:'环境设置',
@@ -2698,8 +2703,6 @@ const LANG_PACKS = {
     ai_model_section:'🎯 按功能的默认AI模型',
     api_key_section:'🔑 API密钥管理',
     browser_only_save:'仅保存在浏览器中',
-    collab_content_label:'核心请求内容',
-    collab_gen_btn:'▶ 生成定制草稿',
     trans_file_hint:'可上传 Excel·Word·CSV·图片·PDF·txt 文件',
     conf_mode_label:'💡 会议模式:',
     conf_mode_desc:'仅显示以对方语言检测到的发言字幕。结束时AI会自动摘要整个会议记录。',
@@ -2881,11 +2884,6 @@ const LANG_PACKS = {
     btn_end_meeting:'⏹ End & Summarize',
     btn_summarizing:'Summarizing...',
     // ─── Additional keys ───
-    year_suffix:'', mon_jan:'January', mon_feb:'February', mon_mar:'March', mon_apr:'April', mon_may:'May', mon_jun:'June', mon_jul:'July', mon_aug:'August', mon_sep:'September', mon_oct:'October', mon_nov:'November', mon_dec:'December',
-    lbl_location:'Location & Weather', lbl_current_loc:'Current Location', btn_change:'Change',
-    lbl_id:'ID', lbl_pw:'Password', ph_id:'Enter your ID',
-    link_register:'Sign Up', link_find_id:'Find ID', link_find_pw:'Find Password',
-    status_done:'Done', btn_apply_sel:'Apply',
 
     // ─── 추가 키 ───
     settings_title:'Settings',
@@ -2895,8 +2893,6 @@ const LANG_PACKS = {
     ai_model_section:'🎯 Default AI Model by Function',
     api_key_section:'🔑 API Key Management',
     browser_only_save:'Stored in browser only',
-    collab_content_label:'Key Request Content',
-    collab_gen_btn:'▶ Generate Custom Draft',
     trans_file_hint:'Upload Excel·Word·CSV·Image·PDF·TXT files',
     conf_mode_label:'💡 Conference Mode:',
     conf_mode_desc:'Only captions detected in the peer language are shown. AI auto-summarizes the meeting when done.',
@@ -3034,11 +3030,6 @@ const LANG_PACKS = {
     btn_end_meeting:'⏹ 終了して要約',
     btn_summarizing:'要約中...',
     // ─── 追加キー ───
-    year_suffix:'年', mon_jan:'1月', mon_feb:'2月', mon_mar:'3月', mon_apr:'4月', mon_may:'5月', mon_jun:'6月', mon_jul:'7月', mon_aug:'8月', mon_sep:'9月', mon_oct:'10月', mon_nov:'11月', mon_dec:'12月',
-    lbl_location:'場所・天気', lbl_current_loc:'現在地', btn_change:'変更',
-    lbl_id:'アカウント', lbl_pw:'パスワード', ph_id:'アカウントを入力してください',
-    link_register:'会員登録', link_find_id:'ID検索', link_find_pw:'パスワード検索',
-    status_done:'完了', btn_apply_sel:'適用',
 
     // ─── 추가 키 ───
     settings_title:'環境設定',
@@ -3048,8 +3039,6 @@ const LANG_PACKS = {
     ai_model_section:'🎯 機能別デフォルトAIモデル',
     api_key_section:'🔑 APIキー管理',
     browser_only_save:'ブラウザにのみ保存',
-    collab_content_label:'核心リクエスト内容',
-    collab_gen_btn:'▶ カスタム草稿生成',
     trans_file_hint:'Excel·Word·CSV·画像·PDFのアップロード可',
     conf_mode_label:'💡 会議モード:',
     conf_mode_desc:'相手言語で検出された発話のみ字幕表示。終了時AIが議事録を自動要約します。',
@@ -4646,6 +4635,15 @@ function handlePasteImage(e){
   // 일반 텍스트 → 기본 붙여넣기
 }
 
+/** ★ API 키 입력창 표시/숨기기 토글 */
+function toggleApiKeyVisibility(inputId, btn){
+  const inp = document.getElementById(inputId);
+  if(!inp) return;
+  const isText = inp.type === 'text';
+  inp.type = isText ? 'password' : 'text';
+  btn.innerText = isText ? '👁' : '🙈';
+}
+
 /** ★ 번역 엔진 설정 */
 function setTransEngine(engine){
   localStorage.setItem('trans_engine', engine);
@@ -6228,6 +6226,7 @@ function toggleConfMic(){
 
 async function startConfMic(){
   const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if(!SR){ showToast('⚠️ 현재 브라우저는 음성 인식을 지원하지 않습니다. Chrome 혹은 Edge를 권장합니다.'); return; }
   if(!SR){ showToast('⚠️ 이 브라우저는 음성 인식을 지원하지 않습니다.'); return; }
   if(!requireApiKey()) return;
 
@@ -6738,7 +6737,7 @@ function setInterpMode(sub){ switchVoiceSubMode(sub); }
 function checkSpeechSupport(){
   const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
   if(!SR){
-    showToast('⚠️ 음성 인식 미지원 브라우저입니다. Chrome을 사용해 주세요.');
+    showToast('⚠️ 현재 브라우저는 음성 인식을 지원하지 않습니다. Chrome 혹은 Edge를 권장합니다.');
     return false;
   }
   const apiKey = localStorage.getItem('gemini_api_key');
