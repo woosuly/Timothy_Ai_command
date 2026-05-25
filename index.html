@@ -6325,7 +6325,7 @@ async function startConfMic(){
   if(status) status.innerText='🔴 인식 중';
   initConfRecognition();
 
-  // ★ 인식 언어 안내 토스트
+  // ★ 인식 언어 안내
   const myL   = document.getElementById('confMyLang')?.value   || 'ko';
   const peerL = document.getElementById('confPeerLang')?.value || 'en';
   const isBi  = myL !== peerL;
@@ -6392,7 +6392,6 @@ function initConfRecognition(){
     r.maxAlternatives = 1;
 
     let _restartTimer = null;
-    let _isStarted = false;
 
     function safeStart(){
       if(!isConfRunning || _confStopIntentional) return;
@@ -6401,10 +6400,8 @@ function initConfRecognition(){
         if(!isConfRunning || _confStopIntentional) return;
         try{
           r.start();
-          _isStarted = true;
         } catch(e){
           console.warn('[STT Conf] 재시작 실패:', lang, e.message);
-          // 실패 시 한 번 더 재시도
           if(isConfRunning && !_confStopIntentional){
             _restartTimer = setTimeout(safeStart, 800);
           }
@@ -6441,19 +6438,14 @@ function initConfRecognition(){
     };
 
     r.onend = () => {
-      _isStarted = false;
       if(isConfRunning && !_confStopIntentional){
         safeStart();
       }
     };
 
     r.onerror = (e) => {
-      _isStarted = false;
-      if(e.error === 'aborted') return; // 의도적 중지
-      if(e.error === 'no-speech'){
-        // no-speech는 정상 — onend가 자동으로 재시작 처리
-        return;
-      }
+      if(e.error === 'aborted') return;
+      if(e.error === 'no-speech') return; // onend가 재시작 처리
       if(e.error === 'not-allowed'){
         showToast('⚠️ 마이크 권한이 차단되었습니다. 브라우저 설정에서 허용해 주세요.');
         stopConfMic();
@@ -6468,8 +6460,7 @@ function initConfRecognition(){
       }
     };
 
-    // ★ 안드로이드 Chrome: start() 직후 바로 실행
-    try{ r.start(); _isStarted = true; } catch(err){ console.warn('[STT Conf] start 실패:', lang, err); safeStart(); }
+    try{ r.start(); } catch(err){ console.warn('[STT Conf] start 실패:', lang, err); safeStart(); }
     return r;
   }
 
@@ -8662,8 +8653,10 @@ function renderTaskModelSelects(){
   ['analyze','write','translate'].forEach(task=>{
     const sel = document.getElementById(`taskModelSel-${task}`);
     if(!sel) return;
-    // 처음 한 번만 옵션 생성
-    if(sel.options.length === 0){
+
+    // ★ AI 모델 옵션이 없으면 추가 (DeepL 전용 옵션은 제외하고 판단)
+    const hasAiOptions = Array.from(sel.options).some(o => AI_MODELS.find(m => m.id === o.value));
+    if(!hasAiOptions){
       AI_MODELS.forEach(m=>{
         const opt = document.createElement('option');
         opt.value = m.id;
@@ -8671,9 +8664,13 @@ function renderTaskModelSelects(){
         sel.appendChild(opt);
       });
     }
+
     // 항상 현재 값으로 업데이트
     sel.value = getModelForTask(task);
   });
+
+  // ★ 키 상태 반영 (DeepL 옵션 포함) — 모델 옵션 채운 뒤 실행
+  syncModelSelectsToKeys();
   renderTaskModelBadges();
 }
 
