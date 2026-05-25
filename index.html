@@ -6296,17 +6296,16 @@ function toggleConfMic(){
 async function startConfMic(){
   const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
   if(!SR){ showToast('⚠️ 현재 브라우저는 음성 인식을 지원하지 않습니다. Chrome 혹은 Edge를 권장합니다.'); return; }
-  if(!SR){ showToast('⚠️ 이 브라우저는 음성 인식을 지원하지 않습니다.'); return; }
   if(!requireApiKey()) return;
 
-  // ★ 마이크 권한 확인 (이미 허용 시 팝업 없이 즉시 통과)
   const permitted = await requestMicPermission();
   if(!permitted) return;
 
   if(window.speechSynthesis) window.speechSynthesis.speak(new SpeechSynthesisUtterance(''));
 
+  _confStopIntentional = false; // ★ 시작 전 플래그 초기화
   isConfRunning = true; _isConfRunning = true;
-  onConfStart(); // ★ 타이머 + 버튼 활성화
+  onConfStart();
   const btn = document.getElementById('confMicBtn');
   const status = document.getElementById('confStatus');
   if(btn){ btn.innerText='⏹ 회의 중지'; btn.style.background='rgba(244,63,94,.15)'; btn.style.borderColor='rgba(244,63,94,.5)'; btn.style.color='#f43f5e'; }
@@ -6317,8 +6316,11 @@ async function startConfMic(){
 
 function stopConfMic(){
   isConfRunning = false; _isConfRunning = false;
-  onConfStop(); // ★ 타이머 + 버튼 정리
+  _confStopIntentional = true;
+  onConfStop();
   if(confRecognition){ try{confRecognition.stop();}catch{} confRecognition=null; }
+  // ★ 양방향 두 번째 인식기도 정리
+  if(window._confRecognition2){ try{window._confRecognition2.stop();}catch{} window._confRecognition2=null; }
   const btn = document.getElementById('confMicBtn');
   const status = document.getElementById('confStatus');
   if(btn){ btn.innerText='🎤 회의 시작'; btn.style.background='rgba(16,185,129,.15)'; btn.style.borderColor='rgba(16,185,129,.4)'; btn.style.color='#10b981'; }
@@ -6330,31 +6332,25 @@ function stopConfMic(){
 }
 
 function initConfRecognition(){
+  // 기존 인식기 정리
   if(confRecognition){
     try{ confRecognition.onresult=null; confRecognition.onend=null; confRecognition.stop(); }catch{}
     confRecognition = null;
   }
+  if(window._confRecognition2){
+    try{ window._confRecognition2.onresult=null; window._confRecognition2.onend=null; window._confRecognition2.stop(); }catch{}
+    window._confRecognition2 = null;
+  }
+
   const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
   if(!SR) return;
 
   const myLang   = document.getElementById('confMyLang')?.value   || 'ko';
   const peerLang = document.getElementById('confPeerLang')?.value || 'en';
-
-  // ★ 단방향(같은 언어) = 회의록 모드, 양방향 = 실시간 통역 모드
   const isBilingual = (myLang !== peerLang);
 
-  confRecognition = new SR();
-  confRecognition.lang           = isBilingual
-    ? (LANG_BCP47[peerLang] || 'en-US')  // 양방향: 상대방 언어 인식
-    : (LANG_BCP47[myLang]   || 'ko-KR'); // 단방향: 내 언어 인식(회의록)
-  confRecognition.continuous     = true;
-  confRecognition.interimResults = true;
-  confRecognition.maxAlternatives = 1;
-
   // ── 번역 큐 ──
-  let _queue = [];
-  let _qRunning = false;
-
+  let _queue = [], _qRunning = false;
   async function drainQueue(){
     if(_qRunning) return;
     _qRunning = true;
@@ -6365,68 +6361,75 @@ function initConfRecognition(){
     _qRunning = false;
   }
 
-  // ── 즉시 번역 트리거 패턴 (쉼표·마침표·문장부호) ──
   const INSTANT_PUNCT = /[,.!?;，。！？；、…]\s*$/;
 
-  // 임시 버퍼 (interim 누적용)
-  let _interimBuf = '';
+  // ── STT 인식기 생성 함수 ──
+  function createRecognizer(lang, fromLang, toLang){
+    const r = new SR();
+    r.lang            = LANG_BCP47[lang] || 'ko-KR';
+    r.continuous      = true;
+    r.interimResults  = true;
+    r.maxAlternatives = 1;
 
-  confRecognition.onresult = (e) => {
-    const interimBar = document.getElementById('confInterimBar');
+    r.onresult = (e) => {
+      const bar = document.getElementById('confInterimBar');
+      for(let i = e.resultIndex; i < e.results.length; i++){
+        const res  = e.results[i];
+        const text = res[0].transcript.trim();
+        if(!text) continue;
 
-    for(let i = e.resultIndex; i < e.results.length; i++){
-      const res  = e.results[i];
-      const text = res[0].transcript.trim();
-      if(!text) continue;
-
-      if(res.isFinal){
-        _interimBuf = '';
-        if(interimBar) interimBar.innerText = t('status_listening');
-
-        if(isBilingual){
-          // ★ 양방향: 확정 문장 → 번역 큐에 추가
-          _queue.push({ text, from: peerLang, to: myLang });
-          drainQueue();
-        } else {
-          // ★ 단방향(회의록): 번역 없이 원문 그대로 자막 추가
-          addConfCaption(text, null, myLang);
-        }
-
-      } else {
-        // 임시 결과 처리
-        _interimBuf = text;
-        if(interimBar) interimBar.innerText = `🎙️ ${text}`;
-
-        if(isBilingual && INSTANT_PUNCT.test(text)){
-          // ★ 쉼표·마침표 감지 → 완전한 문장 완성 안 기다리고 즉시 번역
-          const partial = text.replace(INSTANT_PUNCT, '').trim();
-          if(partial.length >= 2){
-            _queue.push({ text: partial, from: peerLang, to: myLang });
+        if(res.isFinal){
+          if(bar) bar.innerText = t('status_listening');
+          if(isBilingual){
+            _queue.push({ text, from: fromLang, to: toLang });
             drainQueue();
+          } else {
+            addConfCaption(text, null, myLang);
+          }
+        } else {
+          if(bar) bar.innerText = '🎙️ ' + text;
+          if(isBilingual && INSTANT_PUNCT.test(text)){
+            const partial = text.replace(INSTANT_PUNCT,'').trim();
+            if(partial.length >= 2){
+              _queue.push({ text: partial, from: fromLang, to: toLang });
+              drainQueue();
+            }
           }
         }
       }
-    }
-  };
+    };
 
-  confRecognition.onend = () => {
-    if(isConfRunning && !_confStopIntentional){
-      setTimeout(() => { if(isConfRunning) initConfRecognition(); }, 50);
-    }
-    _confStopIntentional = false;
-  };
+    r.onend = () => {
+      if(isConfRunning && !_confStopIntentional){
+        setTimeout(() => {
+          if(isConfRunning && !_confStopIntentional){
+            try{ r.start(); }catch(e){ console.warn('[STT Conf] 재시작 실패:', e.message); }
+          }
+        }, 100);
+      }
+    };
 
-  confRecognition.onerror = (e) => {
-    if(e.error === 'no-speech') return;
-    if(e.error === 'aborted')   return;
-    console.warn('[STT Conf]', e.error);
-    if(isConfRunning && !_confStopIntentional){
-      setTimeout(() => { if(isConfRunning) initConfRecognition(); }, 200);
-    }
-  };
+    r.onerror = (e) => {
+      if(e.error === 'no-speech' || e.error === 'aborted') return;
+      console.warn('[STT Conf]', lang, e.error);
+      if(isConfRunning && !_confStopIntentional){
+        setTimeout(() => { if(isConfRunning) try{ r.start(); }catch{} }, 300);
+      }
+    };
 
-  try{ confRecognition.start(); }
-  catch(err){ console.warn('[STT Conf] start 실패:', err); }
+    try{ r.start(); } catch(err){ console.warn('[STT Conf] start 실패:', lang, err); }
+    return r;
+  }
+
+  if(isBilingual){
+    // ★ 양방향: 상대방 언어만 인식 → 내 언어로 번역 (이어폰 착용 전제)
+    confRecognition = createRecognizer(peerLang, peerLang, myLang);
+    window._confRecognition2 = null; // 두 번째 인식기 없음
+  } else {
+    // 단방향: 내 언어만 인식 (회의록)
+    confRecognition = createRecognizer(myLang, myLang, myLang);
+    window._confRecognition2 = null;
+  }
 }
 
 /** 회의 자막 번역 + 출력 */
