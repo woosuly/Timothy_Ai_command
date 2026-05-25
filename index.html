@@ -2243,12 +2243,25 @@ textarea::-webkit-scrollbar-thumb{background:#334155;border-radius:4px;}
             <button class="api-save-btn" onclick="saveApiKey('anthropic')">등록</button>
           </div>
         </div>
+
+        <!-- DeepL -->
+        <div class="api-key-row">
+          <div class="api-key-label"><span>🌿</span> DeepL (고품질 번역, 선택)</div>
+          <div class="api-state-registered" id="apiReg-deepl" style="display:none;">
+            <div class="api-registered-msg">🔐 API 키가 등록되었습니다.</div>
+            <button class="api-release-btn" onclick="releaseApiKey('deepl')">해제</button>
+          </div>
+          <div class="api-state-input" id="apiInput-deepl">
+            <input type="password" id="inputDeeplKey" class="key-input api-key-input" placeholder="Free: ...​:fx  /  Pro: 일반 키 (deepl.com/pro-api)">
+            <button class="api-save-btn" onclick="saveApiKey('deepl')">등록</button>
+          </div>
+        </div>
       </div>
       <div style="font-size:10px;color:#475569;margin-top:6px;line-height:1.6;">
         * Gemini 키 없으면 분석·번역 기능이 비활성화됩니다.<br>
         * OpenAI·Claude 키 없으면 Gemini로 자동 대체 실행됩니다.<br>
-        * DeepL Free 키는 끝에 <code style="color:#34d399;">:fx</code> 가 붙습니다.<br>
-        * 번역 엔진을 DeepL로 쓰려면: DeepL 키 등록 → 위 <b>번역/통역</b> 모델 선택란에서 <b style="color:#34d399;">🌿 DeepL</b> 선택</div>
+        * DeepL Free 키는 끝에 <code style="color:#34d399;">:fx</code> 가 붙습니다 (예: <code style="color:#34d399;">abc123:fx</code>).<br>
+        * DeepL 등록 후 위 <b>번역/통역</b> 모델 선택란에서 <b style="color:#34d399;">🌿 DeepL</b>을 선택하세요.</div>
 
       <!-- 장소 설정 -->
       <div class="settings-section-hdr" style="margin-top:12px;">📍 장소 및 날씨</div>
@@ -6311,7 +6324,14 @@ async function startConfMic(){
   if(btn){ btn.innerText='⏹ 회의 중지'; btn.style.background='rgba(244,63,94,.15)'; btn.style.borderColor='rgba(244,63,94,.5)'; btn.style.color='#f43f5e'; }
   if(status) status.innerText='🔴 인식 중';
   initConfRecognition();
-  showToast('🏢 회의 모드 시작 — 상대방이 말하면 자막이 표시됩니다');
+
+  // ★ 인식 언어 안내 토스트
+  const myL   = document.getElementById('confMyLang')?.value   || 'ko';
+  const peerL = document.getElementById('confPeerLang')?.value || 'en';
+  const isBi  = myL !== peerL;
+  const listenLang = isBi ? (LANG_NAMES[peerL]||peerL) : (LANG_NAMES[myL]||myL);
+  const modeLabel  = isBi ? `통역 모드 — ${listenLang} 인식 중` : `회의록 모드 — ${listenLang} 인식 중`;
+  showToast(`🏢 ${modeLabel}`);
 }
 
 function stopConfMic(){
@@ -6371,6 +6391,27 @@ function initConfRecognition(){
     r.interimResults  = true;
     r.maxAlternatives = 1;
 
+    let _restartTimer = null;
+    let _isStarted = false;
+
+    function safeStart(){
+      if(!isConfRunning || _confStopIntentional) return;
+      if(_restartTimer) clearTimeout(_restartTimer);
+      _restartTimer = setTimeout(() => {
+        if(!isConfRunning || _confStopIntentional) return;
+        try{
+          r.start();
+          _isStarted = true;
+        } catch(e){
+          console.warn('[STT Conf] 재시작 실패:', lang, e.message);
+          // 실패 시 한 번 더 재시도
+          if(isConfRunning && !_confStopIntentional){
+            _restartTimer = setTimeout(safeStart, 800);
+          }
+        }
+      }, 200);
+    }
+
     r.onresult = (e) => {
       const bar = document.getElementById('confInterimBar');
       for(let i = e.resultIndex; i < e.results.length; i++){
@@ -6379,7 +6420,7 @@ function initConfRecognition(){
         if(!text) continue;
 
         if(res.isFinal){
-          if(bar) bar.innerText = t('status_listening');
+          if(bar) bar.innerText = t('status_listening') || '🎙️ 인식 대기 중...';
           if(isBilingual){
             _queue.push({ text, from: fromLang, to: toLang });
             drainQueue();
@@ -6400,24 +6441,35 @@ function initConfRecognition(){
     };
 
     r.onend = () => {
+      _isStarted = false;
       if(isConfRunning && !_confStopIntentional){
-        setTimeout(() => {
-          if(isConfRunning && !_confStopIntentional){
-            try{ r.start(); }catch(e){ console.warn('[STT Conf] 재시작 실패:', e.message); }
-          }
-        }, 100);
+        safeStart();
       }
     };
 
     r.onerror = (e) => {
-      if(e.error === 'no-speech' || e.error === 'aborted') return;
+      _isStarted = false;
+      if(e.error === 'aborted') return; // 의도적 중지
+      if(e.error === 'no-speech'){
+        // no-speech는 정상 — onend가 자동으로 재시작 처리
+        return;
+      }
+      if(e.error === 'not-allowed'){
+        showToast('⚠️ 마이크 권한이 차단되었습니다. 브라우저 설정에서 허용해 주세요.');
+        stopConfMic();
+        return;
+      }
+      if(e.error === 'network'){
+        showToast('⚠️ 네트워크 오류 — 음성 인식을 재시도합니다.');
+      }
       console.warn('[STT Conf]', lang, e.error);
       if(isConfRunning && !_confStopIntentional){
-        setTimeout(() => { if(isConfRunning) try{ r.start(); }catch{} }, 300);
+        safeStart();
       }
     };
 
-    try{ r.start(); } catch(err){ console.warn('[STT Conf] start 실패:', lang, err); }
+    // ★ 안드로이드 Chrome: start() 직후 바로 실행
+    try{ r.start(); _isStarted = true; } catch(err){ console.warn('[STT Conf] start 실패:', lang, err); safeStart(); }
     return r;
   }
 
@@ -8355,6 +8407,7 @@ const API_KEY_MAP = {
   gemini:    { storage:'gemini_api_key',    inputId:'inputGeminiKey',    regId:'apiReg-gemini',    inpId:'apiInput-gemini'    },
   openai:    { storage:'openai_api_key',    inputId:'inputOpenaiKey',    regId:'apiReg-openai',    inpId:'apiInput-openai'    },
   anthropic: { storage:'anthropic_api_key', inputId:'inputAnthropicKey', regId:'apiReg-anthropic', inpId:'apiInput-anthropic' },
+  deepl:     { storage:'deepl_api_key',     inputId:'inputDeeplKey',     regId:'apiReg-deepl',     inpId:'apiInput-deepl'     },
 };
 
 /**
@@ -8436,7 +8489,7 @@ function renderApiKeyState(provider){
 
 /** 모달 열릴 때 3개 모두 렌더 */
 function loadApiKeyInputs(){
-  ['gemini','openai','anthropic'].forEach(renderApiKeyState);
+  ['gemini','openai','anthropic','deepl'].forEach(renderApiKeyState);
 }
 
 /** [등록] 버튼 */
@@ -8453,6 +8506,7 @@ function saveApiKey(provider){
   renderApiKeyState(provider);
   updateApiKeyStatus(); // 레거시 배지 호환
   syncFunctionLockState();
+  syncModelSelectsToKeys(); // ★ DeepL 등 모델 셀렉트 즉시 갱신
   showToast(`✅ ${provider.toUpperCase()} API 키 등록 완료`);
 }
 
