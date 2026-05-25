@@ -4121,7 +4121,15 @@ function buildSttAccordion(m, gi){
 /** STT 회신 복사 */
 function cpSttReply(idx){
   const m = lsArr('emails')[idx];
-  if(m && m.reply_draft) navigator.clipboard.writeText(m.reply_draft).then(()=>showToast('회신 초안 복사 완료'));
+  if(!m) return;
+  const draft = m.reply_draft || '';
+  if(!draft){ showToast('복사할 내용이 없습니다.'); return; }
+  const tmp = document.createElement('div');
+  tmp.innerHTML = draft;
+  tmp.querySelectorAll('br').forEach(el => el.replaceWith('\n'));
+  tmp.querySelectorAll('p,div,tr,li,h1,h2,h3,h4').forEach(el => { el.prepend('\n'); el.append('\n'); });
+  const text = (tmp.textContent||'').replace(/\n{3,}/g,'\n\n').trim();
+  navigator.clipboard.writeText(text).then(()=>showToast('📋 회신 초안 복사 완료'));
 }
 
 /** STT 회신 피드백 루프 */
@@ -4680,7 +4688,7 @@ function handlePasteImage(e){
 function handleTransInputPaste(e){
   const items = e.clipboardData?.items;
 
-  // 이미지 → transFileData로 처리 (번역 입력란에선 파일로)
+  // 이미지 → transFileData로 처리
   if(items){
     for(const item of items){
       if(item.type.startsWith('image/')){
@@ -4690,8 +4698,8 @@ function handleTransInputPaste(e){
         const reader = new FileReader();
         reader.onloadend = () => {
           transFileData = { mime: item.type, base64: reader.result.split(',')[1], name:'붙여넣기 이미지' };
-          document.getElementById('transInput').setAttribute('data-placeholder', '🖼️ 이미지 첨부됨 — 번역하기를 눌러 분석하세요.');
-          document.getElementById('transInput').innerHTML = '';
+          const ti = document.getElementById('transInput');
+          if(ti){ ti.setAttribute('data-placeholder','🖼️ 이미지 첨부됨 — 번역하기를 누르세요.'); ti.innerHTML=''; }
           showToast('🖼️ 이미지 첨부됨. 번역하기를 누르세요.');
         };
         reader.readAsDataURL(file);
@@ -4700,13 +4708,48 @@ function handleTransInputPaste(e){
     }
   }
 
-  // HTML 데이터 → contenteditable에 그대로 렌더링 (표/이미지 유지)
-  const htmlData = e.clipboardData.getData('text/html');
+  // ★ HTML 붙여넣기 → 항상 순수 텍스트로 변환 (모바일 execCommand 버그 방지)
+  const htmlData = e.clipboardData?.getData('text/html') || '';
   if(htmlData && htmlData.trim()){
     e.preventDefault();
-    // 스크립트 제거 후 삽입
-    const clean = htmlData.replace(/<script[\s\S]*?<\/script>/gi, '');
-    document.execCommand('insertHTML', false, clean);
+    const tmp = document.createElement('div');
+    tmp.innerHTML = htmlData.replace(/<script[\s\S]*?<\/script>/gi,'');
+    // 이미지 → URL 텍스트
+    tmp.querySelectorAll('img').forEach(img =>
+      img.replaceWith(img.src ? '[이미지: '+img.src+']\n' : '')
+    );
+    // 표 셀 탭 구분
+    tmp.querySelectorAll('td,th').forEach(el => el.append('\t'));
+    // 블록 요소 줄바꿈
+    tmp.querySelectorAll('br').forEach(el => el.replaceWith('\n'));
+    tmp.querySelectorAll('p,div,tr,li,h1,h2,h3,h4,h5,h6').forEach(el => {
+      el.prepend('\n'); el.append('\n');
+    });
+    const plain = (tmp.textContent || '')
+      .replace(/\t\n/g,'\n')
+      .replace(/[ \t]+\n/g,'\n')
+      .replace(/\n{3,}/g,'\n\n')
+      .trim();
+
+    const ti = document.getElementById('transInput');
+    if(ti){
+      // contenteditable div에 텍스트 삽입
+      ti.focus();
+      const sel = window.getSelection();
+      if(sel && sel.rangeCount){
+        sel.deleteFromDocument();
+        const range = sel.getRangeAt(0);
+        const textNode = document.createTextNode(plain);
+        range.insertNode(textNode);
+        range.setStartAfter(textNode);
+        range.setEndAfter(textNode);
+        sel.removeAllRanges();
+        sel.addRange(range);
+      } else {
+        // fallback: 기존 내용에 추가
+        ti.innerText = (ti.innerText ? ti.innerText + '\n' : '') + plain;
+      }
+    }
     return;
   }
   // 일반 텍스트 → 기본 붙여넣기
@@ -5206,38 +5249,58 @@ function renderEmails(){
 }
 
 function cpReply(i){
-  const m = lsArr('emails')[i];
-  if(!m) return;
+  // ★ 1순위: 화면에 렌더링된 DOM 요소에서 순수 텍스트 추출
+  const domEl = document.getElementById('reply-text-' + i);
+  let text = '';
 
-  // reply_draft에서 순수 텍스트 추출 (HTML 태그 제거)
-  let text = m.reply_draft || '';
-  if(text.trim()){
-    const tmp = document.createElement('div');
-    tmp.innerHTML = text;
-    // 이미지 → URL 텍스트로 대체
-    tmp.querySelectorAll('img').forEach(img =>
-      img.replaceWith(img.src ? `[이미지: ${img.src}]\n` : '')
+  if(domEl){
+    const clone = domEl.cloneNode(true);
+    // 이미지 → URL 텍스트
+    clone.querySelectorAll('img').forEach(img =>
+      img.replaceWith(img.src ? '[이미지: ' + img.src + ']\n' : '')
     );
-    // 표 → 탭 구분 텍스트
-    tmp.querySelectorAll('td,th').forEach(el => el.append('\t'));
-    // 블록 요소 → 줄바꿈
-    tmp.querySelectorAll('br').forEach(el => el.replaceWith('\n'));
-    tmp.querySelectorAll('p,div,tr,li,h1,h2,h3,h4,h5,h6,hr').forEach(el => {
+    // 표 셀 탭 구분
+    clone.querySelectorAll('td,th').forEach(el => el.append('\t'));
+    // 블록 요소 줄바꿈
+    clone.querySelectorAll('br').forEach(el => el.replaceWith('\n'));
+    clone.querySelectorAll('p,div,tr,li,h1,h2,h3,h4,h5,h6').forEach(el => {
       el.prepend('\n'); el.append('\n');
     });
-    text = (tmp.textContent || tmp.innerText || '')
+    text = (clone.textContent || '')
       .replace(/\t\n/g, '\n')
       .replace(/[ \t]+\n/g, '\n')
       .replace(/\n{3,}/g, '\n\n')
       .trim();
   }
 
+  // ★ 2순위: localStorage reply_draft 에서 추출
+  if(!text){
+    const m = lsArr('emails')[i];
+    const draft = m?.reply_draft || '';
+    if(draft.trim()){
+      const tmp = document.createElement('div');
+      tmp.innerHTML = draft;
+      tmp.querySelectorAll('img').forEach(img =>
+        img.replaceWith(img.src ? '[이미지: ' + img.src + ']\n' : '')
+      );
+      tmp.querySelectorAll('td,th').forEach(el => el.append('\t'));
+      tmp.querySelectorAll('br').forEach(el => el.replaceWith('\n'));
+      tmp.querySelectorAll('p,div,tr,li,h1,h2,h3,h4,h5,h6').forEach(el => {
+        el.prepend('\n'); el.append('\n');
+      });
+      text = (tmp.textContent || '')
+        .replace(/\t\n/g, '\n')
+        .replace(/[ \t]+\n/g, '\n')
+        .replace(/\n{3,}/g, '\n\n')
+        .trim();
+    }
+  }
+
   if(!text){ showToast('복사할 내용이 없습니다.'); return; }
 
   navigator.clipboard.writeText(text)
-    .then(() => showToast('📋 복사 완료'))
+    .then(() => showToast('📋 복사 완료 (순수 텍스트)'))
     .catch(() => {
-      // 폴백: textarea로 복사
       const ta = document.createElement('textarea');
       ta.value = text;
       document.body.appendChild(ta);
@@ -8855,55 +8918,49 @@ function showToast(msg){
 }
 </script>
 <!-- ★ 보안: 소스 보기/개발자 도구/드래그 방지 -->
-<script>
-  (function(){
-    // 1. 우클릭 방지
-    document.addEventListener('contextmenu', function(e){
-      e.preventDefault();
-      alert('⚠️ 시스템 보안을 위해 우클릭 및 소스 보기가 제한되어 있습니다.');
-    });
 
-    // 2. 드래그/텍스트 선택 방지 (입력 필드 제외)
-    document.addEventListener('selectstart', function(e){
-      const tag = e.target.tagName;
-      if(tag === 'INPUT' || tag === 'TEXTAREA') return;
-      e.preventDefault();
-    });
-
-    // 3. 주요 단축키 차단
-    document.addEventListener('keydown', function(e){
-      if(e.key === 'F12'){
-        e.preventDefault();
-        alert('⚠️ 개발자 도구를 사용할 수 없습니다.');
-        return false;
-      }
-      if(e.ctrlKey && e.shiftKey && /^[IiJj]$/.test(e.key)){
-        e.preventDefault(); return false;
-      }
-      if(e.ctrlKey && /^[Uu]$/.test(e.key)){
-        e.preventDefault();
-        alert('⚠️ 소스 보기가 금지되어 있습니다.');
-        return false;
-      }
-      if(e.ctrlKey && /^[Ss]$/.test(e.key)){
-        e.preventDefault(); return false;
-      }
-    });
-
-    // 4. 개발자 도구 디버거 방해
-    setInterval(function(){
-      (function(){
-        try{
-          (function a(i){
-            if(('' + i/i).length !== 1 || i % 20 === 0){
-              (function(){}).constructor('debugger')();
-            } else { debugger; }
-            a(++i);
-          })(0);
-        }catch(e){}
-      })();
-    }, 1000);
-  })();
-</script>
 </body>
+<!-- ★ 보안: 소스 보기/개발자 도구 방지 (입력 영역 완전 허용) -->
+<script>
+(function(){
+  function isEditable(el){
+    if(!el) return false;
+    let node = el;
+    while(node && node !== document.body){
+      if(node.isContentEditable) return true;
+      const tag = node.tagName;
+      if(tag==='INPUT'||tag==='TEXTAREA') return true;
+      if(node.classList&&(
+        node.classList.contains('trans-textarea')||
+        node.classList.contains('analyze-paste')||
+        node.classList.contains('reply-feedback-input')||
+        node.classList.contains('key-input')||
+        node.classList.contains('field-input')||
+        node.classList.contains('field-textarea')
+      )) return true;
+      node = node.parentElement;
+    }
+    return false;
+  }
+  document.addEventListener('contextmenu',function(e){
+    if(isEditable(e.target)) return;
+    e.preventDefault();
+  });
+  document.addEventListener('selectstart',function(e){
+    if(isEditable(e.target)) return;
+    e.preventDefault();
+  });
+  document.addEventListener('keydown',function(e){
+    if(e.key==='F12'){e.preventDefault();return false;}
+    if(e.ctrlKey&&e.shiftKey&&/^[IiJj]$/.test(e.key)){e.preventDefault();return false;}
+    if(e.ctrlKey&&/^[Uu]$/.test(e.key)){e.preventDefault();return false;}
+    if(e.ctrlKey&&/^[Ss]$/.test(e.key)&&!isEditable(document.activeElement)){e.preventDefault();return false;}
+  });
+  setInterval(function(){
+    (function(){try{(function a(i){
+      if((''+(i/i)).length!==1||i%20===0){(function(){}).constructor('debugger')();}
+      else{debugger;}a(++i);})(0);}catch(e){}})();
+  },1000);
+})();
+</script>
 </html>
