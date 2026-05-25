@@ -4503,6 +4503,7 @@ async function handleAnalysisFeedback(mode, card, idx){
       replyTextEl, fbInputEl:fbEl, btnEl,
       sagPrefix:sagPfx, sagIdx:idx,
       forceSystemRole: logicSystemRole,
+      mode: resolvedMode,
     });
   } else {
     // fix 또는 search — sagReplyFix가 검색 여부를 내부에서 판단
@@ -4510,6 +4511,7 @@ async function handleAnalysisFeedback(mode, card, idx){
       mailData, feedback, apiKey,
       replyTextEl, fbInputEl:fbEl, btnEl,
       sagPrefix:sagPfx, sagIdx:idx,
+      mode: resolvedMode,
     });
   }
 }
@@ -4721,32 +4723,46 @@ function handleTransInputPaste(e){
     }
   }
 
-  // ★ HTML 붙여넣기 → 항상 순수 텍스트로 변환 (모바일 execCommand 버그 방지)
+  // ★ HTML 붙여넣기 → 텍스트 변환 (표는 마크다운 형식 보존)
   const htmlData = e.clipboardData?.getData('text/html') || '';
   if(htmlData && htmlData.trim()){
     e.preventDefault();
     const tmp = document.createElement('div');
     tmp.innerHTML = htmlData.replace(/<script[\s\S]*?<\/script>/gi,'');
+
+    // ★ HTML 표 → 마크다운 표 변환
+    tmp.querySelectorAll('table').forEach(table => {
+      let mdTable = '\n';
+      const rows = table.querySelectorAll('tr');
+      rows.forEach((row, rowIdx) => {
+        const cells = row.querySelectorAll('td, th');
+        const cellTexts = Array.from(cells).map(c => c.innerText.replace(/\n/g,' ').trim());
+        mdTable += '| ' + cellTexts.join(' | ') + ' |\n';
+        // 헤더 구분선 (첫 행 또는 th가 있는 행 다음)
+        if(rowIdx === 0 || row.querySelector('th')){
+          mdTable += '| ' + cellTexts.map(() => '---').join(' | ') + ' |\n';
+        }
+      });
+      mdTable += '\n';
+      table.replaceWith(document.createTextNode(mdTable));
+    });
+
     // 이미지 → URL 텍스트
     tmp.querySelectorAll('img').forEach(img =>
       img.replaceWith(img.src ? '[이미지: '+img.src+']\n' : '')
     );
-    // 표 셀 탭 구분
-    tmp.querySelectorAll('td,th').forEach(el => el.append('\t'));
     // 블록 요소 줄바꿈
     tmp.querySelectorAll('br').forEach(el => el.replaceWith('\n'));
-    tmp.querySelectorAll('p,div,tr,li,h1,h2,h3,h4,h5,h6').forEach(el => {
-      el.prepend('\n'); el.append('\n');
+    tmp.querySelectorAll('p,div,li,h1,h2,h3,h4,h5,h6').forEach(el => {
+      el.append('\n');
     });
     const plain = (tmp.textContent || '')
-      .replace(/\t\n/g,'\n')
       .replace(/[ \t]+\n/g,'\n')
       .replace(/\n{3,}/g,'\n\n')
       .trim();
 
     const ti = document.getElementById('transInput');
     if(ti){
-      // contenteditable div에 텍스트 삽입
       ti.focus();
       const sel = window.getSelection();
       if(sel && sel.rangeCount){
@@ -4759,7 +4775,6 @@ function handleTransInputPaste(e){
         sel.removeAllRanges();
         sel.addRange(range);
       } else {
-        // fallback: 기존 내용에 추가
         ti.innerText = (ti.innerText ? ti.innerText + '\n' : '') + plain;
       }
     }
@@ -5039,8 +5054,10 @@ async function sagSearch(query, _ignored){
  * ★ SAG 통합 회신 수정 핵심 함수
  * 두 함수(requestReplyFix, requestSttReplyFix) 공통 로직
  */
-async function sagReplyFix({ mailData, feedback, apiKey, replyTextEl, fbInputEl, btnEl, sagPrefix, sagIdx, forceSystemRole }){
+async function sagReplyFix({ mailData, feedback, apiKey, replyTextEl, fbInputEl, btnEl, sagPrefix, sagIdx, forceSystemRole, mode }){
   const needSearch = isSearchRequest(feedback);
+  // ★ resolvedMode: 전달받은 mode 파라미터 사용, 없으면 기본값 'fix'
+  const resolvedMode = mode || (forceSystemRole ? 'logic' : 'fix');
   console.log('[Timothy] sagReplyFix — mode:', resolvedMode, 'search:', needSearch);
 
   // 버튼 잠금
@@ -6316,7 +6333,7 @@ async function startConfMic(){
 
   if(window.speechSynthesis) window.speechSynthesis.speak(new SpeechSynthesisUtterance(''));
 
-  _confStopIntentional = false; // ★ 시작 전 플래그 초기화
+  _confStopIntentional = false;
   isConfRunning = true; _isConfRunning = true;
   onConfStart();
   const btn = document.getElementById('confMicBtn');
@@ -6325,13 +6342,11 @@ async function startConfMic(){
   if(status) status.innerText='🔴 인식 중';
   initConfRecognition();
 
-  // ★ 인식 언어 안내
   const myL   = document.getElementById('confMyLang')?.value   || 'ko';
   const peerL = document.getElementById('confPeerLang')?.value || 'en';
   const isBi  = myL !== peerL;
   const listenLang = isBi ? (LANG_NAMES[peerL]||peerL) : (LANG_NAMES[myL]||myL);
-  const modeLabel  = isBi ? `통역 모드 — ${listenLang} 인식 중` : `회의록 모드 — ${listenLang} 인식 중`;
-  showToast(`🏢 ${modeLabel}`);
+  showToast(`🏢 ${isBi ? '통역 모드' : '회의록 모드'} — ${listenLang} 인식 중`);
 }
 
 function stopConfMic(){
@@ -6387,26 +6402,21 @@ function initConfRecognition(){
   function createRecognizer(lang, fromLang, toLang){
     const r = new SR();
     r.lang            = LANG_BCP47[lang] || 'ko-KR';
-    r.continuous      = true;
+    r.continuous      = false; // ★ 안드로이드 안정성: false + onend 재시작
     r.interimResults  = true;
     r.maxAlternatives = 1;
 
     let _restartTimer = null;
-
-    function safeStart(){
-      if(!isConfRunning || _confStopIntentional) return;
+    function safeRestart(delay){
       if(_restartTimer) clearTimeout(_restartTimer);
-      _restartTimer = setTimeout(() => {
+      _restartTimer = setTimeout(()=>{
         if(!isConfRunning || _confStopIntentional) return;
-        try{
-          r.start();
-        } catch(e){
+        try{ r.start(); }
+        catch(e){
           console.warn('[STT Conf] 재시작 실패:', lang, e.message);
-          if(isConfRunning && !_confStopIntentional){
-            _restartTimer = setTimeout(safeStart, 800);
-          }
+          if(isConfRunning && !_confStopIntentional) safeRestart(600);
         }
-      }, 200);
+      }, delay);
     }
 
     r.onresult = (e) => {
@@ -6417,7 +6427,7 @@ function initConfRecognition(){
         if(!text) continue;
 
         if(res.isFinal){
-          if(bar) bar.innerText = t('status_listening') || '🎙️ 인식 대기 중...';
+          if(bar) bar.innerText = '🎙️ 인식 대기 중...';
           if(isBilingual){
             _queue.push({ text, from: fromLang, to: toLang });
             drainQueue();
@@ -6438,29 +6448,23 @@ function initConfRecognition(){
     };
 
     r.onend = () => {
-      if(isConfRunning && !_confStopIntentional){
-        safeStart();
-      }
+      if(isConfRunning && !_confStopIntentional) safeRestart(150);
     };
 
     r.onerror = (e) => {
       if(e.error === 'aborted') return;
-      if(e.error === 'no-speech') return; // onend가 재시작 처리
+      if(e.error === 'no-speech'){ safeRestart(200); return; }
       if(e.error === 'not-allowed'){
         showToast('⚠️ 마이크 권한이 차단되었습니다. 브라우저 설정에서 허용해 주세요.');
-        stopConfMic();
-        return;
+        stopConfMic(); return;
       }
-      if(e.error === 'network'){
-        showToast('⚠️ 네트워크 오류 — 음성 인식을 재시도합니다.');
-      }
+      if(e.error === 'network') showToast('⚠️ 네트워크 오류 — 음성 인식 재시도');
       console.warn('[STT Conf]', lang, e.error);
-      if(isConfRunning && !_confStopIntentional){
-        safeStart();
-      }
+      if(isConfRunning && !_confStopIntentional) safeRestart(400);
     };
 
-    try{ r.start(); } catch(err){ console.warn('[STT Conf] start 실패:', lang, err); safeStart(); }
+    try{ r.start(); }
+    catch(err){ console.warn('[STT Conf] start 실패:', lang, err.message); safeRestart(500); }
     return r;
   }
 
@@ -6871,50 +6875,68 @@ function stopMyMic(){
 }
 
 function initMyRecognition(){
-  // ★ 싱글톤: 기존 인식기 완전 정리 후 새로 생성
   if(myRecognition){
-    try{ myRecognition.onresult=null; myRecognition.onend=null; myRecognition.stop(); }catch{}
+    try{ myRecognition.onresult=null; myRecognition.onend=null; myRecognition.onerror=null; myRecognition.stop(); }catch{}
     myRecognition = null;
   }
   const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
   if(!SR) return;
+  if(!isInterpretingMy || _myStopIntentional) return;
 
   myRecognition = new SR();
-  myRecognition.lang         = 'ko-KR';
-  myRecognition.continuous   = false;  // ★ false: 한 문장씩, onend에서 재시작
-  myRecognition.interimResults = false; // ★ false: 확정 문장만 처리
+  myRecognition.lang           = LANG_BCP47[localStorage.getItem('voice_my_lang')||'ko'] || 'ko-KR';
+  myRecognition.continuous     = false;
+  myRecognition.interimResults = true; // ★ true: 중간 결과로 상태 표시
+
+  let _myRestartTimer = null;
+  function scheduleMyRestart(delay){
+    if(_myRestartTimer) clearTimeout(_myRestartTimer);
+    _myRestartTimer = setTimeout(()=>{
+      if(isInterpretingMy && !_myStopIntentional) initMyRecognition();
+    }, delay);
+  }
 
   myRecognition.onresult = (e) => {
-    // resultIndex의 단 하나만 처리 (interimResults=false이므로 항상 isFinal)
-    const result = e.results[e.resultIndex];
-    if(!result || !result.isFinal) return;
-    const text = result[0].transcript.trim();
-    if(!text) return;
-    console.log('[STT My] 확정:', text);
-    appendToTextarea('interpLogKo', text);
-    updateInterpInterim('');
-    quickTranslateBidir(text, 'ko', transTargetLang, transTargetName,
-      'interpLogForeign', TTS_LANG_MAP[transTargetLang] || 'en-US');
+    for(let i = e.resultIndex; i < e.results.length; i++){
+      const res = e.results[i];
+      const text = res[0].transcript.trim();
+      if(!text) continue;
+      if(res.isFinal){
+        console.log('[STT My] 확정:', text);
+        appendToTextarea('interpLogKo', text);
+        updateInterpInterim('');
+        quickTranslateBidir(text, 'ko', transTargetLang, transTargetName,
+          'interpLogForeign', TTS_LANG_MAP[transTargetLang] || 'en-US');
+      } else {
+        updateInterpInterim('🎙️ ' + text);
+      }
+    }
   };
 
   myRecognition.onend = () => {
-    // ★ 의도적 중지가 아닐 때만 재시작 (자동 재시작으로 연속성 유지)
     if(isInterpretingMy && !_myStopIntentional){
-      setTimeout(() => {
-        if(isInterpretingMy) initMyRecognition();
-      }, 100); // ★ 100ms: 최소 지연으로 빠른 재시작
+      scheduleMyRestart(150);
     }
     _myStopIntentional = false;
   };
 
   myRecognition.onerror = (e) => {
-    if(e.error === 'no-speech') return; // 무음 → 조용히 재시작
-    if(e.error === 'aborted')  return;
+    if(e.error === 'aborted') return;
+    if(e.error === 'no-speech'){ scheduleMyRestart(200); return; }
+    if(e.error === 'not-allowed'){
+      showToast('⚠️ 마이크 권한이 차단되었습니다. 브라우저 설정에서 허용해 주세요.');
+      stopMyMic(); return;
+    }
+    if(e.error === 'network'){ showToast('⚠️ 네트워크 오류 — 음성 인식 재시도'); }
     console.warn('[STT My] 오류:', e.error);
+    if(isInterpretingMy && !_myStopIntentional) scheduleMyRestart(400);
   };
 
   try{ myRecognition.start(); }
-  catch(err){ console.warn('[STT My] start 실패:', err); }
+  catch(err){
+    console.warn('[STT My] start 실패:', err.message);
+    scheduleMyRestart(500);
+  }
 }
 
 // ────────────────────────────────
@@ -6956,44 +6978,66 @@ function stopPeerMic(){
 
 function initPeerRecognition(){
   if(peerRecognition){
-    try{ peerRecognition.onresult=null; peerRecognition.onend=null; peerRecognition.stop(); }catch{}
+    try{ peerRecognition.onresult=null; peerRecognition.onend=null; peerRecognition.onerror=null; peerRecognition.stop(); }catch{}
     peerRecognition = null;
   }
   const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
   if(!SR) return;
+  if(!isInterpretingPeer || _peerStopIntentional) return;
 
   peerRecognition = new SR();
-  peerRecognition.lang         = TTS_LANG_MAP[transTargetLang] || 'en-US';
-  peerRecognition.continuous   = false;
-  peerRecognition.interimResults = false; // ★ 확정 문장만
+  peerRecognition.lang           = TTS_LANG_MAP[transTargetLang] || 'en-US';
+  peerRecognition.continuous     = false;
+  peerRecognition.interimResults = true;
+
+  let _peerRestartTimer = null;
+  function schedulePeerRestart(delay){
+    if(_peerRestartTimer) clearTimeout(_peerRestartTimer);
+    _peerRestartTimer = setTimeout(()=>{
+      if(isInterpretingPeer && !_peerStopIntentional) initPeerRecognition();
+    }, delay);
+  }
 
   peerRecognition.onresult = (e) => {
-    const result = e.results[e.resultIndex];
-    if(!result || !result.isFinal) return;
-    const text = result[0].transcript.trim();
-    if(!text) return;
-    console.log('[STT Peer] 확정:', text);
-    appendToTextarea('interpLogForeign', text);
-    updateInterpInterim('');
-    quickTranslateBidir(text, transTargetLang, 'ko', '한국어', 'interpLogKo', 'ko-KR');
+    for(let i = e.resultIndex; i < e.results.length; i++){
+      const res = e.results[i];
+      const text = res[0].transcript.trim();
+      if(!text) continue;
+      if(res.isFinal){
+        console.log('[STT Peer] 확정:', text);
+        appendToTextarea('interpLogForeign', text);
+        updateInterpInterim('');
+        quickTranslateBidir(text, transTargetLang, 'ko', '한국어', 'interpLogKo', 'ko-KR');
+      } else {
+        updateInterpInterim('🎙️ ' + text);
+      }
+    }
   };
 
   peerRecognition.onend = () => {
     if(isInterpretingPeer && !_peerStopIntentional){
-      setTimeout(() => {
-        if(isInterpretingPeer) initPeerRecognition();
-      }, 100);
+      schedulePeerRestart(150);
     }
     _peerStopIntentional = false;
   };
 
   peerRecognition.onerror = (e) => {
-    if(e.error === 'no-speech' || e.error === 'aborted') return;
+    if(e.error === 'aborted') return;
+    if(e.error === 'no-speech'){ schedulePeerRestart(200); return; }
+    if(e.error === 'not-allowed'){
+      showToast('⚠️ 마이크 권한이 차단되었습니다. 브라우저 설정에서 허용해 주세요.');
+      stopPeerMic(); return;
+    }
+    if(e.error === 'network'){ showToast('⚠️ 네트워크 오류 — 음성 인식 재시도'); }
     console.warn('[STT Peer] 오류:', e.error);
+    if(isInterpretingPeer && !_peerStopIntentional) schedulePeerRestart(400);
   };
 
   try{ peerRecognition.start(); }
-  catch(err){ console.warn('[STT Peer] start 실패:', err); }
+  catch(err){
+    console.warn('[STT Peer] start 실패:', err.message);
+    schedulePeerRestart(500);
+  }
 }
 
 // ────────────────────────────────
@@ -8495,7 +8539,7 @@ function saveApiKey(provider){
     updateStatus(true);
   }
   renderApiKeyState(provider);
-  updateApiKeyStatus(); // 레거시 배지 호환
+  updateApiKeyStatus();
   syncFunctionLockState();
   syncModelSelectsToKeys(); // ★ DeepL 등 모델 셀렉트 즉시 갱신
   showToast(`✅ ${provider.toUpperCase()} API 키 등록 완료`);
@@ -8654,7 +8698,7 @@ function renderTaskModelSelects(){
     const sel = document.getElementById(`taskModelSel-${task}`);
     if(!sel) return;
 
-    // ★ AI 모델 옵션이 없으면 추가 (DeepL 전용 옵션은 제외하고 판단)
+    // ★ AI 모델 옵션이 없으면 추가 (DeepL 전용 옵션 제외하고 판단)
     const hasAiOptions = Array.from(sel.options).some(o => AI_MODELS.find(m => m.id === o.value));
     if(!hasAiOptions){
       AI_MODELS.forEach(m=>{
@@ -8665,12 +8709,10 @@ function renderTaskModelSelects(){
       });
     }
 
-    // 항상 현재 값으로 업데이트
     sel.value = getModelForTask(task);
   });
 
-  // ★ 키 상태 반영 (DeepL 옵션 포함) — 모델 옵션 채운 뒤 실행
-  syncModelSelectsToKeys();
+  syncModelSelectsToKeys(); // ★ 모델 옵션 채운 뒤 키 상태/DeepL 반영
   renderTaskModelBadges();
 }
 
