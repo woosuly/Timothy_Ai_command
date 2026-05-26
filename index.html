@@ -973,11 +973,20 @@ textarea::-webkit-scrollbar-thumb{background:#334155;border-radius:4px;}
 /* ── AI 출력 렌더링 — 표·이미지·마크다운 ── */
 .ai-render-wrap{ overflow-x:auto; }
 .ai-render-wrap table{
-  width:100%;border-collapse:collapse;margin:14px 0;font-size:12px;
+  min-width:480px;          /* ★ 최소 너비 보장 → 모바일에서 가로 스크롤 */
+  border-collapse:collapse;margin:14px 0;font-size:12px;
   text-align:left;background:#1e293b;border-radius:6px;overflow:hidden;
+  table-layout:auto;        /* ★ auto: 내용에 따라 셀 너비 자동 결정 */
 }
 .ai-render-wrap th,.ai-render-wrap td{
-  padding:9px 11px;border:1px solid #334155;word-break:break-all;
+  padding:7px 10px;border:1px solid #334155;
+  word-break:keep-all;      /* ★ keep-all: 단어 단위 줄바꿈 (break-all 제거) */
+  white-space:nowrap;       /* ★ 기본적으로 줄바꿈 없이 → 표가 가로로 확장 */
+  vertical-align:middle;
+}
+.ai-render-wrap td{
+  white-space:normal;       /* ★ 데이터 셀만 줄바꿈 허용 (헤더는 nowrap 유지) */
+  min-width:60px;
 }
 .ai-render-wrap th{
   background:#0f172a;color:#3b82f6;font-weight:700;
@@ -4703,7 +4712,7 @@ function handlePasteImage(e){
 function handleTransInputPaste(e){
   const items = e.clipboardData?.items;
 
-  // 이미지 → transFileData로 처리
+  // ① 클립보드에 이미지 파일 직접 있을 때 (스크린샷 붙여넣기)
   if(items){
     for(const item of items){
       if(item.type.startsWith('image/')){
@@ -4723,42 +4732,61 @@ function handleTransInputPaste(e){
     }
   }
 
-  // ★ HTML 붙여넣기 → 텍스트 변환 (표는 마크다운 형식 보존)
+  // ② HTML 붙여넣기 (회신 초안 등 서식 있는 콘텐츠)
   const htmlData = e.clipboardData?.getData('text/html') || '';
   if(htmlData && htmlData.trim()){
     e.preventDefault();
     const tmp = document.createElement('div');
     tmp.innerHTML = htmlData.replace(/<script[\s\S]*?<\/script>/gi,'');
 
-    // ★ HTML 표 → 마크다운 표 변환
+    // ★ HTML 표 → 마크다운 표 변환 (구조 보존)
     tmp.querySelectorAll('table').forEach(table => {
       let mdTable = '\n';
-      const rows = table.querySelectorAll('tr');
-      rows.forEach((row, rowIdx) => {
+      const rows = Array.from(table.querySelectorAll('tr'));
+      let headerDone = false;
+      rows.forEach(row => {
         const cells = row.querySelectorAll('td, th');
-        const cellTexts = Array.from(cells).map(c => c.innerText.replace(/\n/g,' ').trim());
+        if(!cells.length) return;
+        const isHeader = !!row.querySelector('th');
+        const cellTexts = Array.from(cells).map(c =>
+          (c.innerText || c.textContent || '').replace(/\n+/g,' ').replace(/\|/g,'').trim()
+        );
         mdTable += '| ' + cellTexts.join(' | ') + ' |\n';
-        // 헤더 구분선 (첫 행 또는 th가 있는 행 다음)
-        if(rowIdx === 0 || row.querySelector('th')){
+        if((isHeader || !headerDone) && rows.length > 1){
           mdTable += '| ' + cellTexts.map(() => '---').join(' | ') + ' |\n';
+          headerDone = true;
         }
       });
       mdTable += '\n';
       table.replaceWith(document.createTextNode(mdTable));
     });
 
-    // 이미지 → URL 텍스트
-    tmp.querySelectorAll('img').forEach(img =>
-      img.replaceWith(img.src ? '[이미지: '+img.src+']\n' : '')
-    );
+    // ★ 이미지 처리 — http URL은 마크다운으로 보존, base64는 첨부로
+    tmp.querySelectorAll('img').forEach(img => {
+      const src = img.getAttribute('src') || '';
+      const alt = img.getAttribute('alt') || '이미지';
+      if(src.startsWith('http')){
+        img.replaceWith(document.createTextNode(`\n![${alt}](${src})\n`));
+      } else if(src.startsWith('data:')){
+        const mimeMatch = src.match(/^data:([^;]+);/);
+        if(mimeMatch && !transFileData){
+          transFileData = { mime: mimeMatch[1], base64: src.split(',')[1], name:'붙여넣기 이미지' };
+          showToast('🖼️ 이미지가 첨부 파일로 등록됐습니다.');
+        }
+        img.replaceWith(document.createTextNode('\n[이미지 첨부됨]\n'));
+      } else {
+        // blob: URL 등 — 텍스트로 대체
+        img.replaceWith(document.createTextNode('\n[이미지]\n'));
+      }
+    });
+
     // 블록 요소 줄바꿈
     tmp.querySelectorAll('br').forEach(el => el.replaceWith('\n'));
-    tmp.querySelectorAll('p,div,li,h1,h2,h3,h4,h5,h6').forEach(el => {
-      el.append('\n');
-    });
+    tmp.querySelectorAll('p,div,li,h1,h2,h3,h4,h5,h6').forEach(el => el.append('\n'));
+
     const plain = (tmp.textContent || '')
-      .replace(/[ \t]+\n/g,'\n')
-      .replace(/\n{3,}/g,'\n\n')
+      .replace(/[ \t]+\n/g, '\n')
+      .replace(/\n{3,}/g, '\n\n')
       .trim();
 
     const ti = document.getElementById('transInput');
@@ -4780,7 +4808,7 @@ function handleTransInputPaste(e){
     }
     return;
   }
-  // 일반 텍스트 → 기본 붙여넣기
+  // ③ 일반 텍스트 → 기본 붙여넣기
 }
 
 
