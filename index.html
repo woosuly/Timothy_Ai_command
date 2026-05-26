@@ -5215,7 +5215,8 @@ async function sagReplyFix({ mailData, feedback, apiKey, replyTextEl, fbInputEl,
   const resolvedMode = mode || (forceSystemRole ? 'logic' : 'fix');
   console.log('[Timothy] sagReplyFix — mode:', resolvedMode, 'search:', needSearch);
 
-  // 버튼 잠금
+  // 버튼 잠금 — 원래 텍스트 저장
+  const originalBtnText = btnEl ? btnEl.innerText : '';
   if(btnEl){ btnEl.disabled=true; btnEl.innerText='처리 중...'; }
   sagSetStep(sagPrefix, sagIdx, 1);
 
