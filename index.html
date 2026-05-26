@@ -6284,8 +6284,24 @@ function clearTrans(){
 async function runTranslate(){
   if(!requireApiKey()) return;
   const k = localStorage.getItem('gemini_api_key');
-  const text = (document.getElementById('transInput').innerText||document.getElementById('transInput').textContent||'').trim();
-  if(!text && !transFileData){ showToast('번역할 내용을 입력하거나 파일을 첨부하세요.'); return; }
+  const rawText = (document.getElementById('transInput').innerText||document.getElementById('transInput').textContent||'').trim();
+  if(!rawText && !transFileData){ showToast('번역할 내용을 입력하거나 파일을 첨부하세요.'); return; }
+
+  // ★ 이미지 URL 추출 — 번역 대상에서 제외하고 위치 보존
+  const imgPlaceholders = [];
+  const text = rawText.replace(/!\[([^\]]*)\]\((https?:\/\/[^\s)]+)\)/g, (match, alt, url) => {
+    const id = `__IMG_${imgPlaceholders.length}__`;
+    imgPlaceholders.push({ id, alt, url });
+    return id;
+  }).replace(/\[이미지(?::[^\]]*)?\]\((https?:\/\/[^\s)]+)\)/g, (match, url) => {
+    const id = `__IMG_${imgPlaceholders.length}__`;
+    imgPlaceholders.push({ id, alt:'이미지', url });
+    return id;
+  }).replace(/\[이미지(?::[^\]]*)?(?::[^\]]*)?(?:: )?(https?:\/\/[^\s\]]+)\]/g, (match, url) => {
+    const id = `__IMG_${imgPlaceholders.length}__`;
+    imgPlaceholders.push({ id, alt:'이미지', url });
+    return id;
+  });
 
   const btn = document.getElementById('transRunBtn');
   if(btn){ btn.disabled = true; btn.innerText = t('status_translating'); }
@@ -6343,6 +6359,19 @@ async function runTranslate(){
         translated = await callAI(prompt, sysRole, 'translate');
       }
     } // ← Gemini/GPT else 블록 닫기
+
+    // ★ 번역 결과에 이미지 복원
+    if(imgPlaceholders.length > 0){
+      imgPlaceholders.forEach(({ id, alt, url }) => {
+        translated = translated.replace(id, `![${alt}](${url})`);
+      });
+      // 플레이스홀더가 번역되어 다른 형태로 남은 경우 대비 — 원문 이미지 후처리 추가
+      imgPlaceholders.forEach(({ alt, url }) => {
+        if(!translated.includes(url)){
+          translated = translated + `\n\n![${alt}](${url})`;
+        }
+      });
+    }
 
     document.getElementById('transResult') && renderAiOutput(document.getElementById('transResult'), translated);
     showToast(engine==='deepl' ? '🌿 DeepL 번역 완료' : '✅ 번역 완료');
