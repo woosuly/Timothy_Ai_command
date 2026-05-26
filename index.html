@@ -4579,43 +4579,61 @@ async function callDeepL(text, targetLang){
 async function copyRichText(el, toastMsg){
   if(!el) return;
 
-  // ── 1. HTML 복제 후 인라인 CSS 적용 ──
+  // ── 1. 인라인 CSS 적용 (메일/Excel/Word 호환) ──
   const clone = el.cloneNode(true);
 
-  // 표 스타일 강제 삽입 (메일 클라이언트 호환)
   clone.querySelectorAll('table').forEach(t => {
+    t.removeAttribute('class');
     t.setAttribute('border','1');
-    t.style.cssText = 'border-collapse:collapse;width:100%;margin:8px 0;font-size:13px;';
+    t.setAttribute('cellpadding','6');
+    t.setAttribute('cellspacing','0');
+    t.style.cssText = 'border-collapse:collapse;width:100%;margin:10px 0;font-size:13px;font-family:sans-serif;';
   });
-  clone.querySelectorAll('th').forEach(th => {
-    th.style.cssText = 'background:#1e3a5f;color:#e2e8f0;padding:6px 10px;border:1px solid #334155;text-align:left;font-weight:700;';
+  clone.querySelectorAll('thead').forEach(thead => {
+    thead.style.cssText = '';
+  });
+  clone.querySelectorAll('th').forEach((th, i) => {
+    th.style.cssText = 'background-color:#1e3a8a;color:#ffffff;padding:7px 12px;border:1px solid #334155;text-align:left;font-weight:700;white-space:nowrap;';
   });
   clone.querySelectorAll('td').forEach(td => {
-    td.style.cssText = 'padding:5px 10px;border:1px solid #334155;vertical-align:top;';
+    td.style.cssText = 'padding:6px 12px;border:1px solid #cbd5e1;vertical-align:top;background-color:#ffffff;color:#1e293b;';
   });
-  clone.querySelectorAll('tr:nth-child(even) td').forEach(td => {
-    td.style.backgroundColor = '#0f172a';
+  // 짝수 행 배경
+  clone.querySelectorAll('tbody tr:nth-child(even) td').forEach(td => {
+    td.style.backgroundColor = '#f1f5f9';
   });
-  clone.querySelectorAll('strong,b').forEach(e => {
-    e.style.fontWeight = 'bold';
+  clone.querySelectorAll('strong,b').forEach(e => { e.style.fontWeight = '700'; });
+  clone.querySelectorAll('em,i').forEach(e => { e.style.fontStyle = 'italic'; });
+  clone.querySelectorAll('p').forEach(p => { p.style.margin = '6px 0'; });
+  clone.querySelectorAll('ul,ol').forEach(l => { l.style.paddingLeft = '18px'; l.style.margin = '6px 0'; });
+  clone.querySelectorAll('li').forEach(li => { li.style.marginBottom = '3px'; });
+  clone.querySelectorAll('h1,h2,h3').forEach(h => {
+    h.style.cssText = 'margin:10px 0 4px;font-weight:700;color:#0f172a;';
   });
-  clone.querySelectorAll('p').forEach(p => {
-    p.style.margin = '6px 0';
+  clone.querySelectorAll('blockquote').forEach(bq => {
+    bq.style.cssText = 'border-left:4px solid #3b82f6;padding:6px 12px;margin:8px 0;color:#475569;background:#f8fafc;';
   });
-
-  // ── 2. 이미지 처리 — pollinations URL은 <img> 태그로 유지 ──
-  // (메일 클라이언트에서 외부 이미지 로드 허용 시 표시됨)
+  // 이미지 — 외부 URL만 유지 (blob/data는 제거)
   clone.querySelectorAll('img').forEach(img => {
-    img.style.cssText = 'max-width:100%;display:block;margin:8px 0;';
+    const src = img.getAttribute('src') || '';
+    if(src.startsWith('http')){
+      img.style.cssText = 'max-width:100%;height:auto;display:block;margin:8px 0;border-radius:4px;';
+    } else {
+      img.replaceWith(document.createTextNode(''));
+    }
   });
 
-  // 완성된 HTML
-  const htmlContent = `<!DOCTYPE html><html><body style="font-family:sans-serif;font-size:14px;color:#1e293b;line-height:1.6;">${clone.innerHTML}</body></html>`;
+  const htmlContent = [
+    '<!DOCTYPE html>',
+    '<html><head><meta charset="utf-8"></head>',
+    '<body style="font-family:\'Malgun Gothic\',\'맑은 고딕\',sans-serif;font-size:14px;color:#1e293b;line-height:1.7;margin:0;padding:0;">',
+    clone.innerHTML,
+    '</body></html>'
+  ].join('');
 
-  // ── 3. 순수 텍스트 추출 — 표는 마크다운 형식으로 ──
+  // ── 2. 텍스트 추출 — 표는 마크다운 형식으로 (번역란 붙여넣기 호환) ──
   const tmp2 = clone.cloneNode(true);
 
-  // ★ 표 → 마크다운 표 변환 (붙여넣기 시 번역란에서 표 구조 유지)
   tmp2.querySelectorAll('table').forEach(table => {
     let mdRows = [];
     let headerDone = false;
@@ -4644,10 +4662,9 @@ async function copyRichText(el, toastMsg){
     table.replaceWith(document.createTextNode('\n' + mdRows.join('\n') + '\n\n'));
   });
 
-  // 이미지 → URL 텍스트
   tmp2.querySelectorAll('img').forEach(img => {
     const src = img.getAttribute('src') || '';
-    img.replaceWith(src.startsWith('http') ? `\n![이미지](${src})\n` : '');
+    img.replaceWith(document.createTextNode(src.startsWith('http') ? `\n![이미지](${src})\n` : ''));
   });
   tmp2.querySelectorAll('br').forEach(e => e.replaceWith('\n'));
   tmp2.querySelectorAll('p,div,li,h1,h2,h3,h4,h5,h6').forEach(e => e.append('\n'));
@@ -4657,21 +4674,33 @@ async function copyRichText(el, toastMsg){
     .replace(/\n{3,}/g, '\n\n')
     .trim();
 
-  // ── 4. 클립보드에 쓰기 ──
+  // ── 3. 클립보드에 HTML+텍스트 동시 저장 ──
   try{
-    const clipItem = new ClipboardItem({
-      'text/html':  new Blob([htmlContent], { type:'text/html'  }),
-      'text/plain': new Blob([plainText],   { type:'text/plain' }),
-    });
-    await navigator.clipboard.write([clipItem]);
-    showToast(toastMsg || '📋 서식 포함 복사 완료');
-  } catch(e){
-    // ClipboardItem 미지원 → plain text fallback
-    try{
+    if(typeof ClipboardItem !== 'undefined' && navigator.clipboard?.write){
+      const clipItem = new ClipboardItem({
+        'text/html':  new Blob([htmlContent], { type: 'text/html'  }),
+        'text/plain': new Blob([plainText],   { type: 'text/plain' }),
+      });
+      await navigator.clipboard.write([clipItem]);
+      showToast(toastMsg || '📋 서식 포함 복사 완료 (Outlook·Excel에 붙여넣기 가능)');
+    } else {
+      // ClipboardItem 미지원 브라우저 (구버전 Edge 등) → 텍스트 fallback
       await navigator.clipboard.writeText(plainText);
-      showToast((toastMsg||'📋 복사 완료') + ' (이 브라우저는 서식 미지원)');
+      showToast((toastMsg || '📋 복사 완료') + ' (이 브라우저는 서식 미지원)');
+    }
+  } catch(err){
+    // 권한 거부 등 최후 fallback — execCommand
+    try{
+      const ta = document.createElement('textarea');
+      ta.value = plainText;
+      ta.style.cssText = 'position:fixed;top:-9999px;left:-9999px;opacity:0;';
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand('copy');
+      document.body.removeChild(ta);
+      showToast((toastMsg || '📋 복사 완료') + ' (텍스트 전용)');
     } catch(e2){
-      showToast('⚠️ 복사 실패: 브라우저 클립보드 권한을 확인하세요.');
+      showToast('⚠️ 복사 실패 — 브라우저 클립보드 권한을 허용해 주세요.');
     }
   }
 }
@@ -4765,37 +4794,25 @@ function handleTransInputPaste(e){
     const tmp = document.createElement('div');
     tmp.innerHTML = htmlData.replace(/<script[\s\S]*?<\/script>/gi,'');
 
-    // ★ HTML 표 → 마크다운 표 변환 (thead/tbody 구조 포함)
+    // ★ HTML 표 → 마크다운 표 변환 (구조 보존)
     tmp.querySelectorAll('table').forEach(table => {
-      let mdRows = [];
-      let headerInserted = false;
-
-      // thead 처리
-      table.querySelectorAll('thead tr').forEach(row => {
-        const cells = Array.from(row.querySelectorAll('th, td'));
+      let mdTable = '\n';
+      const rows = Array.from(table.querySelectorAll('tr'));
+      let headerDone = false;
+      rows.forEach(row => {
+        const cells = row.querySelectorAll('td, th');
         if(!cells.length) return;
-        const texts = cells.map(c => (c.textContent||'').replace(/\n+/g,' ').replace(/\|/g,'⎸').trim());
-        mdRows.push('| ' + texts.join(' | ') + ' |');
-        mdRows.push('| ' + texts.map(()=>'---').join(' | ') + ' |');
-        headerInserted = true;
-      });
-
-      // tbody 처리 (thead 없으면 첫 행을 헤더로)
-      table.querySelectorAll('tbody tr, tr').forEach((row, idx) => {
-        // thead 안의 tr은 이미 처리됨, 건너뜀
-        if(row.closest('thead')) return;
-        const cells = Array.from(row.querySelectorAll('td, th'));
-        if(!cells.length) return;
-        const texts = cells.map(c => (c.textContent||'').replace(/\n+/g,' ').replace(/\|/g,'⎸').trim());
-        mdRows.push('| ' + texts.join(' | ') + ' |');
-        // thead가 없었을 때 첫 행 다음에 구분선 삽입
-        if(!headerInserted && idx === 0){
-          mdRows.push('| ' + texts.map(()=>'---').join(' | ') + ' |');
-          headerInserted = true;
+        const isHeader = !!row.querySelector('th');
+        const cellTexts = Array.from(cells).map(c =>
+          (c.innerText || c.textContent || '').replace(/\n+/g,' ').replace(/\|/g,'').trim()
+        );
+        mdTable += '| ' + cellTexts.join(' | ') + ' |\n';
+        if((isHeader || !headerDone) && rows.length > 1){
+          mdTable += '| ' + cellTexts.map(() => '---').join(' | ') + ' |\n';
+          headerDone = true;
         }
       });
-
-      const mdTable = '\n' + mdRows.join('\n') + '\n\n';
+      mdTable += '\n';
       table.replaceWith(document.createTextNode(mdTable));
     });
 
@@ -4846,12 +4863,7 @@ function handleTransInputPaste(e){
     }
     return;
   }
-  // ③ 일반 텍스트 — 마크다운 표 형식이면 그대로 삽입
-  const plainData = e.clipboardData?.getData('text/plain') || '';
-  if(plainData && /^\|.+\|/m.test(plainData)){
-    // 마크다운 표 패턴 감지 → 기본 붙여넣기 허용 (표 구조 보존)
-    return; // 브라우저 기본 동작으로 처리
-  }
+  // ③ 일반 텍스트 → 기본 붙여넣기
 }
 
 
@@ -7292,13 +7304,15 @@ function selCollabStyle(btn, styleKey){
 async function genCollabMail(){
   if(!requireApiKey()) return;
   const apiKey = localStorage.getItem('gemini_api_key');
-  const styleKey = document.getElementById('collabTarget').value || currentCollabStyle;
-  const content  = document.getElementById('collabContent').value.trim();
+  const styleKey = (document.getElementById('collabTarget')?.value || currentCollabStyle || 'formal_bilingual');
+  const rawContent = document.getElementById('collabContent')?.value || '';
+  const content = rawContent.trim();
   if(!content){ showToast('핵심 요청 내용을 입력하세요.'); return; }
 
   const resultEl = document.getElementById('collabResult');
+  if(!resultEl) return;
   resultEl.style.display = 'block';
-    resultEl.innerText = t('msg_draft_gen');
+  resultEl.innerText = t('msg_draft_gen') || '✍️ 초안 생성 중...';
 
   // ★ 어조별 프롬프트 지침 — 6종 완전 분기
   const STYLE_PROMPTS = {
@@ -7344,46 +7358,38 @@ async function genCollabMail(){
   };
 
   const chosen = STYLE_PROMPTS[styleKey] || STYLE_PROMPTS.formal_bilingual;
+  // ★ 항상 Gemini 직접 fetch — callAI의 Claude/OpenAI는 모바일 CORS 차단됨
+  const gemUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
   const prompt = `부서장 보좌 AI 비서입니다.\n${chosen.guide}\n\n핵심 요청 내용: ${content}`;
 
-  // ★ gemini-2.0-flash 사용 (2.5-flash는 thinking 모델이라 느려서 abort 발생)
-  const COLLAB_MODELS = ['gemini-2.0-flash-001', 'gemini-1.5-flash-latest'];
-  let lastErr = '';
-
-  for(const model of COLLAB_MODELS){
-    try{
-      const gemUrl = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
-      const ctrl  = new AbortController();
-      const timer = setTimeout(() => ctrl.abort(), 60000); // ★ 60초로 늘림
-      const res   = await fetch(gemUrl, {
-        method:  'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body:    JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] }),
-        signal:  ctrl.signal,
-      });
-      clearTimeout(timer);
-      if(!res.ok) throw new Error(`API 오류 ${res.status}`);
-      const data = await res.json();
-      const text = data.candidates?.[0]?.content?.parts?.[0]?.text?.trim();
-      if(!text) throw new Error('AI 응답 없음');
-      renderAiOutput(resultEl, text);
-      // 복사 버튼
-      if(!resultEl.nextElementSibling?.classList.contains('collab-copy-btn')){
-        resultEl.insertAdjacentHTML('afterend',
-          `<button class="collab-copy-btn" onclick="event.stopPropagation();copyRichText(document.getElementById('collabResult'),'📋 초안 복사 완료')"
-            style="margin-top:7px;padding:6px 14px;background:rgba(16,185,129,.12);color:#10b981;border:1px solid rgba(16,185,129,.3);border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;">
-            📄 초안 복사 (서식 유지)
-          </button>`
-        );
-      }
-      return; // ★ 성공 시 루프 탈출
-    } catch(err){
-      lastErr = err.message;
-      console.warn(`[genCollabMail] ${model} 실패:`, err.message);
-      resultEl.innerText = `⏳ ${model} 실패 → 다음 모델 시도 중...`;
+  try{
+    const ctrl  = new AbortController();
+    const timer = setTimeout(() => ctrl.abort(), 30000);
+    const res   = await fetch(gemUrl, {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body:    JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] }),
+      signal:  ctrl.signal,
+    });
+    clearTimeout(timer);
+    if(!res.ok) throw new Error(`API 오류 ${res.status}`);
+    const data = await res.json();
+    const text = data.candidates?.[0]?.content?.parts?.[0]?.text?.trim();
+    if(!text) throw new Error('AI 응답 없음');
+    renderAiOutput(resultEl, text);
+    // 복사 버튼 추가
+    const copyBtn = resultEl.nextElementSibling;
+    if(!copyBtn || !copyBtn.classList.contains('collab-copy-btn')){
+      resultEl.insertAdjacentHTML('afterend',
+        `<button class="collab-copy-btn" onclick="event.stopPropagation();copyRichText(document.getElementById('collabResult'),'📋 초안 복사 완료 (메일에 서식 유지)')"
+          style="margin-top:7px;padding:6px 14px;background:rgba(16,185,129,.12);color:#10b981;border:1px solid rgba(16,185,129,.3);border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;">
+          📄 초안 복사 (서식 유지)
+        </button>`
+      );
     }
+  } catch(err){
+    resultEl.innerText = '⚠️ 생성 실패: ' + err.message;
   }
-  resultEl.innerText = '⚠️ 생성 실패: ' + lastErr;
 }
 
 // ══════════════════════════════
@@ -7688,11 +7694,17 @@ function collectPptSlides(){
   const count = pptSlides.length;
   const slides = [];
   for(let i=0; i<count; i++){
-    const title   = (document.getElementById('ppt-title-'+i)||{}).value||'';
-    const subtitle= (document.getElementById('ppt-sub-'+i)||{}).value||'';
-    const raw     = (document.getElementById('ppt-bullets-'+i)||{}).value||'';
-    const bullets = raw.split('\n').filter(b=>b.trim());
-    slides.push({slide:i+1, title, subtitle, bullets, is_section:!!pptSlides[i]?.is_section});
+    const titleEl    = document.getElementById('ppt-title-'+i);
+    const subtitleEl = document.getElementById('ppt-sub-'+i);
+    const bulletsEl  = document.getElementById('ppt-bullets-'+i);
+    const title    = (titleEl?.value    || '').trim() || '(제목 없음)';
+    const subtitle = (subtitleEl?.value || '').trim();
+    const raw      = (bulletsEl?.value  || '').trim();
+    // ★ null/빈값 안전 처리
+    const bullets  = raw ? raw.split('\n').map(b => (b||'').trim()).filter(Boolean) : [];
+    const isSection = !!pptSlides[i]?.is_section;
+    slides.push({ slide:i+1, title, subtitle, bullets, is_section:isSection,
+                  summary:'', left_bullets:[], right_bullets:[] });
   }
   return slides;
 }
@@ -7767,6 +7779,13 @@ async function downloadPpt(fmt){
     const arr = pptSettings.arrangement || 'full';
 
     slides.forEach((s, idx) => {
+      // ★ null 방어 — 슬라이드 데이터 안전 처리
+      if(!s) return;
+      s.title    = (s.title    || '').trim() || '(제목 없음)';
+      s.subtitle = (s.subtitle || '').trim();
+      s.bullets  = Array.isArray(s.bullets) ? s.bullets.filter(b => b && String(b).trim()) : [];
+      s.summary  = (s.summary  || '').trim();
+
       const slide = pptx.addSlide();
 
       // ── 배경 전체
@@ -9097,45 +9116,6 @@ function showToast(msg){
 </body>
 <!-- ★ 보안: 소스 보기/개발자 도구 방지 (입력 영역 완전 허용) -->
 <script>
-(function(){
-  function isEditable(el){
-    if(!el) return false;
-    let node = el;
-    while(node && node !== document.body){
-      if(node.isContentEditable) return true;
-      const tag = node.tagName;
-      if(tag==='INPUT'||tag==='TEXTAREA') return true;
-      if(node.classList&&(
-        node.classList.contains('trans-textarea')||
-        node.classList.contains('analyze-paste')||
-        node.classList.contains('reply-feedback-input')||
-        node.classList.contains('key-input')||
-        node.classList.contains('field-input')||
-        node.classList.contains('field-textarea')
-      )) return true;
-      node = node.parentElement;
-    }
-    return false;
-  }
-  document.addEventListener('contextmenu',function(e){
-    if(isEditable(e.target)) return;
-    e.preventDefault();
-  });
-  document.addEventListener('selectstart',function(e){
-    if(isEditable(e.target)) return;
-    e.preventDefault();
-  });
-  document.addEventListener('keydown',function(e){
-    if(e.key==='F12'){e.preventDefault();return false;}
-    if(e.ctrlKey&&e.shiftKey&&/^[IiJj]$/.test(e.key)){e.preventDefault();return false;}
-    if(e.ctrlKey&&/^[Uu]$/.test(e.key)){e.preventDefault();return false;}
-    if(e.ctrlKey&&/^[Ss]$/.test(e.key)&&!isEditable(document.activeElement)){e.preventDefault();return false;}
-  });
-  setInterval(function(){
-    (function(){try{(function a(i){
-      if((''+(i/i)).length!==1||i%20===0){(function(){}).constructor('debugger')();}
-      else{debugger;}a(++i);})(0);}catch(e){}})();
-  },1000);
-})();
+// ★ 우클릭/드래그 차단 제거 — 클립보드 정상 동작 보장
 </script>
 </html>
