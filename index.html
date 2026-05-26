@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>👑 티모시 AI 커맨드 센터 | Timothy AI Command Center</title>
+<title>👑 Timothy AI Command Center</title>
 <!-- PptxGenJS CDN -->
 <script src="https://cdn.jsdelivr.net/npm/pptxgenjs@3.12.0/dist/pptxgenjs.bundle.js"></script>
 <style>
@@ -1102,26 +1102,26 @@ textarea::-webkit-scrollbar-thumb{background:#334155;border-radius:4px;}
 <!-- ★ 모바일 상단 헤더 -->
 <div class="mob-header" style="display:none;">
   <button class="mob-menu-btn" onclick="toggleMobSidebar()" id="mobMenuBtn">☰</button>
-  <span class="mob-title">🤖 Timothy AI 비서</span>
+  <span class="mob-title" data-i18n="mob_title">🤖 Timothy AI 비서</span>
   <span class="mob-status-dot" id="mobStatusDot"></span>
 </div>
 
 <!-- ★ 모바일 하단 탭 바 -->
 <div class="mob-tab-bar" style="display:none;">
   <button class="mob-tab active" id="mobtab-dashboard" onclick="switchViewMob('dashboard')">
-    <span class="tab-icon">📊</span><span>AI 분석</span>
+    <span class="tab-icon">📊</span><span data-i18n="mob_tab_ai">AI 분석</span>
   </button>
   <button class="mob-tab" id="mobtab-schedule" onclick="switchViewMob('schedule')">
-    <span class="tab-icon">📅</span><span>일정</span>
+    <span class="tab-icon">📅</span><span data-i18n="mob_tab_schedule">일정</span>
   </button>
   <button class="mob-tab" id="mobtab-learning" onclick="switchViewMob('learning')">
-    <span class="tab-icon">✍️</span><span>학습관</span>
+    <span class="tab-icon">✍️</span><span data-i18n="mob_tab_learning">학습관</span>
   </button>
   <button class="mob-tab" id="mobtab-translate" onclick="switchViewMob('translate')">
-    <span class="tab-icon">🌐</span><span>번역</span>
+    <span class="tab-icon">🌐</span><span data-i18n="mob_tab_translate">번역</span>
   </button>
   <button class="mob-tab" id="mobtab-more" onclick="toggleMobSidebar()">
-    <span class="tab-icon">⚙️</span><span>더보기</span>
+    <span class="tab-icon">⚙️</span><span data-i18n="mob_tab_more">더보기</span>
   </button>
 </div>
 
@@ -1143,7 +1143,7 @@ textarea::-webkit-scrollbar-thumb{background:#334155;border-radius:4px;}
         </svg>
       </div>
       <div class="sidebar-logo-text">
-        <div class="sidebar-logo-main"><span>AI</span> 비서</div>
+        <div class="sidebar-logo-main"><span>AI</span> <span data-i18n="sidebar_logo_main">비서</span></div>
         <div class="sidebar-logo-sub">TIMOTHY · GEMINI</div>
       </div>
     </div>
@@ -1155,14 +1155,14 @@ textarea::-webkit-scrollbar-thumb{background:#334155;border-radius:4px;}
     <div class="user-info-row" id="userInfoRow">
       <div style="overflow:hidden;flex:1;">
         <div class="user-name" id="displayName">Guest</div>
-        <div class="user-dept" id="displayDept" style="font-size:10px;color:#475569;">로그인 전</div>
+        <div class="user-dept" id="displayDept" style="font-size:10px;color:#475569;" data-i18n="user_dept_init">로그인 전</div>
       </div>
-      <button class="logout-btn" onclick="openSettingsModal()" title="설정 열기" style="font-size:16px;">⚙️</button>
+      <button class="logout-btn" onclick="openSettingsModal()" title="Settings" style="font-size:16px;">⚙️</button>
     </div>
     <!-- API 키 없을 때 안내 (배너) -->
     <div id="apiKeyNotice" style="display:none;margin-top:8px;padding:7px 10px;background:rgba(244,63,94,.1);border:1px solid rgba(244,63,94,.25);border-radius:7px;font-size:10px;color:#f43f5e;line-height:1.6;">
-      🔑 <b>API 키 미등록</b><br>
-      <span style="color:#94a3b8;">⚙️ 설정 → API 설정에서 등록하세요.</span>
+      🔑 <b data-i18n="api_key_notice_title">API 키 미등록</b><br>
+      <span style="color:#94a3b8;" data-i18n="api_key_notice_desc">⚙️ 설정 → API 설정에서 등록하세요.</span>
     </div>
     <div class="weather-box" onclick="openSettingsModal()" style="margin-top:8px;">
       <div id="liveDateLabel" style="font-size:10px;">--</div>
@@ -1179,7 +1179,7 @@ textarea::-webkit-scrollbar-thumb{background:#334155;border-radius:4px;}
     <div onclick="switchView('schedule')" id="nav-schedule" class="nav-item" data-i18n="nav_schedule">📅 업무 Schedule</div>
     <div onclick="switchView('learning')" id="nav-learning" class="nav-item" data-i18n="nav_learning">✍️ 스타일 학습관</div>
     <div onclick="switchView('translate')" id="nav-translate" class="trans-nav-btn" data-i18n="nav_translate">🎙️ AI 통역/번역</div>
-    <div id="nav-ppt" class="ppt-nav-btn disabled-nav" style="opacity:.45;cursor:not-allowed;pointer-events:none;" title="고도화 작업 중 — 곧 공개됩니다">📊 문서 자동 매니저 <span style="font-size:9px;background:rgba(168,85,247,.3);padding:1px 5px;border-radius:3px;margin-left:3px;">(예정)</span></div>
+    <div id="nav-ppt" class="ppt-nav-btn disabled-nav" style="opacity:.45;cursor:not-allowed;pointer-events:none;" title="Under development — Coming soon" data-i18n="nav_ppt_label">📊 문서 자동 매니저<span style="font-size:9px;background:rgba(168,85,247,.3);padding:1px 5px;border-radius:3px;margin-left:3px;" data-i18n="nav_ppt_badge">(예정)</span></div>
   </nav>
   <!-- ★ 하단: 상태 표시만 유지, 중복 설정 버튼 제거 -->
   <div class="status-footer">
@@ -1206,7 +1206,7 @@ textarea::-webkit-scrollbar-thumb{background:#334155;border-radius:4px;}
         <!-- 메일 분석 패널 -->
         <div id="panel-mail" class="analyze-panel-wrap">
           <textarea id="emailPasteInput" class="analyze-paste" data-i18n-placeholder="mail_ph"
-            placeholder="메일 텍스트를 붙여넣거나, 이미지/PDF를 업로드하세요.&#10;&#10;여러 메일을 한꺼번에 입력해도 됩니다."></textarea>
+            data-i18n-placeholder="mail_ph" placeholder="메일 텍스트를 붙여넣거나, 이미지/PDF를 업로드하세요."></textarea>
           <div class="file-upload-row">
             <label for="multimodalFile" class="file-label-btn" data-i18n="file_select">📷 파일 선택</label>
             <input type="file" id="multimodalFile" accept="image/*,application/pdf,.txt,.md,.csv,.xlsx,.xls,.docx" style="display:none;" onchange="handleFileSelection(event)">
@@ -1228,7 +1228,7 @@ textarea::-webkit-scrollbar-thumb{background:#334155;border-radius:4px;}
           </div>
           <div id="sttUploadBadge" class="stt-upload-badge"></div>
           <textarea id="meetingPasteInput" class="analyze-paste" data-i18n-placeholder="stt_text_ph"
-            placeholder="또는 회의록·STT 전사 텍스트를 직접 붙여넣으세요."></textarea>
+            data-i18n-placeholder="stt_text_ph" placeholder="또는 회의록·STT 전사 텍스트를 직접 붙여넣으세요."></textarea>
           <button id="meetingBtn" class="analyze-run-btn" style="background:#7c3aed;" data-i18n="stt_analyze_btn" onclick="analyzeMeeting()">▶ STT/회의록 분석</button>
         </div>
 
@@ -1239,16 +1239,16 @@ textarea::-webkit-scrollbar-thumb{background:#334155;border-radius:4px;}
         <div class="sec-title" data-i18n="mail_section_title">✉️ AI 수신 발신처별 브리핑</div>
         <div class="domain-tabs-wrap">
           <div class="domain-tabs">
-            <button onclick="filterDomain('전체')" id="domTab-전체" class="domain-btn active">전체</button>
-            <button onclick="filterDomain('제조')" id="domTab-제조" class="domain-btn">제조</button>
-            <button onclick="filterDomain('설비')" id="domTab-설비" class="domain-btn">설비</button>
-            <button onclick="filterDomain('제조기술')" id="domTab-제조기술" class="domain-btn">제조기술</button>
-            <button onclick="filterDomain('개발')" id="domTab-개발" class="domain-btn">개발</button>
-            <button onclick="filterDomain('품질')" id="domTab-품질" class="domain-btn">품질</button>
+            <button onclick="filterDomain('전체')" id="domTab-전체" class="domain-btn active" data-i18n="domain_all">전체</button>
+            <button onclick="filterDomain('제조')" id="domTab-제조" class="domain-btn" data-i18n="domain_mfg">제조</button>
+            <button onclick="filterDomain('설비')" id="domTab-설비" class="domain-btn" data-i18n="domain_equip">설비</button>
+            <button onclick="filterDomain('제조기술')" id="domTab-제조기술" class="domain-btn" data-i18n="domain_mfgtech">제조기술</button>
+            <button onclick="filterDomain('개발')" id="domTab-개발" class="domain-btn" data-i18n="domain_dev">개발</button>
+            <button onclick="filterDomain('품질')" id="domTab-품질" class="domain-btn" data-i18n="domain_qa">품질</button>
             <button onclick="filterDomain('GOC')" id="domTab-GOC" class="domain-btn">GOC</button>
-            <button onclick="filterDomain('지원')" id="domTab-지원" class="domain-btn">지원</button>
-            <button onclick="filterDomain('인사')" id="domTab-인사" class="domain-btn">인사</button>
-            <button onclick="filterDomain('인프라')" id="domTab-인프라" class="domain-btn">인프라</button>
+            <button onclick="filterDomain('지원')" id="domTab-지원" class="domain-btn" data-i18n="domain_support">지원</button>
+            <button onclick="filterDomain('인사')" id="domTab-인사" class="domain-btn" data-i18n="domain_hr">인사</button>
+            <button onclick="filterDomain('인프라')" id="domTab-인프라" class="domain-btn" data-i18n="domain_infra">인프라</button>
             <button onclick="filterDomain('EHS')" id="domTab-EHS" class="domain-btn">EHS</button>
           </div>
         </div>
@@ -1256,7 +1256,7 @@ textarea::-webkit-scrollbar-thumb{background:#334155;border-radius:4px;}
         <div id="paginationBar" class="pagebar"></div>
         <div class="search-bar">
           <input type="text" id="searchInput" class="search-input" placeholder="검색어 입력..." data-i18n-placeholder="search_ph" oninput="onSearchInput()">
-          <button class="scope-btn" onclick="openModal('scopeModal')">🔍 범위</button>
+          <button class="scope-btn" onclick="openModal('scopeModal')" data-i18n="scope_btn">🔍 범위</button>
         </div>
       </div>
 
@@ -1309,8 +1309,8 @@ textarea::-webkit-scrollbar-thumb{background:#334155;border-radius:4px;}
     <!-- 헤더 -->
     <div class="learning-header">
       <div>
-        <h2 style="font-size:14px;font-weight:bold;color:#f1f5f9;">✍️ 문체 스타일 학습관</h2>
-        <div style="font-size:10px;color:#475569;margin-top:2px;">IndexedDB 로컬 저장 · AI 분석 시 자동 반영</div>
+        <h2 style="font-size:14px;font-weight:bold;color:#f1f5f9;" data-i18n="learning_view_title">✍️ 문체 스타일 학습관</h2>
+        <div style="font-size:10px;color:#475569;margin-top:2px;" data-i18n="learning_view_sub">IndexedDB 로컬 저장 · AI 분석 시 자동 반영</div>
       </div>
       <div style="display:flex;gap:7px;align-items:center;flex-wrap:wrap;justify-content:flex-end;">
         <!-- 학습 적용 토글 -->
@@ -1319,7 +1319,7 @@ textarea::-webkit-scrollbar-thumb{background:#334155;border-radius:4px;}
             <input type="checkbox" id="learningToggle" onchange="onLearningToggleChange()" checked>
             <span class="learn-toggle-slider"></span>
           </label>
-          <span id="learningStatusBadge" class="learn-status-badge learn-status-on">학습 적용 중</span>
+          <span id="learningStatusBadge" class="learn-status-badge learn-status-on" data-i18n="learn_applying">학습 적용 중</span>
         </div>
         <!-- 학습 검증 -->
         <button onclick="verifyLearning()" style="padding:5px 11px;background:rgba(245,158,11,.12);color:#f59e0b;border:1px solid rgba(245,158,11,.25);border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;" data-i18n="learn_verify_btn">🔍 학습 검증</button>
@@ -1341,13 +1341,13 @@ textarea::-webkit-scrollbar-thumb{background:#334155;border-radius:4px;}
 <!-- ════════════ TRANSLATE ════════════ -->
 <main id="view-translate" style="overflow:hidden;overflow-y:auto;">
   <div class="trans-view">
-    <div class="trans-view-title">🎙️ AI 통역 / 번역</div>
+    <div class="trans-view-title" data-i18n="trans_view_title">🎙️ AI 통역 / 번역</div>
 
     <!-- ══ 탭 3개: 문서번역 / 음성통역 / 회의모드 ══ -->
     <div class="tv-depth2-tabs">
-      <button class="tv-main-tab active" id="mainTabDoc"   onclick="switchMainMode('doc')">📄 문서/텍스트 번역</button>
-      <button class="tv-main-tab"        id="mainTabVoice" onclick="switchMainMode('voice')">🎙️ 실시간 음성 통역</button>
-      <button class="tv-main-tab"        id="mainTabConf"  onclick="switchMainMode('conf')">🏢 회의 모드</button>
+      <button class="tv-main-tab active" id="mainTabDoc"   onclick="switchMainMode('doc')" data-i18n="doc_trans_tab">📄 문서/텍스트 번역</button>
+      <button class="tv-main-tab"        id="mainTabVoice" onclick="switchMainMode('voice')" data-i18n="voice_trans_tab">🎙️ 실시간 음성 통역</button>
+      <button class="tv-main-tab"        id="mainTabConf"  onclick="switchMainMode('conf')" data-i18n="conf_trans_tab">🏢 회의 모드</button>
     </div>
 
     <!-- ════ 패널: 문서/텍스트 번역 ════ -->
@@ -1355,38 +1355,38 @@ textarea::-webkit-scrollbar-thumb{background:#334155;border-radius:4px;}
       <!-- 모드별 언어 선택 -->
       <div class="mode-lang-bar">
         <div class="mode-lang-item">
-          <label class="mode-lang-lbl">📝 내 언어</label>
+          <label class="mode-lang-lbl" data-i18n="my_lang_label">📝 내 언어</label>
           <select id="docMyLang" class="mode-lang-sel" onchange="onDocLangChange()">
-            <option value="ko">🇰🇷 한국어</option>
-            <option value="en">🇺🇸 영어</option>
-            <option value="zh">🇨🇳 중국어</option>
-            <option value="ja">🇯🇵 일본어</option>
+            <option value="ko" data-i18n="lang_ko">🇰🇷 한국어</option>
+            <option value="en" data-i18n="lang_en">🇺🇸 영어</option>
+            <option value="zh" data-i18n="lang_zh">🇨🇳 중국어</option>
+            <option value="ja" data-i18n="lang_ja">🇯🇵 일본어</option>
           </select>
         </div>
         <div style="font-size:18px;color:#334155;align-self:center;">⇄</div>
         <div class="mode-lang-item">
-          <label class="mode-lang-lbl">🌐 상대 언어</label>
+          <label class="mode-lang-lbl" data-i18n="peer_lang_label">🌐 상대 언어</label>
           <select id="docPeerLang" class="mode-lang-sel" onchange="onDocLangChange()">
-            <option value="en">🇺🇸 영어</option>
-            <option value="ko">🇰🇷 한국어</option>
-            <option value="zh">🇨🇳 중국어</option>
-            <option value="ja">🇯🇵 일본어</option>
+            <option value="en" data-i18n="lang_en">🇺🇸 영어</option>
+            <option value="ko" data-i18n="lang_ko">🇰🇷 한국어</option>
+            <option value="zh" data-i18n="lang_zh">🇨🇳 중국어</option>
+            <option value="ja" data-i18n="lang_ja">🇯🇵 일본어</option>
           </select>
         </div>
         <div style="flex:1;"></div>
-        <button onclick="clearTrans()" style="padding:5px 11px;background:rgba(244,63,94,.12);border:1px solid rgba(244,63,94,.35);color:#f43f5e;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;flex-shrink:0;">🗑 초기화</button>
+        <button onclick="clearTrans()" style="padding:5px 11px;background:rgba(244,63,94,.12);border:1px solid rgba(244,63,94,.35);color:#f43f5e;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;flex-shrink:0;" data-i18n="btn_reset">🗑 초기화</button>
       </div>
 
       <!-- 3 Depth: 텍스트 / 파일 -->
       <div class="tv-depth3-tabs">
-        <button class="tv-sub-tab active" id="docTabText" onclick="switchDocSubMode('text')">📝 텍스트 직접 입력</button>
-        <button class="tv-sub-tab"        id="docTabFile" onclick="switchDocSubMode('file')">📎 문서/음성 파일</button>
+        <button class="tv-sub-tab active" id="docTabText" onclick="switchDocSubMode('text')" data-i18n="doc_text_tab">📝 텍스트 직접 입력</button>
+        <button class="tv-sub-tab"        id="docTabFile" onclick="switchDocSubMode('file')" data-i18n="doc_file_tab">📎 문서/음성 파일</button>
       </div>
 
       <!-- 파일 업로드 -->
       <div id="docFileArea" style="display:none;background:rgba(30,41,59,.25);border:1px solid #1e293b;border-radius:10px;padding:10px 13px;flex-shrink:0;">
         <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
-          <label for="transFileInput" class="trans-file-btn">📎 파일 선택</label>
+          <label for="transFileInput" class="trans-file-btn" data-i18n="file_select">📎 파일 선택</label>
           <input type="file" id="transFileInput" accept="image/*,application/pdf,.txt,.md,.docx,audio/*" style="display:none;" onchange="handleTransFile(event)">
           <span id="transFileBadge" class="trans-file-badge" style="flex:1;" data-i18n="trans_file_hint">Excel·Word·CSV·이미지·PDF·txt 업로드 가능</span>
           <button id="transFileClearBtn" onclick="clearTransFile()" style="display:none;background:none;border:none;color:#f43f5e;cursor:pointer;font-size:14px;">✕</button>
@@ -1397,7 +1397,7 @@ textarea::-webkit-scrollbar-thumb{background:#334155;border-radius:4px;}
       <div class="trans-layout">
         <div class="trans-panel">
           <div style="display:flex;align-items:center;justify-content:space-between;flex-shrink:0;">
-            <div class="trans-panel-title" id="docSrcTitle">📝 원문 입력</div>
+            <div class="trans-panel-title" id="docSrcTitle" data-i18n="trans_src_title">📝 원문 입력</div>
           </div>
           <div id="transInput" class="trans-textarea ai-render-wrap"
             contenteditable="true"
@@ -1406,19 +1406,19 @@ textarea::-webkit-scrollbar-thumb{background:#334155;border-radius:4px;}
             aria-label="번역할 텍스트 입력"
             style="overflow-y:auto;min-height:120px;cursor:text;white-space:pre-wrap;outline:none;"
             onpaste="handleTransInputPaste(event)"
-            data-placeholder="번역할 텍스트를 입력하거나 파일을 첨부하세요..."></div>
+            data-i18n-placeholder="trans_input_ph" data-placeholder="번역할 텍스트를 입력하거나 파일을 첨부하세요..."></div>
         </div>
         <div class="trans-panel">
-          <div class="trans-panel-title" id="docDstTitle">🌐 번역 결과</div>
+          <div class="trans-panel-title" id="docDstTitle" data-i18n="trans_result_title">🌐 번역 결과</div>
           <div id="transResult" class="trans-textarea ai-render-wrap" style="overflow-y:auto;min-height:120px;cursor:text;white-space:normal;"></div>
         </div>
       </div>
 
       <!-- 액션 버튼 -->
       <div style="display:flex;gap:8px;flex-shrink:0;">
-        <button id="transRunBtn" class="trans-run-btn" onclick="runTranslate()" style="flex:2;">▶ 번역하기</button>
-        <button class="trans-copy-btn" onclick="copyTrans()" style="flex:1;padding:10px;">📄 복사</button>
-        <button class="trans-copy-btn" onclick="swapTrans()" style="flex:1;padding:10px;border-color:#3b82f6;color:#3b82f6;">⇄ 교체</button>
+        <button id="transRunBtn" class="trans-run-btn" onclick="runTranslate()" style="flex:2;" data-i18n="btn_translate">▶ 번역하기</button>
+        <button class="trans-copy-btn" onclick="copyTrans()" style="flex:1;padding:10px;" data-i18n="btn_copy_trans">📄 복사</button>
+        <button class="trans-copy-btn" onclick="swapTrans()" style="flex:1;padding:10px;border-color:#3b82f6;color:#3b82f6;" data-i18n="btn_swap">⇄ 교체</button>
       </div>
 
       <!-- 협조 요청 메일 빌더 -->
@@ -1426,12 +1426,12 @@ textarea::-webkit-scrollbar-thumb{background:#334155;border-radius:4px;}
         <div class="collab-title" data-i18n="collab_section_title">✉️ 유관부서 협조 요청 메일 빌더</div>
         <div class="field-label" style="margin-bottom:8px;" data-i18n="collab_style_label">작성 스타일 (어조) 선택</div>
         <div class="collab-style-row" id="collabStyleRow">
-          <button class="collab-style-btn active" onclick="event.stopPropagation();selCollabStyle(this,'formal_bilingual')" data-style="formal_bilingual">📋 격식체 <span style="font-size:9px;opacity:.7;">(중/한 병기)</span></button>
-          <button class="collab-style-btn" onclick="event.stopPropagation();selCollabStyle(this,'direct')"      data-style="direct">⚡ 직접 지시체 <span style="font-size:9px;opacity:.7;">(단호)</span></button>
-          <button class="collab-style-btn" onclick="event.stopPropagation();selCollabStyle(this,'concise')"     data-style="concise">📌 간결체 <span style="font-size:9px;opacity:.7;">(현장)</span></button>
-          <button class="collab-style-btn" onclick="event.stopPropagation();selCollabStyle(this,'official')"    data-style="official">📜 공식 서한체 <span style="font-size:9px;opacity:.7;">(규정)</span></button>
-          <button class="collab-style-btn" onclick="event.stopPropagation();selCollabStyle(this,'data_driven')" data-style="data_driven">📊 데이터 중심체 <span style="font-size:9px;opacity:.7;">(논리)</span></button>
-          <button class="collab-style-btn" onclick="event.stopPropagation();selCollabStyle(this,'polite')"      data-style="polite">🤝 정중체 <span style="font-size:9px;opacity:.7;">(협조)</span></button>
+          <button class="collab-style-btn active" onclick="event.stopPropagation();selCollabStyle(this,'formal_bilingual')" data-style="formal_bilingual" data-i18n="collab_formal">📋 격식체</button>
+          <button class="collab-style-btn" onclick="event.stopPropagation();selCollabStyle(this,'direct')"      data-style="direct" data-i18n="collab_direct">⚡ 직접 지시체</button>
+          <button class="collab-style-btn" onclick="event.stopPropagation();selCollabStyle(this,'concise')"     data-style="concise" data-i18n="collab_concise">📌 간결체</button>
+          <button class="collab-style-btn" onclick="event.stopPropagation();selCollabStyle(this,'official')"    data-style="official" data-i18n="collab_official">📜 공식 서한체</button>
+          <button class="collab-style-btn" onclick="event.stopPropagation();selCollabStyle(this,'data_driven')" data-style="data_driven" data-i18n="collab_data">📊 데이터 중심체</button>
+          <button class="collab-style-btn" onclick="event.stopPropagation();selCollabStyle(this,'polite')"      data-style="polite" data-i18n="collab_polite">🤝 정중체</button>
         </div>
         <input type="hidden" id="collabTarget" value="formal_bilingual">
         <div class="collab-content-row">
@@ -1448,22 +1448,22 @@ textarea::-webkit-scrollbar-thumb{background:#334155;border-radius:4px;}
       <!-- 모드별 언어 선택 -->
       <div class="mode-lang-bar">
         <div class="mode-lang-item">
-          <label class="mode-lang-lbl">🇰🇷 내 언어</label>
+          <label class="mode-lang-lbl" data-i18n="my_lang_label">🇰🇷 내 언어</label>
           <select id="voiceMyLang" class="mode-lang-sel" onchange="onVoiceLangChange()">
-            <option value="ko">🇰🇷 한국어</option>
-            <option value="en">🇺🇸 영어</option>
-            <option value="zh">🇨🇳 중국어</option>
-            <option value="ja">🇯🇵 일본어</option>
+            <option value="ko" data-i18n="lang_ko">🇰🇷 한국어</option>
+            <option value="en" data-i18n="lang_en">🇺🇸 영어</option>
+            <option value="zh" data-i18n="lang_zh">🇨🇳 중국어</option>
+            <option value="ja" data-i18n="lang_ja">🇯🇵 일본어</option>
           </select>
         </div>
         <div style="font-size:18px;color:#334155;align-self:center;">↔</div>
         <div class="mode-lang-item">
           <label class="mode-lang-lbl">🌐 상대 언어</label>
           <select id="voicePeerLang" class="mode-lang-sel" onchange="onVoiceLangChange()">
-            <option value="en">🇺🇸 영어</option>
-            <option value="ko">🇰🇷 한국어</option>
-            <option value="zh">🇨🇳 중국어</option>
-            <option value="ja">🇯🇵 일본어</option>
+            <option value="en" data-i18n="lang_en">🇺🇸 영어</option>
+            <option value="ko" data-i18n="lang_ko">🇰🇷 한국어</option>
+            <option value="zh" data-i18n="lang_zh">🇨🇳 중국어</option>
+            <option value="ja" data-i18n="lang_ja">🇯🇵 일본어</option>
           </select>
         </div>
         <div style="flex:1;"></div>
@@ -1483,7 +1483,7 @@ textarea::-webkit-scrollbar-thumb{background:#334155;border-radius:4px;}
       <!-- 상태 바 -->
       <div class="interp-status-bar" id="interpStatusBar" style="flex-shrink:0;">
         <span class="interp-dot"></span>
-        <span id="interpStatusText" style="font-size:11px;">대기 중</span>
+        <span id="interpStatusText" style="font-size:11px;" data-i18n="status_ready">대기 중</span>
         <span id="interpInterim" class="interp-interim"></span>
         <span id="interpLangBadge" style="font-size:10px;color:#94a3b8;margin-left:auto;"></span>
       </div>
@@ -1530,20 +1530,20 @@ textarea::-webkit-scrollbar-thumb{background:#334155;border-radius:4px;}
         <div class="mode-lang-item">
           <label class="mode-lang-lbl">🇰🇷 내 언어</label>
           <select id="confMyLang" class="mode-lang-sel" onchange="onConfLangChange()">
-            <option value="ko">🇰🇷 한국어</option>
-            <option value="en">🇺🇸 영어</option>
-            <option value="zh">🇨🇳 중국어</option>
-            <option value="ja">🇯🇵 일본어</option>
+            <option value="ko" data-i18n="lang_ko">🇰🇷 한국어</option>
+            <option value="en" data-i18n="lang_en">🇺🇸 영어</option>
+            <option value="zh" data-i18n="lang_zh">🇨🇳 중국어</option>
+            <option value="ja" data-i18n="lang_ja">🇯🇵 일본어</option>
           </select>
         </div>
         <div style="font-size:16px;color:#475569;align-self:center;font-weight:600;">vs</div>
         <div class="mode-lang-item">
           <label class="mode-lang-lbl">🌐 상대 언어</label>
           <select id="confPeerLang" class="mode-lang-sel" onchange="onConfLangChange()">
-            <option value="en">🇺🇸 영어</option>
-            <option value="ko">🇰🇷 한국어</option>
-            <option value="zh">🇨🇳 중국어</option>
-            <option value="ja">🇯🇵 일본어</option>
+            <option value="en" data-i18n="lang_en">🇺🇸 영어</option>
+            <option value="ko" data-i18n="lang_ko">🇰🇷 한국어</option>
+            <option value="zh" data-i18n="lang_zh">🇨🇳 중국어</option>
+            <option value="ja" data-i18n="lang_ja">🇯🇵 일본어</option>
           </select>
         </div>
         <div style="flex:1;"></div>
@@ -1598,7 +1598,7 @@ textarea::-webkit-scrollbar-thumb{background:#334155;border-radius:4px;}
       <div class="conf-summary-wrap" id="confSummaryWrap" style="display:none;">
         <div class="conf-summary-hdr">
           📄 회의록 AI 요약
-          <button onclick="navigator.clipboard.writeText(document.getElementById('confSummaryBody').innerText).then(()=>showToast('📄 회의록 복사 완료'))"
+          <button onclick="navigator.clipboard.writeText(document.getElementById('confSummaryBody').innerText).then(()=>showToast('📄 '+t('toast_copy_ok')))"
             style="padding:3px 10px;background:rgba(59,130,246,.12);color:#3b82f6;border:1px solid rgba(59,130,246,.25);border-radius:5px;font-size:10px;cursor:pointer;">📄 복사</button>
         </div>
         <div class="conf-summary-body" id="confSummaryBody"></div>
@@ -1683,7 +1683,7 @@ textarea::-webkit-scrollbar-thumb{background:#334155;border-radius:4px;}
     <!-- ── 우측 슬라이드 프리뷰 ── -->
     <div class="ppt-right">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;flex-shrink:0;gap:8px;">
-        <span style="font-size:13px;font-weight:bold;color:#fff;">🖼️ 슬라이드 프리뷰
+        <span style="font-size:13px;font-weight:bold;color:#fff;">🖼️ Slide Preview
           <span id="pptSlideCount" style="font-size:10px;color:#64748b;"></span>
         </span>
         <div style="display:flex;gap:6px;">
@@ -1708,21 +1708,21 @@ textarea::-webkit-scrollbar-thumb{background:#334155;border-radius:4px;}
       <span class="dp-title" id="dpTitle">2026년 5월</span>
       <button class="dp-nav" onclick="dpNav(1)">›</button>
     </div>
-    <div class="dp-wdays"><div class="dp-wday">일</div><div class="dp-wday">월</div><div class="dp-wday">화</div><div class="dp-wday">수</div><div class="dp-wday">목</div><div class="dp-wday">금</div><div class="dp-wday">토</div></div>
+    <div class="dp-wdays"><div class="dp-wday" data-i18n="sun">일</div><div class="dp-wday" data-i18n="mon">월</div><div class="dp-wday" data-i18n="tue">화</div><div class="dp-wday" data-i18n="wed">수</div><div class="dp-wday" data-i18n="thu">목</div><div class="dp-wday" data-i18n="fri">금</div><div class="dp-wday" data-i18n="sat">토</div></div>
     <div class="dp-days" id="dpDays"></div>
-    <button class="dp-confirm" onclick="dpConfirm()">선택 완료</button>
+    <button class="dp-confirm" onclick="dpConfirm()" data-i18n="lbl_pick_date">선택 완료</button>
   </div>
 </div>
 <!-- 시간 피커 -->
 <div class="dp-overlay" id="tpOverlay">
   <div class="dp-box" style="width:230px;">
-    <div class="dp-header"><span class="dp-title">⏰ 시간 선택</span><button onclick="tpClose()" style="background:none;border:none;color:#64748b;font-size:18px;cursor:pointer;">×</button></div>
+    <div class="dp-header"><span class="dp-title" data-i18n="lbl_pick_time">⏰ 시간 선택</span><button onclick="tpClose()" style="background:none;border:none;color:#64748b;font-size:18px;cursor:pointer;">×</button></div>
     <div class="dp-time-row">
       <select id="tpHour" class="dp-time-sel"></select>
       <span style="color:#94a3b8;font-size:16px;">:</span>
       <select id="tpMin" class="dp-time-sel"></select>
     </div>
-    <button class="dp-confirm" onclick="tpConfirm()">선택 완료</button>
+    <button class="dp-confirm" onclick="tpConfirm()" data-i18n="lbl_pick_date">선택 완료</button>
   </div>
 </div>
 
@@ -1869,11 +1869,11 @@ textarea::-webkit-scrollbar-thumb{background:#334155;border-radius:4px;}
 <!-- 삭제 확인 -->
 <div class="modal-overlay" id="confirmModal">
   <div class="modal-box confirm-box">
-    <h4>🗑️ 삭제 확인</h4>
-    <p id="confirmMsg">삭제하시겠습니까?<br>복구할 수 없습니다.</p>
+    <h4 data-i18n="confirm_title">🗑️ 삭제 확인</h4>
+    <p id="confirmMsg" data-i18n="confirm_msg">삭제하시겠습니까?<br>복구할 수 없습니다.</p>
     <div class="confirm-btns">
       <button class="confirm-no" data-i18n="btn_no" onclick="closeModal('confirmModal')">아니오</button>
-      <button class="confirm-yes" id="confirmYesBtn">예, 삭제</button>
+      <button class="confirm-yes" id="confirmYesBtn" data-i18n="confirm_yes">예, 삭제</button>
     </div>
   </div>
 </div>
@@ -1882,7 +1882,7 @@ textarea::-webkit-scrollbar-thumb{background:#334155;border-radius:4px;}
 <div class="modal-overlay" id="reportModal">
   <div class="modal-box report-box">
     <div class="modal-hdr"><h3 style="color:#10b981;" data-i18n="report_modal_title">📋 주간 보고서 초안</h3><button class="modal-close-x" onclick="closeModal('reportModal')">×</button></div>
-    <div id="reportContent" class="report-content">생성 중...</div>
+    <div id="reportContent" class="report-content" data-i18n="status_generating">생성 중...</div>
     <button class="modal-save-btn" style="background:#10b981;" data-i18n="btn_copy_all" onclick="event.stopPropagation();copyReport()">📄 전체 복사</button>
   </div>
 </div>
@@ -1890,17 +1890,15 @@ textarea::-webkit-scrollbar-thumb{background:#334155;border-radius:4px;}
 <!-- 날씨 -->
 <div class="modal-overlay" id="weatherModal">
   <div class="modal-box" style="max-width:460px;">
-    <div class="modal-hdr"><h3 style="color:#f59e0b;">📍 사업장 기상 설정</h3><button class="modal-close-x" onclick="closeModal('weatherModal')">×</button></div>
+    <div class="modal-hdr"><h3 style="color:#f59e0b;" data-i18n="weather_modal_title">📍 사업장 기상 설정</h3><button class="modal-close-x" onclick="closeModal('weatherModal')">×</button></div>
     <div style="display:flex;gap:7px;margin-bottom:11px;">
-      <input type="text" id="weatherLocInput" class="field-input" placeholder="위치 입력">
-      <button onclick="changeLocation()" style="background:#f59e0b;color:#fff;border:none;padding:0 12px;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;">변경</button>
+      <input type="text" id="weatherLocInput" class="field-input" data-i18n-placeholder="weather_loc_ph" placeholder="위치 입력">
+      <button onclick="changeLocation()" style="background:#f59e0b;color:#fff;border:none;padding:0 12px;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;" data-i18n="btn_change">변경</button>
     </div>
     <div style="background:#020617;border:1px solid #1e293b;border-radius:8px;padding:10px;font-size:10px;color:#94a3b8;">
-      <div style="font-weight:bold;margin-bottom:5px;color:#3b82f6;font-size:11px;">📊 주간 기상</div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px;">
-        <div>• 월: 맑음 ☀️ 22°C</div><div>• 화: 구름조금 ⛅ 24°C</div>
-        <div>• 수: 흐림 ☁️ 20°C</div><div>• 목: 비 🌧️ 18°C</div>
-        <div>• 금: 맑음 ☀️ 23°C</div><div>• 토: 구름많음 ☁️ 21°C</div>
+      <div style="font-weight:bold;margin-bottom:7px;color:#3b82f6;font-size:11px;" data-i18n="weather_weekly_title">📊 주간 기상</div>
+      <div id="weeklyWeatherGrid" style="display:grid;grid-template-columns:1fr 1fr;gap:5px;">
+        <div style="color:#475569;" data-i18n="weather_loading">날씨 불러오는 중...</div>
       </div>
     </div>
   </div>
@@ -2154,13 +2152,13 @@ textarea::-webkit-scrollbar-thumb{background:#334155;border-radius:4px;}
         <div style="font-size:11px;color:#475569;text-align:center;margin-bottom:18px;">로그인하여 서비스를 이용하세요</div>
 
         <div class="field-group" style="margin-bottom:9px;">
-          <div class="field-label" style="margin-bottom:4px;">아이디</div>
+          <div class="field-label" style="margin-bottom:4px;" data-i18n="lbl_id">아이디</div>
           <input type="text" id="loginId" class="field-input"
             placeholder="아이디를 입력하세요" data-i18n-placeholder="ph_id"
             onkeypress="if(event.key==='Enter')betaAlert()">
         </div>
         <div class="field-group" style="margin-bottom:14px;">
-          <div class="field-label" style="margin-bottom:4px;">비밀번호</div>
+          <div class="field-label" style="margin-bottom:4px;" data-i18n="lbl_pw">비밀번호</div>
           <input type="password" id="loginPassword" class="field-input"
             placeholder="••••••••"
             onkeypress="if(event.key==='Enter')betaAlert()">
@@ -2173,18 +2171,18 @@ textarea::-webkit-scrollbar-thumb{background:#334155;border-radius:4px;}
 
         <div style="text-align:center;margin-top:12px;font-size:11px;color:#475569;display:flex;justify-content:center;gap:6px;align-items:center;">
           <a href="#" onclick="betaAlert();return false;"
-            style="color:#64748b;text-decoration:none;hover:color:#e2e8f0;">회원가입</a>
+            style="color:#64748b;text-decoration:none;" data-i18n="link_register">회원가입</a>
           <span style="color:#334155;">|</span>
           <a href="#" onclick="betaAlert();return false;"
-            style="color:#64748b;text-decoration:none;">아이디 찾기</a>
+            style="color:#64748b;text-decoration:none;" data-i18n="link_find_id">아이디 찾기</a>
           <span style="color:#334155;">|</span>
           <a href="#" onclick="betaAlert();return false;"
-            style="color:#64748b;text-decoration:none;">비밀번호 찾기</a>
+            style="color:#64748b;text-decoration:none;" data-i18n="link_find_pw">비밀번호 찾기</a>
         </div>
       </div>
 
       <!-- 언어 설정 -->
-      <div class="settings-section-hdr" style="margin-top:14px;">🌐 언어 설정</div>
+      <div class="settings-section-hdr" style="margin-top:14px;" data-i18n="lang_settings_title">🌐 언어 설정</div>
       <div style="display:flex;gap:6px;">
         <button class="lang-btn active" id="sLangBtn-KO" onclick="setLanguage('KO')" style="flex:1;padding:8px 0;border-radius:8px;border:1px solid #334155;background:none;color:#64748b;cursor:pointer;font-weight:700;font-size:11px;"><div style="font-size:18px;margin-bottom:2px;">🇰🇷</div><div>한국어</div></button>
         <button class="lang-btn" id="sLangBtn-ZH" onclick="setLanguage('ZH')" style="flex:1;padding:8px 0;border-radius:8px;border:1px solid #334155;background:none;color:#64748b;cursor:pointer;font-weight:700;font-size:11px;"><div style="font-size:18px;margin-bottom:2px;">🇨🇳</div><div>中文</div></button>
@@ -2291,14 +2289,21 @@ textarea::-webkit-scrollbar-thumb{background:#334155;border-radius:4px;}
         * DeepL 등록 후 위 <b>번역/통역</b> 모델 선택란에서 <b style="color:#34d399;">🌿 DeepL</b>을 선택하세요.</div>
 
       <!-- 장소 설정 -->
-      <div class="settings-section-hdr" style="margin-top:12px;">📍 장소 및 날씨</div>
+      <div class="settings-section-hdr" style="margin-top:12px;" data-i18n="lbl_location">📍 장소 및 날씨</div>
       <div style="display:flex;gap:8px;margin-bottom:8px;">
-        <input type="text" id="settingsLocInput" class="field-input" placeholder="사업장 위치 (예: 청주, 서울 강남)" style="flex:1;">
-        <button onclick="applyLocation()" style="padding:9px 14px;background:#f59e0b;color:#0f172a;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;">📍 변경</button>
+        <input type="text" id="settingsLocInput" class="field-input" data-i18n-placeholder="weather_loc_ph" placeholder="사업장 위치 (예: 청주, 서울 강남)" style="flex:1;">
+        <button onclick="applyLocation()" style="padding:9px 14px;background:#f59e0b;color:#0f172a;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;" data-i18n="btn_change">📍 변경</button>
       </div>
       <div style="background:#020617;border:1px solid #1e293b;border-radius:8px;padding:9px 12px;font-size:11px;color:#64748b;">
         <div style="color:#60a5fa;font-weight:700;margin-bottom:4px;" data-i18n="lbl_current_loc">현재 위치</div>
         <div id="currentLocDisplay" style="color:#e2e8f0;font-size:12px;font-weight:600;">📍 청주 사업장</div>
+      </div>
+      <!-- ★ 실시간 주간 날씨 예보 -->
+      <div style="background:#020617;border:1px solid #1e293b;border-radius:8px;padding:9px 12px;font-size:10px;color:#94a3b8;margin-top:8px;">
+        <div style="font-weight:700;margin-bottom:6px;color:#3b82f6;font-size:11px;" data-i18n="weather_weekly_title">📊 주간 기상</div>
+        <div id="settingsWeeklyWeatherGrid" style="display:flex;flex-direction:column;gap:2px;">
+          <div style="color:#475569;" data-i18n="weather_loading">날씨 불러오는 중...</div>
+        </div>
       </div>
     </div><!-- /stab-api -->
 
@@ -2310,15 +2315,15 @@ textarea::-webkit-scrollbar-thumb{background:#334155;border-radius:4px;}
       <div class="skin-grid" id="skinGrid"></div>
 
       <!-- 폰트 -->
-      <div class="settings-section-hdr" style="margin-top:12px;">🔤 폰트 설정</div>
+      <div class="settings-section-hdr" style="margin-top:12px;" data-i18n="font_settings_title">🔤 폰트 설정</div>
       <select id="fontSelect" class="field-input" onchange="applyFont(this.value)" style="cursor:pointer;"></select>
-      <div style="font-size:10px;color:#475569;margin-top:4px;">* 선택 즉시 적용 · 저장 시 영구 유지</div>
+      <div style="font-size:10px;color:#475569;margin-top:4px;" data-i18n="font_instant_note">* 선택 즉시 적용 · 저장 시 영구 유지</div>
     </div><!-- /stab-appear -->
 
     <!-- 공통 하단 버튼 -->
     <div style="display:flex;gap:8px;margin-top:14px;">
-      <button onclick="saveSettings()" style="flex:1;padding:11px;background:linear-gradient(135deg,#2563eb,#1d4ed8);color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;">✅ 설정 저장</button>
-      <button onclick="closeModal('settingsModal')" style="padding:11px 18px;background:rgba(30,41,59,.6);color:#94a3b8;border:1px solid #334155;border-radius:8px;font-size:13px;cursor:pointer;">닫기</button>
+      <button onclick="saveSettings()" style="flex:1;padding:11px;background:linear-gradient(135deg,#2563eb,#1d4ed8);color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;" data-i18n="settings_save_btn">✅ 설정 저장</button>
+      <button onclick="closeModal('settingsModal')" style="padding:11px 18px;background:rgba(30,41,59,.6);color:#94a3b8;border:1px solid #334155;border-radius:8px;font-size:13px;cursor:pointer;" data-i18n="btn_close">닫기</button>
     </div>
 
     <!-- 💾 데이터 백업 & 복구 -->
@@ -2399,7 +2404,7 @@ function stopAllMicrophones(){
  */
 async function requestMicPermission(){
   if(!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia){
-    showToast('⚠️ 이 브라우저는 마이크를 지원하지 않습니다.');
+    showToast(t('toast_mic_not_supported'));
     return false;
   }
   try{
@@ -2409,7 +2414,7 @@ async function requestMicPermission(){
         const perm = await navigator.permissions.query({ name:'microphone' });
         if(perm.state === 'granted') return true;   // 이미 허용 → 바로 진입
         if(perm.state === 'denied'){
-          showToast('⚠️ 마이크 권한이 차단되어 있습니다. 브라우저 주소창 🔒 → 사이트 설정에서 허용해 주세요.');
+          showToast(t('toast_mic_blocked'));
           return false;
         }
         // 'prompt' → 아래에서 getUserMedia로 실제 요청
@@ -2422,9 +2427,9 @@ async function requestMicPermission(){
     return true;
   }catch(err){
     if(err.name === 'NotAllowedError' || err.name === 'PermissionDeniedError'){
-      showToast('⚠️ 마이크 권한이 거부됐습니다. 브라우저 설정에서 허용 후 다시 시도해 주세요.');
+      showToast(t('toast_mic_denied'));
     } else {
-      showToast('⚠️ 마이크를 사용할 수 없습니다: ' + err.message);
+      showToast(t('toast_mic_error') + err.message);
     }
     return false;
   }
@@ -2585,6 +2590,139 @@ const LANG_PACKS = {
     api_register_btn:'등록',
     interp_log_ph:'통역 시작 후 내 음성이 기록됩니다...',
     interp_start_btn:'🎙️ 내 음성 통역 시작',
+    // ── 날씨 모달 ──
+    weather_modal_title:'📍 사업장 기상 설정',
+    weather_loc_ph:'위치 입력',
+    weather_weekly_title:'📊 주간 기상',
+    weather_loading:'날씨 불러오는 중...',
+    weather_no_data:'날씨 정보 없음',
+    // ── 사이드바/공통 하드코딩 제거 ──
+    mob_title:'🤖 Timothy AI 비서',
+    mob_tab_ai:'AI 분석',
+    mob_tab_schedule:'일정',
+    mob_tab_learning:'학습관',
+    mob_tab_translate:'번역',
+    mob_tab_more:'더보기',
+    sidebar_logo_main:'AI 비서',
+    user_dept_init:'로그인 전',
+    api_key_notice_title:'API 키 미등록',
+    api_key_notice_desc:'⚙️ 설정 → API 설정에서 등록하세요.',
+    loc_default:'📍 청주 사업장',
+    // ── 사이드바 nav (data-i18n 없는 것) ──
+    nav_ppt_tooltip:'고도화 작업 중 — 곧 공개됩니다',
+    nav_ppt_label:'📊 문서 자동 매니저',
+    nav_ppt_badge:'(예정)',
+    // ── JS 토스트 메시지 ──
+    toast_mic_not_supported:'⚠️ 이 브라우저는 마이크를 지원하지 않습니다.',
+    toast_mic_blocked:'⚠️ 마이크 권한이 차단되어 있습니다. 브라우저 주소창 🔒 → 사이트 설정에서 허용해 주세요.',
+    toast_mic_denied:'⚠️ 마이크 권한이 거부됐습니다. 브라우저 설정에서 허용 후 다시 시도해 주세요.',
+    toast_mic_error:'⚠️ 마이크를 사용할 수 없습니다: ',
+    toast_login_ok:'✅ 로그인 완료',
+    toast_logout:'로그아웃 되었습니다.',
+    toast_dept_name_required:'부서명과 이름을 입력해 주세요.',
+    toast_api_key_required:'API Key를 입력해 주세요.',
+    toast_loc_required:'위치를 입력하세요.',
+    toast_loc_changed:'✅ 위치가 \'${val}\'(으)로 변경됐습니다.',
+    toast_name_or_dept_required:'이름 또는 부서명을 입력하세요.',
+    toast_profile_saved:'✅ 사용자 정보가 저장됐습니다.',
+    toast_settings_saved:'✅ 설정이 저장됐습니다.',
+    toast_beta:'현재 베타 서비스 중입니다.\n\n정식 출시 시 이메일로 안내드리겠습니다.',
+    toast_no_input:'데이터를 입력해 주세요.',
+    toast_voice_male:'👨 남자 목소리 선택됨',
+    toast_voice_female:'👩 여자 목소리 선택됨',
+    toast_copy_ok:'📋 복사 완료',
+    toast_copy_fail:'⚠️ 복사 실패 — 브라우저 클립보드 권한을 허용해 주세요.',
+    toast_translate_ok:'✅ 번역 완료',
+    toast_translate_fail:'⚠️ 번역 실패: ',
+    toast_no_translate:'복사할 번역 결과가 없습니다.',
+    toast_trans_cleared:'번역 내용이 초기화됐습니다.',
+    toast_trans_required:'번역할 내용을 입력하거나 파일을 첨부하세요.',
+    toast_draft_gen:'초안 생성 중...',
+    toast_draft_ok:'✅ 초안 수정 완료',
+    toast_draft_fail:'⚠️ 수정 실패: ',
+    toast_collab_required:'핵심 요청 내용을 입력하세요.',
+    toast_fix_required:'수정 내용을 입력하세요.',
+    toast_no_draft:'수정할 초안이 없습니다.',
+    toast_ppt_designing:'▶ 문서 설계 중...',
+    toast_ppt_ok:'✅ ${n}장 슬라이드 설계 완료',
+    toast_ppt_fail:'⚠️ PPT 설계 실패: ',
+    toast_ppt_design_first:'먼저 문서를 설계해 주세요.',
+    toast_pptx_making:'PPTX 생성 중...',
+    toast_ppt_settings_saved:'✅ 문서 설정이 저장됐습니다.',
+    toast_ppt_input_required:'보고서 내용을 입력하세요.',
+    toast_ppt_file_required:'파일을 업로드하거나 수정 요청을 입력하세요.',
+    toast_ai_model:'🤖 AI 모델: ',
+    toast_loc_update:'✅ 위치가 변경됐습니다.',
+    toast_backup_ok:'✅ 백업 복구 완료! 앱을 새로고침합니다...',
+    toast_backup_invalid:'⚠️ 잘못된 백업 파일 형식입니다. JSON을 확인하세요.',
+    toast_backup_wrong:'⚠️ Timothy 백업 파일이 아닙니다. 올바른 파일을 선택하세요.',
+    toast_no_copy:'복사할 내용이 없습니다.',
+    toast_no_title:'제목을 입력하세요.',
+    toast_task_reg_ok:'업무 등록 완료',
+    toast_tracker_linked:'트래커 연동 완료',
+    toast_report_copy:'보고서 복사 완료',
+    toast_schedule_ok:'일정 수정 완료',
+    toast_schedule_add_ok:'일정 등록 완료',
+    toast_learn_on:'✅ 학습 데이터 AI 적용 활성화',
+    toast_learn_off:'⏸️ 학습 데이터 AI 적용 비활성화',
+    toast_no_body:'본문을 입력하세요.',
+    toast_style_saved:'학습 저장 완료',
+    toast_style_deleted:'🗑 학습 데이터 삭제됨',
+    toast_no_style_del:'삭제할 스타일 데이터가 없습니다.',
+    toast_style_all_del:'✅ 스타일 학습 데이터가 전체 삭제됐습니다.',
+    toast_pick_date:'날짜를 선택해 주세요.',
+    toast_api_key_enter:'API 키를 입력하세요.',
+    toast_api_key_ok:'✅  API 키 등록 완료',
+    toast_api_key_released:' API 키가 해제됐습니다.',
+    toast_search_needed:'🔍 실시간 인터넷 검색 기능은 Google API 키가 필요합니다. 설정에서 구글 키를 먼저 등록해 주세요.',
+    toast_net_error:'⚠️ 네트워크 오류 — 음성 인식 재시도',
+    toast_meeting_cleared:'회의 기록이 초기화됐습니다.',
+    toast_no_meeting:'요약할 회의 내용이 없습니다.',
+    toast_meeting_summary_ok:'✅ 회의록 요약 완료',
+    toast_meeting_summary_fail:'⚠️ 요약 실패: ',
+    toast_interp_cleared:'통역 기록이 초기화됐습니다.',
+    toast_my_mic_start:'🎙️ 내 음성 인식 시작 — 한국어로 말씀하세요',
+    toast_my_mic_stop:'⏸️ 내 음성 인식 중지',
+    toast_peer_mic_stop:'⏸️ 상대방 음성 인식 중지',
+    toast_conf_stop:'⏹ 회의 모드 중지',
+    toast_summary_making:'📄 AI 회의록 요약 중...',
+    toast_action_items_ok:'✅ ${n}건 Action Item이 트래커에 등록됐습니다.',
+    toast_no_action_items:'등록할 Action Item이 없습니다.',
+    toast_analyze_ok:'✅ 분석 완료',
+    toast_analyze_fail:'⚠️ 분석 실패: ',
+    toast_stt_ok:'✅ STT 심층 분석 완료 · 결과 카드 생성됨',
+    toast_stt_fail:'⚠️ STT/회의록 분석 실패: ',
+    toast_voice_only:'음성 파일만 업로드 가능합니다.',
+    toast_voice_loaded:'✅ 음성 파일 로드 완료. 분석을 시작하세요.',
+    toast_voice_or_text:'음성 파일을 업로드하거나 텍스트를 입력하세요.',
+    // ── 기상 WMO 코드 텍스트 ──
+    wmo_clear:'맑음', wmo_partly_cloudy:'구름 조금', wmo_cloudy:'구름 많음', wmo_overcast:'흐림',
+    wmo_fog:'안개', wmo_drizzle:'이슬비', wmo_rain:'비', wmo_heavy_rain:'강한 비',
+    wmo_snow:'눈', wmo_heavy_snow:'폭설', wmo_shower:'소나기', wmo_heavy_shower:'강한 소나기',
+    wmo_thunder:'뇌우',
+    // ── 삭제 확인 모달 ──
+    confirm_title:'🗑️ 삭제 확인',
+    confirm_msg:'삭제하시겠습니까?<br>복구할 수 없습니다.',
+    confirm_yes:'예, 삭제',
+    // ── 폰트 설정 ──
+    font_instant_note:'* 선택 즉시 적용 · 저장 시 영구 유지',
+    // ── 도메인 탭 ──
+    domain_all:'전체', domain_mfg:'제조', domain_equip:'설비', domain_mfgtech:'제조기술',
+    domain_dev:'개발', domain_qa:'품질', domain_support:'지원', domain_hr:'인사', domain_infra:'인프라',
+    // ── 번역 뷰 탭/라벨 ──
+    doc_trans_tab:'📄 문서/텍스트 번역',
+    voice_trans_tab:'🎙️ 실시간 음성 통역',
+    conf_trans_tab:'🏢 회의 모드',
+    my_lang_label:'📝 내 언어',
+    peer_lang_label:'🌐 상대 언어',
+    doc_text_tab:'📝 텍스트 직접 입력',
+    doc_file_tab:'📎 문서/음성 파일',
+    btn_reset:'🗑 초기화',
+    lang_ko:'🇰🇷 한국어', lang_en:'🇺🇸 영어', lang_zh:'🇨🇳 중국어', lang_ja:'🇯🇵 일본어',
+    trans_input_ph:'번역할 텍스트를 입력하거나 파일을 첨부하세요...',
+    btn_copy_trans:'📄 복사', btn_swap:'⇄ 교체',
+    collab_formal:'📋 격식체', collab_direct:'⚡ 직접 지시체', collab_concise:'📌 간결체',
+    collab_official:'📜 공식 서한체', collab_data:'📊 데이터 중심체', collab_polite:'🤝 정중체',
   },
   ZH: {
     tab_mail:'📩 邮件分析', tab_stt:'🎙️ STT语音分析',
@@ -2782,6 +2920,88 @@ const LANG_PACKS = {
     btn_apply_sel:'应用',
     msg_speech_cnt:'发话 ${n}件',
     nav_no_file:'未选择文件',
+    // ── 날씨 모달 ──
+    weather_modal_title:'📍 工作地点天气设置',
+    weather_loc_ph:'输入位置',
+    weather_weekly_title:'📊 周间天气',
+    weather_loading:'天气加载中...',
+    weather_no_data:'暂无天气信息',
+    // ── 사이드바/공통 ──
+    mob_title:'🤖 Timothy AI 助理',
+    mob_tab_ai:'AI分析', mob_tab_schedule:'日程', mob_tab_learning:'学习室',
+    mob_tab_translate:'翻译', mob_tab_more:'更多',
+    sidebar_logo_main:'AI 助理',
+    user_dept_init:'未登录',
+    api_key_notice_title:'API密钥未注册',
+    api_key_notice_desc:'⚙️ 设置 → API设置中注册。',
+    loc_default:'📍 当前位置',
+    nav_ppt_tooltip:'升级中 — 即将公开', nav_ppt_label:'📊 文档自动管理器', nav_ppt_badge:'(即将)',
+    // ── JS 토스트 ──
+    toast_mic_not_supported:'⚠️ 此浏览器不支持麦克风。',
+    toast_mic_blocked:'⚠️ 麦克风权限被阻止。请在浏览器地址栏 🔒 → 网站设置中允许。',
+    toast_mic_denied:'⚠️ 麦克风权限被拒绝。请在浏览器设置中允许后重试。',
+    toast_mic_error:'⚠️ 无法使用麦克风：',
+    toast_login_ok:'✅ 登录完成',
+    toast_logout:'已退出登录。',
+    toast_dept_name_required:'请输入部门名称和姓名。',
+    toast_api_key_required:'请输入API密钥。',
+    toast_loc_required:'请输入位置。',
+    toast_loc_changed:'✅ 位置已更改为\'${val}\'。',
+    toast_name_or_dept_required:'请输入姓名或部门名称。',
+    toast_profile_saved:'✅ 用户信息已保存。',
+    toast_settings_saved:'✅ 设置已保存。',
+    toast_beta:'当前为测试版服务。\n\n正式上线时将通过邮件通知。',
+    toast_no_input:'请输入数据。',
+    toast_voice_male:'👨 已选择男声',
+    toast_voice_female:'👩 已选择女声',
+    toast_copy_ok:'📋 复制完成',
+    toast_copy_fail:'⚠️ 复制失败 — 请允许浏览器剪贴板权限。',
+    toast_translate_ok:'✅ 翻译完成',
+    toast_translate_fail:'⚠️ 翻译失败：',
+    toast_no_translate:'暂无翻译结果可复制。',
+    toast_trans_cleared:'翻译内容已重置。',
+    toast_trans_required:'请输入要翻译的内容或附加文件。',
+    toast_draft_gen:'草稿生成中...', toast_draft_ok:'✅ 草稿修改完成',
+    toast_draft_fail:'⚠️ 修改失败：', toast_collab_required:'请输入核心请求内容。',
+    toast_fix_required:'请输入修改内容。', toast_no_draft:'没有可修改的草稿。',
+    toast_ppt_ok:'✅ ${n}张幻灯片设计完成', toast_ppt_fail:'⚠️ PPT设计失败：',
+    toast_ppt_design_first:'请先设计文档。', toast_pptx_making:'PPTX生成中...',
+    toast_ppt_settings_saved:'✅ 文档设置已保存。', toast_ppt_input_required:'请输入报告内容。',
+    toast_ppt_file_required:'请上传文件或输入修改请求。',
+    toast_ai_model:'🤖 AI模型：', toast_backup_ok:'✅ 备份恢复完成！正在刷新应用...',
+    toast_backup_invalid:'⚠️ 备份文件格式无效。请检查JSON文件。',
+    toast_backup_wrong:'⚠️ 这不是Timothy备份文件。请选择正确的文件。',
+    toast_no_copy:'没有可复制的内容。', toast_no_title:'请输入标题。',
+    toast_task_reg_ok:'任务登记完成', toast_tracker_linked:'追踪器联动完成',
+    toast_report_copy:'报告复制完成', toast_schedule_ok:'日程修改完成',
+    toast_schedule_add_ok:'日程登记完成', toast_learn_on:'✅ 学习数据AI应用已激活',
+    toast_learn_off:'⏸️ 学习数据AI应用已停用', toast_no_body:'请输入正文。',
+    toast_style_saved:'学习保存完成', toast_style_deleted:'🗑 学习数据已删除',
+    toast_no_style_del:'没有可删除的样式数据。', toast_style_all_del:'✅ 已全部删除样式学习数据。',
+    toast_pick_date:'请选择日期。', toast_api_key_enter:'请输入API密钥。',
+    toast_api_key_ok:'✅  API密钥注册完成', toast_api_key_released:' API密钥已解除。',
+    toast_search_needed:'🔍 需要Google API密钥才能使用实时搜索功能。请先在设置中注册。',
+    toast_net_error:'⚠️ 网络错误 — 重试语音识别',
+    toast_meeting_cleared:'会议记录已重置。', toast_no_meeting:'没有可摘要的会议内容。',
+    toast_meeting_summary_ok:'✅ 会议记录摘要完成', toast_meeting_summary_fail:'⚠️ 摘要失败：',
+    toast_interp_cleared:'通译记录已重置。',
+    toast_my_mic_start:'🎙️ 开始我的语音识别', toast_my_mic_stop:'⏸️ 停止我的语音识别',
+    toast_peer_mic_stop:'⏸️ 停止对方语音识别', toast_conf_stop:'⏹ 会议模式停止',
+    toast_summary_making:'📄 AI会议记录摘要中...', toast_action_items_ok:'✅ ${n}件Action Item已登记到追踪器。',
+    toast_no_action_items:'没有可登记的Action Item。', toast_analyze_ok:'✅ 分析完成',
+    toast_analyze_fail:'⚠️ 分析失败：', toast_stt_ok:'✅ STT深度分析完成·结果卡片已生成',
+    toast_stt_fail:'⚠️ STT/会议记录分析失败：', toast_voice_only:'仅可上传音频文件。',
+    toast_voice_loaded:'✅ 音频文件加载完成。请开始分析。', toast_voice_or_text:'请上传音频文件或输入文本。',
+    wmo_clear:'晴天', wmo_partly_cloudy:'少云', wmo_cloudy:'多云', wmo_overcast:'阴天',
+    wmo_fog:'雾', wmo_drizzle:'毛毛雨', wmo_rain:'雨', wmo_heavy_rain:'大雨',
+    wmo_snow:'雪', wmo_heavy_snow:'暴雪', wmo_shower:'阵雨', wmo_heavy_shower:'强阵雨',
+    font_instant_note:'* 立即应用 · 保存后永久保留',
+    confirm_title:'🗑️ 删除确认', confirm_msg:'确定删除吗？<br>此操作无法撤销。', confirm_yes:'是，删除',
+    domain_all:'全部', domain_mfg:'制造', domain_equip:'设备', domain_mfgtech:'制造技术',
+    domain_dev:'开发', domain_qa:'品质', domain_support:'支援', domain_hr:'人事', domain_infra:'基础设施',
+    doc_trans_tab:'📄 文档/文本翻译', voice_trans_tab:'🎙️ 实时语音口译', conf_trans_tab:'🏢 会议模式',
+    my_lang_label:'📝 我的语言', peer_lang_label:'🌐 对方语言',
+    doc_text_tab:'📝 直接输入文本', doc_file_tab:'📎 文档/音频文件', btn_reset:'🗑 重置',
   },
   EN: {
     tab_mail:'📩 Mail Analysis', tab_stt:'🎙️ STT Analysis',
@@ -2935,6 +3155,88 @@ const LANG_PACKS = {
     api_register_btn:'Register',
     interp_log_ph:'My voice will be recorded after starting...',
     interp_start_btn:'🎙️ Start My Voice Interpretation',
+    // ── Weather Modal ──
+    weather_modal_title:'📍 Workplace Weather Settings',
+    weather_loc_ph:'Enter location',
+    weather_weekly_title:'📊 Weekly Forecast',
+    weather_loading:'Loading weather...',
+    weather_no_data:'Weather data unavailable',
+    // ── Sidebar/common ──
+    mob_title:'🤖 Timothy AI Assistant',
+    mob_tab_ai:'AI Analysis', mob_tab_schedule:'Schedule', mob_tab_learning:'Studio',
+    mob_tab_translate:'Translate', mob_tab_more:'More',
+    sidebar_logo_main:'AI Assistant',
+    user_dept_init:'Not logged in',
+    api_key_notice_title:'API Key Not Registered',
+    api_key_notice_desc:'⚙️ Register in Settings → API Settings.',
+    loc_default:'📍 Current Location',
+    nav_ppt_tooltip:'Under development — Coming soon', nav_ppt_label:'📊 Doc Auto Manager', nav_ppt_badge:'(Soon)',
+    // ── JS Toasts ──
+    toast_mic_not_supported:'⚠️ This browser does not support microphone.',
+    toast_mic_blocked:'⚠️ Microphone access is blocked. Allow it in browser address bar 🔒 → Site Settings.',
+    toast_mic_denied:'⚠️ Microphone permission denied. Allow it in browser settings and try again.',
+    toast_mic_error:'⚠️ Microphone unavailable: ',
+    toast_login_ok:'✅ Login successful',
+    toast_logout:'Logged out.',
+    toast_dept_name_required:'Please enter department and name.',
+    toast_api_key_required:'Please enter an API Key.',
+    toast_loc_required:'Please enter a location.',
+    toast_loc_changed:'✅ Location changed to \'${val}\'.',
+    toast_name_or_dept_required:'Please enter a name or department.',
+    toast_profile_saved:'✅ User info saved.',
+    toast_settings_saved:'✅ Settings saved.',
+    toast_beta:'This is a beta service.\n\nYou will be notified by email upon official release.',
+    toast_no_input:'Please enter data.',
+    toast_voice_male:'👨 Male voice selected',
+    toast_voice_female:'👩 Female voice selected',
+    toast_copy_ok:'📋 Copied',
+    toast_copy_fail:'⚠️ Copy failed — please allow clipboard permission.',
+    toast_translate_ok:'✅ Translation complete',
+    toast_translate_fail:'⚠️ Translation failed: ',
+    toast_no_translate:'No translation result to copy.',
+    toast_trans_cleared:'Translation cleared.',
+    toast_trans_required:'Enter text or attach a file to translate.',
+    toast_draft_gen:'Generating draft...', toast_draft_ok:'✅ Draft revised',
+    toast_draft_fail:'⚠️ Revision failed: ', toast_collab_required:'Please enter the request content.',
+    toast_fix_required:'Please enter revision details.', toast_no_draft:'No draft to revise.',
+    toast_ppt_ok:'✅ ${n} slides designed', toast_ppt_fail:'⚠️ PPT design failed: ',
+    toast_ppt_design_first:'Please design a document first.', toast_pptx_making:'Generating PPTX...',
+    toast_ppt_settings_saved:'✅ Document settings saved.', toast_ppt_input_required:'Please enter report content.',
+    toast_ppt_file_required:'Please upload a file or enter revision request.',
+    toast_ai_model:'🤖 AI Model: ', toast_backup_ok:'✅ Backup restored! Reloading app...',
+    toast_backup_invalid:'⚠️ Invalid backup file format. Check the JSON file.',
+    toast_backup_wrong:'⚠️ Not a Timothy backup file. Please choose the correct file.',
+    toast_no_copy:'Nothing to copy.', toast_no_title:'Please enter a title.',
+    toast_task_reg_ok:'Task registered', toast_tracker_linked:'Tracker linked',
+    toast_report_copy:'Report copied', toast_schedule_ok:'Schedule updated',
+    toast_schedule_add_ok:'Schedule added', toast_learn_on:'✅ Learning data AI application enabled',
+    toast_learn_off:'⏸️ Learning data AI application disabled', toast_no_body:'Please enter body text.',
+    toast_style_saved:'Style saved', toast_style_deleted:'🗑 Learning data deleted',
+    toast_no_style_del:'No style data to delete.', toast_style_all_del:'✅ All style data deleted.',
+    toast_pick_date:'Please select a date.', toast_api_key_enter:'Please enter an API key.',
+    toast_api_key_ok:'✅  API key registered', toast_api_key_released:' API key released.',
+    toast_search_needed:'🔍 Real-time search requires a Google API key. Please register it in Settings first.',
+    toast_net_error:'⚠️ Network error — retrying speech recognition',
+    toast_meeting_cleared:'Meeting log cleared.', toast_no_meeting:'No meeting content to summarize.',
+    toast_meeting_summary_ok:'✅ Meeting minutes summarized', toast_meeting_summary_fail:'⚠️ Summary failed: ',
+    toast_interp_cleared:'Interpretation log cleared.',
+    toast_my_mic_start:'🎙️ My voice recognition started', toast_my_mic_stop:'⏸️ My voice recognition stopped',
+    toast_peer_mic_stop:'⏸️ Peer voice recognition stopped', toast_conf_stop:'⏹ Conference mode stopped',
+    toast_summary_making:'📄 Summarizing meeting minutes...', toast_action_items_ok:'✅ ${n} action item(s) added to tracker.',
+    toast_no_action_items:'No action items to register.', toast_analyze_ok:'✅ Analysis complete',
+    toast_analyze_fail:'⚠️ Analysis failed: ', toast_stt_ok:'✅ STT analysis complete · Cards generated',
+    toast_stt_fail:'⚠️ STT/meeting analysis failed: ', toast_voice_only:'Audio files only.',
+    toast_voice_loaded:'✅ Audio loaded. Start analysis.', toast_voice_or_text:'Upload audio or enter text.',
+    wmo_clear:'Clear', wmo_partly_cloudy:'Partly Cloudy', wmo_cloudy:'Mostly Cloudy', wmo_overcast:'Overcast',
+    wmo_fog:'Fog', wmo_drizzle:'Drizzle', wmo_rain:'Rain', wmo_heavy_rain:'Heavy Rain',
+    wmo_snow:'Snow', wmo_heavy_snow:'Heavy Snow', wmo_shower:'Showers', wmo_heavy_shower:'Heavy Showers',
+    font_instant_note:'* Applied immediately · Saved permanently',
+    confirm_title:'🗑️ Confirm Delete', confirm_msg:'Delete this item?<br>This cannot be undone.', confirm_yes:'Yes, Delete',
+    domain_all:'All', domain_mfg:'Manufacturing', domain_equip:'Equipment', domain_mfgtech:'Mfg Tech',
+    domain_dev:'Dev', domain_qa:'Quality', domain_support:'Support', domain_hr:'HR', domain_infra:'Infra',
+    doc_trans_tab:'📄 Doc/Text Translation', voice_trans_tab:'🎙️ Live Voice Interpretation', conf_trans_tab:'🏢 Conference Mode',
+    my_lang_label:'📝 My Language', peer_lang_label:'🌐 Peer Language',
+    doc_text_tab:'📝 Type Text Directly', doc_file_tab:'📎 Doc/Audio File', btn_reset:'🗑 Reset',
   },
   JA: {
     tab_mail:'📩 メール分析', tab_stt:'🎙️ STT音声分析',
@@ -3088,6 +3390,88 @@ const LANG_PACKS = {
     api_register_btn:'登録',
     interp_log_ph:'通訳開始後に自分の音声が記録されます...',
     interp_start_btn:'🎙️ 自分の音声通訳開始',
+    // ── 날씨 모달 ──
+    weather_modal_title:'📍 事業場気象設定',
+    weather_loc_ph:'場所を入力',
+    weather_weekly_title:'📊 週間天気',
+    weather_loading:'天気を読み込み中...',
+    weather_no_data:'天気情報なし',
+    // ── 사이드바/공통 ──
+    mob_title:'🤖 Timothy AI アシスタント',
+    mob_tab_ai:'AI分析', mob_tab_schedule:'日程', mob_tab_learning:'学習室',
+    mob_tab_translate:'翻訳', mob_tab_more:'その他',
+    sidebar_logo_main:'AI アシスタント',
+    user_dept_init:'ログイン前',
+    api_key_notice_title:'APIキー未登録',
+    api_key_notice_desc:'⚙️ 設定 → API設定で登録してください。',
+    loc_default:'📍 現在地',
+    nav_ppt_tooltip:'アップグレード中 — まもなく公開', nav_ppt_label:'📊 文書自動マネージャー', nav_ppt_badge:'(予定)',
+    // ── JS 토스트 ──
+    toast_mic_not_supported:'⚠️ このブラウザはマイクをサポートしていません。',
+    toast_mic_blocked:'⚠️ マイクのアクセスがブロックされています。ブラウザのアドレスバー 🔒 → サイト設定で許可してください。',
+    toast_mic_denied:'⚠️ マイクのアクセスが拒否されました。ブラウザ設定で許可後、再度お試しください。',
+    toast_mic_error:'⚠️ マイクを使用できません：',
+    toast_login_ok:'✅ ログイン完了',
+    toast_logout:'ログアウトしました。',
+    toast_dept_name_required:'部署名と名前を入力してください。',
+    toast_api_key_required:'APIキーを入力してください。',
+    toast_loc_required:'場所を入力してください。',
+    toast_loc_changed:'✅ 場所を\'${val}\'に変更しました。',
+    toast_name_or_dept_required:'名前または部署名を入力してください。',
+    toast_profile_saved:'✅ ユーザー情報を保存しました。',
+    toast_settings_saved:'✅ 設定を保存しました。',
+    toast_beta:'現在ベータサービス中です。\n\n正式リリース時にメールでご案内します。',
+    toast_no_input:'データを入力してください。',
+    toast_voice_male:'👨 男性ボイス選択',
+    toast_voice_female:'👩 女性ボイス選択',
+    toast_copy_ok:'📋 コピー完了',
+    toast_copy_fail:'⚠️ コピー失敗 — ブラウザのクリップボード権限を許可してください。',
+    toast_translate_ok:'✅ 翻訳完了',
+    toast_translate_fail:'⚠️ 翻訳失敗：',
+    toast_no_translate:'コピーできる翻訳結果がありません。',
+    toast_trans_cleared:'翻訳内容をリセットしました。',
+    toast_trans_required:'翻訳する内容を入力するかファイルを添付してください。',
+    toast_draft_gen:'草稿生成中...', toast_draft_ok:'✅ 草稿修正完了',
+    toast_draft_fail:'⚠️ 修正失敗：', toast_collab_required:'核心依頼内容を入力してください。',
+    toast_fix_required:'修正内容を入力してください。', toast_no_draft:'修正できる草稿がありません。',
+    toast_ppt_ok:'✅ ${n}枚スライド設計完了', toast_ppt_fail:'⚠️ PPT設計失敗：',
+    toast_ppt_design_first:'先に文書を設計してください。', toast_pptx_making:'PPTX生成中...',
+    toast_ppt_settings_saved:'✅ 文書設定を保存しました。', toast_ppt_input_required:'報告書内容を入力してください。',
+    toast_ppt_file_required:'ファイルをアップロードするか修正依頼を入力してください。',
+    toast_ai_model:'🤖 AIモデル：', toast_backup_ok:'✅ バックアップ復元完了！アプリを再読み込みします...',
+    toast_backup_invalid:'⚠️ バックアップファイルの形式が無効です。JSONを確認してください。',
+    toast_backup_wrong:'⚠️ Timothyのバックアップファイルではありません。正しいファイルを選択してください。',
+    toast_no_copy:'コピーする内容がありません。', toast_no_title:'タイトルを入力してください。',
+    toast_task_reg_ok:'タスク登録完了', toast_tracker_linked:'トラッカー連動完了',
+    toast_report_copy:'レポートコピー完了', toast_schedule_ok:'予定修正完了',
+    toast_schedule_add_ok:'予定登録完了', toast_learn_on:'✅ 学習データAI適用有効化',
+    toast_learn_off:'⏸️ 学習データAI適用無効化', toast_no_body:'本文を入力してください。',
+    toast_style_saved:'スタイル保存完了', toast_style_deleted:'🗑 学習データ削除済み',
+    toast_no_style_del:'削除できるスタイルデータがありません。', toast_style_all_del:'✅ スタイル学習データをすべて削除しました。',
+    toast_pick_date:'日付を選択してください。', toast_api_key_enter:'APIキーを入力してください。',
+    toast_api_key_ok:'✅  APIキー登録完了', toast_api_key_released:' APIキーを解除しました。',
+    toast_search_needed:'🔍 リアルタイム検索にはGoogle APIキーが必要です。先に設定で登録してください。',
+    toast_net_error:'⚠️ ネットワークエラー — 音声認識再試行',
+    toast_meeting_cleared:'会議記録をリセットしました。', toast_no_meeting:'要約できる会議内容がありません。',
+    toast_meeting_summary_ok:'✅ 議事録要約完了', toast_meeting_summary_fail:'⚠️ 要約失敗：',
+    toast_interp_cleared:'通訳記録をリセットしました。',
+    toast_my_mic_start:'🎙️ 自分の音声認識開始', toast_my_mic_stop:'⏸️ 自分の音声認識停止',
+    toast_peer_mic_stop:'⏸️ 相手の音声認識停止', toast_conf_stop:'⏹ 会議モード停止',
+    toast_summary_making:'📄 AI議事録要約中...', toast_action_items_ok:'✅ ${n}件のアクションアイテムをトラッカーに登録しました。',
+    toast_no_action_items:'登録できるアクションアイテムがありません。', toast_analyze_ok:'✅ 分析完了',
+    toast_analyze_fail:'⚠️ 分析失敗：', toast_stt_ok:'✅ STT深度分析完了・結果カード生成済み',
+    toast_stt_fail:'⚠️ STT/議事録分析失敗：', toast_voice_only:'音声ファイルのみアップロード可能です。',
+    toast_voice_loaded:'✅ 音声ファイル読み込み完了。分析を開始してください。', toast_voice_or_text:'音声ファイルをアップロードするかテキストを入力してください。',
+    wmo_clear:'晴れ', wmo_partly_cloudy:'晴れのち曇り', wmo_cloudy:'曇り', wmo_overcast:'曇天',
+    wmo_fog:'霧', wmo_drizzle:'霧雨', wmo_rain:'雨', wmo_heavy_rain:'大雨',
+    wmo_snow:'雪', wmo_heavy_snow:'大雪', wmo_shower:'にわか雨', wmo_heavy_shower:'激しいにわか雨',
+    font_instant_note:'* 即時適用 · 保存で永続保持',
+    confirm_title:'🗑️ 削除確認', confirm_msg:'削除しますか？<br>元に戻せません。', confirm_yes:'はい、削除',
+    domain_all:'すべて', domain_mfg:'製造', domain_equip:'設備', domain_mfgtech:'製造技術',
+    domain_dev:'開発', domain_qa:'品質', domain_support:'支援', domain_hr:'人事', domain_infra:'インフラ',
+    doc_trans_tab:'📄 文書/テキスト翻訳', voice_trans_tab:'🎙️ リアルタイム音声通訳', conf_trans_tab:'🏢 会議モード',
+    my_lang_label:'📝 自分の言語', peer_lang_label:'🌐 相手の言語',
+    doc_text_tab:'📝 テキスト直接入力', doc_file_tab:'📎 文書/音声ファイル', btn_reset:'🗑 リセット',
   }
 };
 
@@ -3295,18 +3679,62 @@ function startClock(){
   clockInterval = setInterval(tick, 1000);
 }
 
-/** WMO 날씨 코드 → 한국어 + 이모지 */
-function wmoToKor(code){
-  if(code===0) return ['☀️','맑음'];
-  if(code<=2)  return ['⛅','구름조금'];
-  if(code<=3)  return ['☁️','흐림'];
-  if(code<=48) return ['🌫','안개'];
-  if(code<=57) return ['🌦','이슬비'];
-  if(code<=67) return ['🌧','비'];
-  if(code<=77) return ['❄️','눈'];
-  if(code<=82) return ['🌧','소나기'];
-  if(code<=99) return ['⛈','뇌우'];
+/** WMO 날씨 코드 → 현재 언어 텍스트 + 이모지 (다국어 지원) */
+function wmoToText(code){
+  if(code===0) return ['☀️', t('wmo_clear')];
+  if(code<=2)  return ['⛅', t('wmo_partly_cloudy')];
+  if(code<=3)  return ['☁️', t('wmo_cloudy')];
+  if(code<=48) return ['🌫', t('wmo_fog')];
+  if(code<=57) return ['🌦', t('wmo_drizzle')];
+  if(code<=67) return ['🌧', t('wmo_rain')];
+  if(code<=77) return ['❄️', t('wmo_snow')];
+  if(code<=82) return ['🌧', t('wmo_shower')];
+  if(code<=99) return ['⛈', t('wmo_thunder')];
   return ['🌡','--'];
+}
+// 기존 호환용 별칭
+function wmoToKor(code){ return wmoToText(code); }
+
+/** Open-Meteo 7일 예보 → 날씨 모달 주간 그리드 갱신 */
+async function renderWeeklyWeather(lat, lon, tz){
+  const grid = document.getElementById('weeklyWeatherGrid');
+  if(!grid) return;
+  grid.innerHTML = `<div style="color:#475569;grid-column:1/-1;">${t('weather_loading')}</div>`;
+  try{
+    const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}`
+      + `&daily=weathercode,temperature_2m_max,temperature_2m_min`
+      + `&timezone=${encodeURIComponent(tz)}&forecast_days=7`;
+    const ctrl = new AbortController();
+    const timer = setTimeout(()=>ctrl.abort(), 7000);
+    const res = await fetch(url, {signal: ctrl.signal});
+    clearTimeout(timer);
+    if(!res.ok) throw new Error('HTTP '+res.status);
+    const data = await res.json();
+    const days  = data.daily?.time || [];
+    const codes = data.daily?.weathercode || [];
+    const maxT  = data.daily?.temperature_2m_max || [];
+    const minT  = data.daily?.temperature_2m_min || [];
+
+    const pack = LANG_PACKS[currentLang] || LANG_PACKS.KO;
+    const dayKeys = ['sun','mon','tue','wed','thu','fri','sat'];
+    const dayLabels = dayKeys.map(k => pack[k] || k);
+
+    grid.innerHTML = days.slice(0,7).map((dateStr, i) => {
+      const d   = new Date(dateStr + 'T00:00:00');
+      const dow = dayLabels[d.getDay()];
+      const [emoji, desc] = wmoToText(codes[i] ?? 0);
+      const hi  = Math.round(maxT[i] ?? 0);
+      const lo  = Math.round(minT[i] ?? 0);
+      return `<div style="display:flex;align-items:center;gap:4px;padding:3px 0;border-bottom:1px solid rgba(255,255,255,.04);">
+        <span style="font-weight:700;color:#94a3b8;min-width:18px;">${dow}</span>
+        <span>${emoji}</span>
+        <span style="color:#e2e8f0;flex:1;">${desc}</span>
+        <span style="color:#f59e0b;font-weight:600;white-space:nowrap;">${hi}° <span style="color:#475569;font-weight:400;">/ ${lo}°</span></span>
+      </div>`;
+    }).join('');
+  } catch(e){
+    grid.innerHTML = `<div style="color:#475569;grid-column:1/-1;">${t('weather_no_data')}</div>`;
+  }
 }
 
 /** Open-Meteo Geocoding → 위경도 획득 */
@@ -3394,10 +3822,13 @@ async function fetchWeather(lat, lon, tz){
 }
 
 /** 날씨 + 시간대 업데이트 — 위치 변경 시 호출 */
+// 마지막 지오코드 결과를 전역에 보관 (날씨 모달 주간 예보에 재사용)
+let _lastGeo = null;
+
 async function updateWeatherAndTime(locationName){
   const weatherDisp  = document.getElementById('weatherDisplay');
   const weatherExtra = document.getElementById('weatherExtra');
-  if(weatherDisp) weatherDisp.innerText = '날씨 로딩 중...';
+  if(weatherDisp) weatherDisp.innerText = t('weather_loading') || '...';
 
   // 1. 시간대 즉시 설정 (내장 맵 우선)
   const tzFromMap = getTimezone(locationName);
@@ -3407,37 +3838,29 @@ async function updateWeatherAndTime(locationName){
   // 2. 정확한 위경도+시간대 취득
   const geo = await geocode(locationName);
   if(!geo){
-    if(weatherDisp) weatherDisp.innerText = '날씨 정보 없음';
+    if(weatherDisp) weatherDisp.innerText = t('weather_no_data') || '--';
     return;
   }
+  _lastGeo = geo; // ★ 전역 저장
   currentTimezone = geo.tz || currentTimezone;
   startClock();
 
-  // 3. 날씨 가져오기
+  // 3. 현재 날씨 가져오기
   const w = await fetchWeather(geo.lat, geo.lon, currentTimezone);
   if(!w){
-    if(weatherDisp) weatherDisp.innerText = '날씨 정보 없음';
+    if(weatherDisp) weatherDisp.innerText = t('weather_no_data') || '--';
     return;
   }
 
-  // 4. 날씨 코드 → 텍스트 변환
-  const WMO = {
-    0:'☀️ 맑음', 1:'🌤 구름 조금', 2:'⛅ 구름 많음', 3:'☁️ 흐림',
-    45:'🌫 안개', 48:'🌫 안개',
-    51:'🌦 이슬비', 53:'🌦 이슬비', 55:'🌦 이슬비',
-    61:'🌧 비', 63:'🌧 비', 65:'🌧 강한 비',
-    71:'❄️ 눈', 73:'❄️ 눈', 75:'❄️ 폭설',
-    80:'🌦 소나기', 81:'🌦 소나기', 82:'⛈ 강한 소나기',
-    95:'⛈ 뇌우', 96:'⛈ 뇌우', 99:'⛈ 뇌우',
-  };
-  const code   = w.weathercode ?? 0;
-  const desc   = WMO[code] || '날씨 정보';
-  const temp   = Math.round(w.temperature_2m ?? 0);
-  const humid  = w.relativehumidity_2m ?? '--';
-  const wind   = Math.round(w.windspeed_10m ?? 0);
+  // 4. 날씨 코드 → 다국어 텍스트 변환 (wmoToText 사용)
+  const code          = w.weathercode ?? 0;
+  const [emoji, desc] = wmoToText(code);
+  const temp          = Math.round(w.temperature_2m ?? 0);
+  const humid         = w.relativehumidity_2m ?? '--';
+  const wind          = Math.round(w.windspeed_10m ?? 0);
 
-  if(weatherDisp)  weatherDisp.innerText = `${desc} ${temp}°C`;
-  if(weatherExtra) weatherExtra.innerText = `습도 ${humid}% · 바람 ${wind}km/h`;
+  if(weatherDisp)  weatherDisp.innerText = `${emoji} ${desc} ${temp}°C`;
+  if(weatherExtra) weatherExtra.innerText = `💧${humid}% · 💨${wind}km/h`;
 }
 
 // ══════════════════════════════
@@ -3447,14 +3870,14 @@ function doLogin(){
   const dept=document.getElementById('inputDept').value.trim();
   const name=document.getElementById('inputName').value.trim();
   const key=document.getElementById('inputApiKey').value.trim();
-  if(!dept||!name){showToast('부서명과 이름을 입력해 주세요.');return;}
-  if(!key){showToast('API Key를 입력해 주세요.');return;}
+  if(!dept||!name){showToast(t('toast_dept_name_required'));return;}
+  if(!key){showToast(t('toast_api_key_required'));return;}
   localStorage.setItem('gemini_api_key',key);
   localStorage.setItem('profile_data',JSON.stringify({dept,name}));
   bindProfile(dept,name);
   updateStatus(true);
   renderAll();
-  showToast('✅ 로그인 완료');
+  showToast(t('toast_login_ok'));
 }
 function doLogout(){
   localStorage.removeItem('gemini_api_key');
@@ -3462,7 +3885,7 @@ function doLogout(){
   document.getElementById('userLoginForm').style.display='block';
   ['inputDept','inputName','inputApiKey'].forEach(id=>{document.getElementById(id).value='';});
   updateStatus(false);
-  showToast('로그아웃 되었습니다.');
+  showToast(t('toast_logout'));
 }
 function bindProfile(dept,name){
   document.getElementById('userLoginForm').style.display='none';
@@ -3582,7 +4005,7 @@ function handleFileSelection(e){
     r.onloadend = () => {
       fileAttachmentData = { mime, base64: r.result.split(',')[1], name: f.name };
       badge.innerText = '📎 ' + f.name;
-      showToast(`✅ ${f.name} 첨부 완료. 분석 시작하세요.`);
+      showToast(`✅ ${f.name} ` + (t('toast_analyze_ok')||'완료'));
     };
     r.readAsDataURL(f);
     return;
@@ -3610,10 +4033,10 @@ function handleFileSelection(e){
           // ★ 입력란에 넣지 않고 fileAttachmentData에 텍스트로 저장
           fileAttachmentData = { mime:'text/plain', text, name: f.name, isText: true };
           badge.innerText = '📊 ' + f.name;
-          showToast(`✅ Excel "${f.name}" 읽기 완료. 분석 시작하세요.`);
+          showToast(`✅ Excel "${f.name}" ` + (t('toast_analyze_ok')||'완료'));
         }catch(err){
           badge.innerText = f.name + ' ❌';
-          showToast('⚠️ Excel 파싱 오류: ' + err.message);
+          showToast('⚠️ Excel: ' + err.message);
         }
       };
       r.readAsArrayBuffer(f);
@@ -3623,7 +4046,7 @@ function handleFileSelection(e){
       const scr = document.createElement('script');
       scr.src = 'https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js';
       scr.onload  = loadAndRead;
-      scr.onerror = () => { badge.innerText = f.name + ' ❌'; showToast('⚠️ Excel 파서 로드 실패'); };
+      scr.onerror = () => { badge.innerText = f.name + ' ❌'; showToast('⚠️ Excel parser load fail'); };
       document.head.appendChild(scr);
     } else { loadAndRead(); }
     return;
@@ -3636,7 +4059,7 @@ function handleFileSelection(e){
       const text = `[CSV: ${f.name}]\n${r.result.slice(0, 15000)}`;
       fileAttachmentData = { mime:'text/plain', text, name: f.name, isText: true };
       badge.innerText = '📊 ' + f.name;
-      showToast(`✅ CSV "${f.name}" 읽기 완료. 분석 시작하세요.`);
+      showToast(`✅ CSV "${f.name}" ` + (t('toast_analyze_ok')||'완료'));
     };
     r.readAsText(f, 'UTF-8');
     return;
@@ -3649,7 +4072,7 @@ function handleFileSelection(e){
       const text = `[${f.name}]\n${r.result.slice(0, 15000)}`;
       fileAttachmentData = { mime:'text/plain', text, name: f.name, isText: true };
       badge.innerText = '📄 ' + f.name;
-      showToast(`✅ "${f.name}" 읽기 완료. 분석 시작하세요.`);
+      showToast(`✅ "${f.name}" ` + (t('toast_analyze_ok')||'완료'));
     };
     r.readAsText(f, 'UTF-8');
     return;
@@ -3665,9 +4088,9 @@ function handleFileSelection(e){
             const text = `[Word: ${f.name}]\n${result.value.slice(0, 15000)}`;
             fileAttachmentData = { mime:'text/plain', text, name: f.name, isText: true };
             badge.innerText = '📄 ' + f.name;
-            showToast(`✅ Word "${f.name}" 읽기 완료. 분석 시작하세요.`);
+            showToast(`✅ Word "${f.name}" ` + (t('toast_analyze_ok')||'완료'));
           })
-          .catch(err => { badge.innerText = f.name + ' ❌'; showToast('⚠️ DOCX 오류: ' + err.message); });
+          .catch(err => { badge.innerText = f.name + ' ❌'; showToast('⚠️ DOCX: ' + err.message); });
       };
       r.readAsArrayBuffer(f);
     };
@@ -3675,14 +4098,14 @@ function handleFileSelection(e){
       const scr = document.createElement('script');
       scr.src = 'https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js';
       scr.onload  = loadAndRead;
-      scr.onerror = () => { badge.innerText = f.name + ' ❌'; showToast('⚠️ DOCX 파서 로드 실패'); };
+      scr.onerror = () => { badge.innerText = f.name + ' ❌'; showToast('⚠️ DOCX parser load fail'); };
       document.head.appendChild(scr);
     } else { loadAndRead(); }
     return;
   }
 
   badge.innerText = f.name + ' ⚠️';
-  showToast('⚠️ 지원하지 않는 형식입니다. (이미지·PDF·Excel·CSV·Word·TXT)');
+  showToast('⚠️ Unsupported format');
 }
 
 /** Excel → 텍스트 테이블 변환 */
@@ -3714,7 +4137,7 @@ function readExcel(file, badge){
       showToast(`📊 Excel "${file.name}" → 텍스트 변환 완료. 분석 시작하세요.`);
     }catch(err){
       badge.innerText = file.name + ' ❌';
-      showToast('⚠️ Excel 파싱 오류: ' + err.message);
+      showToast('⚠️ Excel: ' + err.message);
     }
   };
   r.readAsArrayBuffer(file);
@@ -3735,7 +4158,7 @@ function readDocx(file, badge){
       })
       .catch(err => {
         badge.innerText = file.name + ' ❌';
-        showToast('⚠️ DOCX 파싱 오류: ' + err.message);
+        showToast('⚠️ DOCX: ' + err.message);
       });
   };
   r.readAsArrayBuffer(file);
@@ -3782,7 +4205,7 @@ async function analyzeMail(){
   const area=document.getElementById('emailPasteInput');
   const text=area.value.trim();
   console.log('[Timothy] 입력 텍스트 길이:', text.length, '/ 파일 첨부:', !!fileAttachmentData);
-  if(!text&&!fileAttachmentData){showToast('데이터를 입력해 주세요.');return;}
+  if(!text&&!fileAttachmentData){showToast(t('toast_no_input'));return;}
   const btn=document.getElementById('analyzeBtn');
   btn.disabled=true; btn.innerText=t('status_analyzing');
 
@@ -3860,7 +4283,7 @@ ${langOut}
     renderAll();
     area.value=''; fileAttachmentData=null;
     document.getElementById('fileNameBadge').innerText='선택된 파일 없음';
-    showToast(`✅ [${result.category}] 분석 완료`);
+    showToast(`✅ [${result.category}] ${t('toast_analyze_ok')}`);
 
   } catch(err){
     console.error('[메일 분석 오류]', err);
@@ -3871,7 +4294,7 @@ ${langOut}
     else if(msg.includes('429')) msg='API 호출 한도 초과입니다. 잠시 후 다시 시도해 주세요.';
     else if(msg.includes('500')||msg.includes('503')) msg='Gemini 서버 오류입니다. 잠시 후 다시 시도해 주세요.';
     else if(msg.includes('Failed to fetch')||msg.includes('network')) msg='네트워크 연결을 확인해 주세요.';
-    showToast('⚠️ 분석 실패: '+msg);
+    showToast(t('toast_analyze_fail')+msg);
   } finally{
     btn.disabled=false;
     btn.innerText=t('analyze_start')||'▶ 분석 시작';
@@ -3889,7 +4312,7 @@ function handleSttDrop(e){
   e.preventDefault();
   document.getElementById('sttUploadZone').classList.remove('drag-over');
   const f=e.dataTransfer.files[0]; if(!f) return;
-  if(!f.type.startsWith('audio/')){showToast('음성 파일만 업로드 가능합니다.');return;}
+  if(!f.type.startsWith('audio/')){showToast(t('toast_voice_only'));return;}
   loadSttAudio(f);
 }
 function loadSttAudio(f){
@@ -3899,7 +4322,7 @@ function loadSttAudio(f){
   const r=new FileReader();
   r.onloadend=()=>{
     sttAudioData={mime:f.type, base64:r.result.split(',')[1]};
-    showToast('✅ 음성 파일 로드 완료. 분석을 시작하세요.');
+    showToast(t('toast_voice_loaded'));
   };
   r.readAsDataURL(f);
 }
@@ -3910,7 +4333,7 @@ async function analyzeMeeting(){
   if(!requireApiKey()) return;
   const apiKey = localStorage.getItem('gemini_api_key');
   const text=document.getElementById('meetingPasteInput').value.trim();
-  if(!text && !sttAudioData){showToast('음성 파일을 업로드하거나 텍스트를 입력하세요.');return;}
+  if(!text && !sttAudioData){showToast(t('toast_voice_or_text'));return;}
   const btn=document.getElementById('meetingBtn');
   btn.disabled=true; btn.innerText=t('status_analyzing');
   const url=`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
@@ -3991,10 +4414,10 @@ ${text ? '【회의록/전사본 내용】\n'+text : ''}`;
     const badge=document.getElementById('sttUploadBadge');
     if(badge){badge.innerText=''; badge.classList.remove('show');}
     document.getElementById('sttFileInput').value='';
-    showToast(`✅ STT 심층 분석 완료 · 결과 카드 생성됨`);
+    showToast(t('toast_stt_ok'));
   } catch(err){
     console.error('[STT 분석 오류]',err);
-    showToast('⚠️ STT/회의록 분석 실패: '+err.message);
+    showToast(t('toast_stt_fail')+err.message);
   } finally{
     btn.disabled=false; btn.innerText=t('stt_analyze_btn')||'▶ STT/회의록 분석';
   }
@@ -4048,7 +4471,7 @@ function insertSttResultCard(result){
 /** 회의록 Action Item을 Tracking에 등록 */
 function registerMeetingActions(result){
   const items = result.action_items || [];
-  if(!items.length){ showToast('등록할 Action Item이 없습니다.'); return; }
+  if(!items.length){ showToast(t('toast_no_action_items')); return; }
   const tasks = lsArr('tasks');
   items.forEach(a => {
     tasks.unshift({
@@ -4063,7 +4486,7 @@ function registerMeetingActions(result){
   });
   lsSet('tasks', tasks);
   renderTracking(); renderWeekly();
-  showToast(`✅ ${items.length}건 Action Item이 트래커에 등록됐습니다.`);
+  showToast(t('toast_action_items_ok').replace('${n}', items.length));
 }
 
 /**
@@ -4173,13 +4596,13 @@ function cpSttReply(idx){
   const m = lsArr('emails')[idx];
   if(!m) return;
   const draft = m.reply_draft || '';
-  if(!draft){ showToast('복사할 내용이 없습니다.'); return; }
+  if(!draft){ showToast(t('toast_no_copy')); return; }
   const tmp = document.createElement('div');
   tmp.innerHTML = draft;
   tmp.querySelectorAll('br').forEach(el => el.replaceWith('\n'));
   tmp.querySelectorAll('p,div,tr,li,h1,h2,h3,h4').forEach(el => { el.prepend('\n'); el.append('\n'); });
   const text = (tmp.textContent||'').replace(/\n{3,}/g,'\n\n').trim();
-  navigator.clipboard.writeText(text).then(()=>showToast('📋 회신 초안 복사 완료'));
+  navigator.clipboard.writeText(text).then(()=>showToast('📋 '+t('toast_copy_ok')));
 }
 
 /** STT 회신 피드백 루프 */
@@ -4190,13 +4613,13 @@ window.addEventListener('error', (e)=>{
   console.error('[Timothy ERROR]', e.message, '\n파일:', e.filename, '\n줄:', e.lineno);
   // 사용자에게도 표시 (토스트가 준비된 후)
   if(typeof showToast === 'function'){
-    showToast('⚠️ 오류: ' + e.message);
+    showToast('⚠️ Error: ' + e.message);
   }
 });
 window.addEventListener('unhandledrejection', (e)=>{
   console.error('[Timothy UNHANDLED PROMISE]', e.reason);
   if(typeof showToast === 'function'){
-    showToast('⚠️ 비동기 오류: ' + (e.reason?.message || e.reason));
+    showToast('⚠️ Async error: ' + (e.reason?.message || e.reason));
   }
 });
 console.log('[Timothy] 스크립트 로드 시작');
@@ -4220,7 +4643,10 @@ function updateUI(){
   document.querySelectorAll('[data-i18n]').forEach(el=>{
     const key = el.getAttribute('data-i18n');
     const val = pack[key];
-    if(val && val !== key) el.innerText = val;
+    if(!val || val === key) return;
+    // confirm_msg 처럼 HTML 태그 포함 키는 innerHTML 사용
+    if(key === 'confirm_msg') { el.innerHTML = val; }
+    else { el.innerText = val; }
   });
 
   // 2. data-i18n-placeholder 순회 갱신
@@ -4235,12 +4661,12 @@ function updateUI(){
   const hasKey = !!localStorage.getItem('gemini_api_key');
   const stxt = document.getElementById('statusTxt');
   const dot  = document.getElementById('statusDot');
-  if(stxt) stxt.innerText = hasKey ? (pack.status_active||'Timothy AI 가동 중') : (pack.status_need_login||'API 키 미등록');
+  if(stxt) stxt.innerText = hasKey ? (pack.status_active||'Timothy AI Active') : (pack.status_need_login||'API Key Required');
   if(dot)  dot.style.background = hasKey ? '#10b981' : '#f43f5e';
 
   // displayDept — 사용자 로그인 전 상태
   const dd = document.getElementById('displayDept');
-  if(dd && !dd.dataset.userSet) dd.innerText = pack.login_status || '로그인 전';
+  if(dd && !dd.dataset.userSet) dd.innerText = pack.login_status || pack.user_dept_init || 'Not logged in';
 
   // 분석 탭 textarea placeholder
   const ep = document.getElementById('emailPasteInput');
@@ -4353,10 +4779,10 @@ function importBackup(event){
     try{
       data = JSON.parse(e.target.result);
     }catch{
-      showToast('⚠️ 잘못된 백업 파일 형식입니다. JSON을 확인하세요.'); return;
+      showToast(t('toast_backup_invalid')); return;
     }
     if(!data._meta || !data.userData){
-      showToast('⚠️ Timothy 백업 파일이 아닙니다. 올바른 파일을 선택하세요.'); return;
+      showToast(t('toast_backup_wrong')); return;
     }
 
     // ② 버전 확인
@@ -4383,7 +4809,7 @@ function importBackup(event){
           if(!k.includes('api_key')) localStorage.setItem(k, v);
         });
         localStorage.setItem('app_version', APP_VERSION);
-        showToast('✅ 백업 복구 완료! 앱을 새로고침합니다...');
+        showToast(t('toast_backup_ok'));
         setTimeout(()=> location.reload(), 1200);
       };
     }
@@ -4498,7 +4924,7 @@ async function handleAnalysisFeedback(mode, card, idx){
 
   const fbEl     = document.getElementById(inputId);
   const feedback = fbEl ? fbEl.value.trim() : '';
-  if(!feedback){ showToast('명령창에 내용을 입력하세요.'); return; }
+  if(!feedback){ showToast(t('toast_no_input')); return; }
 
   const mails    = lsArr('emails');
   const mailData = mails[idx];
@@ -4513,7 +4939,7 @@ async function handleAnalysisFeedback(mode, card, idx){
   if(resolvedMode === 'search'){
     const gemKey = localStorage.getItem('gemini_api_key');
     if(!gemKey){
-      showToast('🔍 실시간 인터넷 검색 기능은 Google API 키가 필요합니다. 설정에서 구글 키를 먼저 등록해 주세요.');
+      showToast(t('toast_search_needed'));
       setTimeout(()=>{ openSettingsModal(); switchSettingsTab('api'); }, 700);
       return;
     }
@@ -4526,7 +4952,7 @@ async function handleAnalysisFeedback(mode, card, idx){
 
   // 분류 배지 표시 (사용자에게 어떤 모드인지 알려줌)
   const modeLabel = { fix:'🔄 수정', logic:'🧠 논리 보강', search:'🌐 검색' };
-  showToast(`${modeLabel[resolvedMode] || '🔄'} 모드로 처리합니다...`);
+  showToast(`${modeLabel[resolvedMode] || '🔄'}...`);
 
   if(resolvedMode === 'logic'){
     const logicSystemRole = `사용자가 '상황 설명'을 입력했음.
@@ -4563,7 +4989,7 @@ async function handleAnalysisFeedback(mode, card, idx){
 
 async function callDeepL(text, targetLang){
   const key = localStorage.getItem('deepl_api_key');
-  if(!key){ showToast('⚠️ DeepL API 키가 없습니다. 설정에서 등록하세요.'); return null; }
+  if(!key){ showToast(t('toast_api_key_enter')); return null; }
 
   const isFree = key.endsWith(':fx');
   const baseUrl = isFree
@@ -4588,24 +5014,24 @@ async function callDeepL(text, targetLang){
     });
     clearTimeout(timer);
 
-    if(res.status === 403){ showToast('⚠️ DeepL 인증 실패. 키를 확인하세요.'); return null; }
-    if(res.status === 456){ showToast('⚠️ DeepL 무료 할당량 초과'); return null; }
-    if(!res.ok){ showToast(`⚠️ DeepL 오류 ${res.status}`); return null; }
+    if(res.status === 403){ showToast('⚠️ DeepL auth fail'); return null; }
+    if(res.status === 456){ showToast('⚠️ DeepL quota exceeded'); return null; }
+    if(!res.ok){ showToast(`⚠️ DeepL error ${res.status}`); return null; }
 
     const data = await res.json();
     return data.translations?.[0]?.text || null;
 
   } catch(err){
-    if(err.name === 'AbortError'){ showToast('⚠️ DeepL 응답 시간 초과'); return null; }
+    if(err.name === 'AbortError'){ showToast('⚠️ DeepL timeout'); return null; }
 
     // ★ CORS/네트워크 차단 → Gemini로 자동 폴백
     if(err.message === 'Failed to fetch' || err.name === 'TypeError'){
-      showToast('⚠️ DeepL CORS 차단 — Gemini로 자동 전환합니다.');
+      showToast('⚠️ DeepL CORS → Gemini fallback');
       return await callGeminiFallbackTranslate(text, targetLang);
     }
 
     console.error('[DeepL]', err.message);
-    showToast('⚠️ DeepL 오류: ' + err.message);
+    showToast('⚠️ DeepL: ' + err.message);
     return null;
   }
 }
@@ -4754,11 +5180,11 @@ async function copyRichText(el, toastMsg){
         'text/plain': new Blob([plainText],   { type: 'text/plain' }),
       });
       await navigator.clipboard.write([clipItem]);
-      showToast(toastMsg || '📋 서식 포함 복사 완료 (Outlook·Excel에 붙여넣기 가능)');
+      showToast(toastMsg || '📋 '+t('toast_copy_ok'));
     } else {
       // ClipboardItem 미지원 브라우저 (구버전 Edge 등) → 텍스트 fallback
       await navigator.clipboard.writeText(plainText);
-      showToast((toastMsg || '📋 복사 완료') + ' (이 브라우저는 서식 미지원)');
+      showToast((toastMsg || '📋 '+t('toast_copy_ok')));
     }
   } catch(err){
     // 권한 거부 등 최후 fallback — execCommand
@@ -4770,9 +5196,9 @@ async function copyRichText(el, toastMsg){
       ta.select();
       document.execCommand('copy');
       document.body.removeChild(ta);
-      showToast((toastMsg || '📋 복사 완료') + ' (텍스트 전용)');
+      showToast((toastMsg || '📋 '+t('toast_copy_ok')));
     } catch(e2){
-      showToast('⚠️ 복사 실패 — 브라우저 클립보드 권한을 허용해 주세요.');
+      showToast(t('toast_copy_fail'));
     }
   }
 }
@@ -4792,7 +5218,7 @@ function handlePasteImage(e){
       reader.onloadend = () => {
         fileAttachmentData = { mime: item.type, base64: reader.result.split(',')[1], name: '붙여넣기 이미지' };
         document.getElementById('fileNameBadge').innerText = '🖼️ 클립보드 이미지';
-        showToast('🖼️ 이미지가 첨부됐습니다. 분석 시작하세요.');
+        showToast('🖼️ '+t('toast_analyze_ok'));
       };
       reader.readAsDataURL(file);
       return;
@@ -4851,7 +5277,7 @@ function handleTransInputPaste(e){
           transFileData = { mime: item.type, base64: reader.result.split(',')[1], name:'붙여넣기 이미지' };
           const ti = document.getElementById('transInput');
           if(ti){ ti.setAttribute('data-placeholder','🖼️ 이미지 첨부됨 — 번역하기를 누르세요.'); ti.innerHTML=''; }
-          showToast('🖼️ 이미지 첨부됨. 번역하기를 누르세요.');
+          showToast('🖼️ '+t('toast_translate_ok'));
         };
         reader.readAsDataURL(file);
         return;
@@ -4898,7 +5324,7 @@ function handleTransInputPaste(e){
         const mimeMatch = src.match(/^data:([^;]+);/);
         if(mimeMatch && !transFileData){
           transFileData = { mime: mimeMatch[1], base64: src.split(',')[1], name:'붙여넣기 이미지' };
-          showToast('🖼️ 이미지가 첨부 파일로 등록됐습니다.');
+          showToast('🖼️ '+t('toast_copy_ok'));
         }
         img.replaceWith(document.createTextNode('\n[이미지 첨부됨]\n'));
       } else {
@@ -4960,7 +5386,7 @@ function setTransEngine(engine){
   if(note) note.style.display = engine === 'deepl' ? 'block' : 'none';
   updateTransEngineBadge();
   const labels = { deepl:'🌿 DeepL', gpt:'🟩 GPT-4o', gemini:'🟦 Gemini' };
-  showToast(`${labels[engine]||'Gemini'} 번역 엔진 선택됨`);
+  showToast(`${labels[engine]||'Gemini'} ${t('toast_translate_ok')}`);
 }
 
 
@@ -5166,7 +5592,7 @@ async function sagSearch(query, _ignored){
 
   // Gemini 키 없으면 친절한 안내 후 중단
   if(!geminiKey){
-    showToast('🔍 실시간 인터넷 검색 기능은 Google API 키가 필요합니다. 설정에서 구글 키를 먼저 등록해 주세요.');
+    showToast(t('toast_search_needed'));
     setTimeout(()=>{ openSettingsModal(); switchSettingsTab('api'); }, 700);
     return { text:'', success:false };
   }
@@ -5200,7 +5626,7 @@ async function sagSearch(query, _ignored){
     return { text, success: true };
   }catch(e){
     console.warn('[SAG Search]', e.message);
-    showToast(`⚠️ 검색 실패: ${e.message}`);
+    showToast('⚠️ Search fail: ' + e.message);
     return { text:'', success:false };
   }
 }
@@ -5236,7 +5662,7 @@ async function sagReplyFix({ mailData, feedback, apiKey, replyTextEl, fbInputEl,
       return;
     }
     searchContext = searchResult.text;
-    if(searchContext) showToast('✅ 검색 완료 — 본문 반영 중...');
+    if(searchContext) showToast('✅ '+t('toast_copy_ok'));
   }
 
   sagSetStep(sagPrefix, sagIdx, 3);
@@ -5308,7 +5734,7 @@ async function sagReplyFix({ mailData, feedback, apiKey, replyTextEl, fbInputEl,
 
   }catch(err){
     sagSetStep(sagPrefix, sagIdx, 0);
-    showToast('⚠️ 처리 실패: ' + err.message);
+    showToast('⚠️ Error: ' + err.message);
     console.error('[sagReplyFix]', err);
   }finally{
     // ★ 원래 버튼 레이블로 정확히 복원
@@ -5482,7 +5908,7 @@ function cpReply(i){
     }
   }
 
-  if(!text){ showToast('복사할 내용이 없습니다.'); return; }
+  if(!text){ showToast(t('toast_no_copy')); return; }
 
   navigator.clipboard.writeText(text)
     .then(() => showToast('📋 복사 완료 (순수 텍스트)'))
@@ -5555,7 +5981,7 @@ function selectWorkType(t){
 }
 function saveWork(){
   const title=document.getElementById('workTitle').value.trim();
-  if(!title){showToast('제목을 입력하세요.');return;}
+  if(!title){showToast(t('toast_no_title'));return;}
   const task={
     id:Date.now(),
     type:selectedWorkType,
@@ -5572,7 +5998,7 @@ function saveWork(){
   ['workTitle','workDueDate','workWorker','workMemo'].forEach(id=>{document.getElementById(id).value='';});
   document.getElementById('workDueDateDisplay').innerText='날짜 선택';
   renderTracking(); renderCalendar(); renderWeekly();
-  showToast(`✅ ${selectedWorkType} 업무 등록 완료`);
+  showToast(`✅ ${selectedWorkType} ${t('toast_task_reg_ok')}`);
 }
 
 // ══════════════════════════════
@@ -5592,7 +6018,7 @@ function syncTracker(b64,cat,subj){
   });
   lsSet('tasks',tasks);
   renderTracking(); renderCalendar(); renderWeekly();
-  showToast('트래커 연동 완료');
+  showToast(t('toast_tracker_linked'));
 }
 
 function renderTracking(){
@@ -5698,7 +6124,7 @@ ${dataCtx}
   }
 }
 function copyReport(){
-  navigator.clipboard.writeText(document.getElementById('reportContent').innerText).then(()=>showToast('보고서 복사 완료'));
+  navigator.clipboard.writeText(document.getElementById('reportContent').innerText).then(()=>showToast(t('toast_report_copy')));
 }
 
 // ══════════════════════════════
@@ -5872,7 +6298,7 @@ function openEditCal(ei){
 }
 function saveCalEvent(){
   const title=document.getElementById('calTitle').value.trim();
-  if(!title){showToast('제목을 입력하세요.');return;}
+  if(!title){showToast(t('toast_no_title'));return;}
   const e={
     type:selectedCalType,
     title,
@@ -5889,7 +6315,7 @@ function saveCalEvent(){
   lsSet('cal_events',evs);
   closeModal('calModal');
   renderCalendar(); renderWeekly();
-  showToast(id!==''?'일정 수정 완료':'일정 등록 완료');
+  showToast(id!==''?t('toast_schedule_ok'):t('toast_schedule_add_ok'));
 }
 function deleteCalFromModal(){
   const id=document.getElementById('calEditId').value; if(id==='') return;
@@ -5993,7 +6419,7 @@ function onLearningToggleChange(){
     badge.className = `learn-status-badge ${learnApplied?'learn-status-on':'learn-status-off'}`;
     badge.innerText  = learnApplied ? t('learn_applying') : t('learn_off');
   }
-  showToast(learnApplied ? '✅ 학습 데이터 AI 적용 활성화' : '⏸️ 학습 데이터 AI 적용 비활성화');
+  showToast(learnApplied ? t('toast_learn_on') : t('toast_learn_off'));
 }
 
 /** 학습 검증 */
@@ -6141,7 +6567,7 @@ async function openStyleEdit(id){
 /** 수정/저장 — saveStyleData 오버라이드 */
 async function saveStyleData(){
   const body=document.getElementById('styleBodyInput').value.trim();
-  if(!body){ showToast('본문을 입력하세요.'); return; }
+  if(!body){ showToast(t('toast_no_body')); return; }
   const data={type:selectedStyleType, font:selectedStyleFont, body, savedAt:new Date().toLocaleDateString('ko-KR')};
   if(learnEditingId){ data.id=learnEditingId; learnEditingId=null; }
   await saveStyleToDB(data);
@@ -6151,7 +6577,7 @@ async function saveStyleData(){
   const h3=document.querySelector('#styleModal .modal-hdr h3');
   if(h3) h3.innerText=t('msg_reg_style');
   await renderLearning();
-  showToast(`✅ [${data.type}/${data.font}] 학습 ${data.id?'수정':'저장'} 완료 (${body.length}자)`);
+  showToast(`✅ [${data.type}/${data.font}] ${t('toast_style_saved')} (${body.length})`);
 }
 
 /** 개별 삭제 */
@@ -6170,14 +6596,14 @@ async function deleteStyleItem(id){
 /** 전체 삭제 */
 async function clearAllStyles(){
   const items = await getAllStyles();
-  if(!items.length){ showToast('삭제할 스타일 데이터가 없습니다.'); return; }
+  if(!items.length){ showToast(t('toast_no_style_del')); return; }
   document.getElementById('confirmMsg').innerHTML='저장된 <b style="color:#f43f5e;">모든 스타일 학습 데이터</b>를 삭제하시겠습니까?<br><span style="font-size:10px;color:#64748b;">복구할 수 없습니다.</span>';
   document.getElementById('confirmYesBtn').style.display='';
   document.getElementById('confirmYesBtn').onclick=async()=>{
     await clearAllStylesFromDB();
     closeModal('confirmModal');
     await renderLearning();
-    showToast('✅ 스타일 학습 데이터가 전체 삭제됐습니다.');
+    showToast(t('toast_style_all_del'));
   };
   openModal('confirmModal');
 }
@@ -6195,7 +6621,7 @@ async function migrateStylesFromLS(){
       const body = typeof item==='string' ? item : (item.body||'');
       if(body) await saveStyleToDB({type:item.type||'보고',font:item.font||'간결체',body,savedAt:item.savedAt||new Date().toLocaleDateString('ko-KR')});
     }
-    showToast(`✅ 기존 학습 데이터 ${arr.length}개를 IndexedDB로 이전했습니다.`);
+    showToast(`✅ Migrated ${arr.length} style(s) to IndexedDB`);
   }catch(e){}
 }
 
@@ -6227,7 +6653,7 @@ function handleTransFile(e){
       badge.classList.add('loaded');
       clearBtn.style.display = 'block';
       transFileData = null; // 텍스트로 처리하므로 파일 첨부 불필요
-      showToast(`✅ ${f.name} 내용이 입력란에 로드됐습니다.`);
+      showToast(`✅ ${f.name} ${t('toast_copy_ok')}`);
     };
     reader.readAsText(f, 'UTF-8');
   } else if(['jpg','jpeg','png','gif','webp','pdf'].includes(ext)){
@@ -6247,7 +6673,7 @@ function handleTransFile(e){
         document.getElementById('transInput').placeholder =
           `${f.name} 파일을 첨부했습니다.\n아래 번역하기를 누르면 파일 내용을 분석·번역합니다.\n추가 지시사항이 있으면 여기에 입력하세요.`;
       }
-      showToast(`✅ ${f.name} 첨부 완료. 번역하기를 누르세요.`);
+      showToast(`✅ ${f.name} ${t('toast_copy_ok')}`);
     };
     reader.readAsDataURL(f);
   } else if(ext === 'docx'){
@@ -6257,7 +6683,7 @@ function handleTransFile(e){
     clearBtn.style.display = 'block';
     showToast('docx 파일은 내용을 직접 복사해 붙여넣어 주세요.');
   } else {
-    showToast('지원하지 않는 파일 형식입니다.');
+    showToast('Unsupported format');
   }
 }
 
@@ -6277,7 +6703,7 @@ function clearTrans(){
   document.getElementById('transInput').value = '';
   document.getElementById('transResult').value = '';
   clearTransFile();
-  showToast('번역 내용이 초기화됐습니다.');
+  showToast(t('toast_trans_cleared'));
 }
 
 /** 번역 실행 — callAI 통합 함수 사용 (선택 모델 자동 적용) */
@@ -6285,7 +6711,7 @@ async function runTranslate(){
   if(!requireApiKey()) return;
   const k = localStorage.getItem('gemini_api_key');
   const rawText = (document.getElementById('transInput').innerText||document.getElementById('transInput').textContent||'').trim();
-  if(!rawText && !transFileData){ showToast('번역할 내용을 입력하거나 파일을 첨부하세요.'); return; }
+  if(!rawText && !transFileData){ showToast(t('toast_trans_required')); return; }
 
   // ★ 이미지 URL 추출 — 번역 대상에서 제외하고 위치 보존
   const imgPlaceholders = [];
@@ -6328,14 +6754,14 @@ async function runTranslate(){
         translated = result;
       } else {
         // ★ DeepL 실패(CORS 포함) → Gemini로 자동 폴백 계속 진행
-        showToast('⚠️ DeepL 실패 — Gemini로 번역합니다.');
+        showToast('⚠️ DeepL fail → Gemini');
         const prompt = `다음 텍스트를 ${docPeerName}(${docPeerLang})으로 번역하세요. 번역문만 출력하세요.\n\n${text}`;
         translated = await callAI(prompt, sysRole, 'translate');
       }
 
     // ──────────── DeepL + 파일 → 파일은 AI로 (DeepL은 텍스트 전용) ────────────
     } else if(engine === 'deepl' && transFileData){
-      showToast('ℹ️ DeepL은 파일 번역 미지원 — Gemini로 처리합니다.');
+      showToast('ℹ️ DeepL no file → Gemini');
       const prompt = `첨부 파일의 텍스트 내용을 모두 ${docPeerName}(${docPeerLang})으로 번역하세요. 번역문만 출력하세요.${text ? '\n\n추가 지시사항: '+text : ''}`;
       translated = await callAI(prompt, sysRole, 'translate');
 
@@ -6374,9 +6800,9 @@ async function runTranslate(){
     }
 
     document.getElementById('transResult') && renderAiOutput(document.getElementById('transResult'), translated);
-    showToast(engine==='deepl' ? '🌿 DeepL 번역 완료' : '✅ 번역 완료');
+    showToast(engine==='deepl' ? '🌿 DeepL '+t('toast_translate_ok') : t('toast_translate_ok'));
   } catch(err){
-    showToast('⚠️ 번역 실패: ' + err.message);
+    showToast(t('toast_translate_fail') + err.message);
   } finally{
     if(btn){ btn.disabled = false; btn.innerText = t('btn_translate')||'▶ 번역하기'; }
   }
@@ -6385,7 +6811,7 @@ async function runTranslate(){
 async function copyTrans(){
   const el = document.getElementById('transResult');
   if(!el || !el.innerText.trim()){
-    showToast('복사할 번역 결과가 없습니다.');
+    showToast(t('toast_no_translate'));
     return;
   }
   const plainText = el.innerText;
@@ -6398,7 +6824,7 @@ async function copyTrans(){
         'text/html':  new Blob([htmlText],  { type:'text/html'  }),
       });
       await navigator.clipboard.write([item]);
-      showToast('📋 표 서식 포함 복사 완료! Outlook·Excel에 붙여넣기 하세요.');
+      showToast('📋 '+t('toast_copy_ok'));
     } catch(e){
       _fallbackCopyEl(el);
     }
@@ -6412,8 +6838,8 @@ function _fallbackCopyEl(el){
   r.selectNodeContents(el);
   s.removeAllRanges();
   s.addRange(r);
-  try{ document.execCommand('copy'); showToast('📋 복사 완료 (레거시 모드)'); }
-  catch(e){ showToast('⚠️ 복사 실패 — 브라우저 클립보드 권한을 허용해 주세요.'); }
+  try{ document.execCommand('copy'); showToast('📋 '+t('toast_copy_ok')); }
+  catch(e){ showToast(t('toast_copy_fail')); }
   s.removeAllRanges();
 }
 function swapTrans(){
@@ -6542,7 +6968,7 @@ function toggleConfMic(){
 
 async function startConfMic(){
   const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-  if(!SR){ showToast('⚠️ 현재 브라우저는 음성 인식을 지원하지 않습니다. Chrome 혹은 Edge를 권장합니다.'); return; }
+  if(!SR){ showToast(t('toast_mic_not_supported')); return; }
   if(!requireApiKey()) return;
 
   const permitted = await requestMicPermission();
@@ -6563,7 +6989,7 @@ async function startConfMic(){
   const peerL = document.getElementById('confPeerLang')?.value || 'en';
   const isBi  = myL !== peerL;
   const listenLang = isBi ? (LANG_NAMES[peerL]||peerL) : (LANG_NAMES[myL]||myL);
-  showToast(`🏢 ${isBi ? '통역 모드' : '회의록 모드'} — ${listenLang} 인식 중`);
+  showToast(`🏢 ${isBi ? t('voice_two_way') : t('tab_stt')} — ${listenLang}`);
 }
 
 function stopConfMic(){
@@ -6580,7 +7006,7 @@ function stopConfMic(){
   const interim = document.getElementById('confInterimBar');
   if(interim) interim.innerText = '인식 중...';
   window.speechSynthesis.cancel();
-  showToast('⏹ 회의 모드 중지');
+  showToast(t('toast_conf_stop'));
 }
 
 function initConfRecognition(){
@@ -6672,10 +7098,10 @@ function initConfRecognition(){
       if(e.error === 'aborted') return;
       if(e.error === 'no-speech'){ safeRestart(200); return; }
       if(e.error === 'not-allowed'){
-        showToast('⚠️ 마이크 권한이 차단되었습니다. 브라우저 설정에서 허용해 주세요.');
+        showToast(t('toast_mic_blocked'));
         stopConfMic(); return;
       }
-      if(e.error === 'network') showToast('⚠️ 네트워크 오류 — 음성 인식 재시도');
+      if(e.error === 'network') showToast(t('toast_net_error'));
       console.warn('[STT Conf]', lang, e.error);
       if(isConfRunning && !_confStopIntentional) safeRestart(400);
     };
@@ -6845,14 +7271,14 @@ function clearConfLog(){
   if(meetingScript.length > 0){
     document.getElementById('confirmMsg').innerHTML = `회의 기록 <b style="color:#f43f5e;">${meetingScript.length}건</b>을 모두 삭제하시겠습니까?`;
     document.getElementById('confirmYesBtn').style.display = '';
-    document.getElementById('confirmYesBtn').onclick = ()=>{ doReset(); closeModal('confirmModal'); showToast('회의 기록이 초기화됐습니다.'); };
+    document.getElementById('confirmYesBtn').onclick = ()=>{ doReset(); closeModal('confirmModal'); showToast(t('toast_meeting_cleared')); };
     openModal('confirmModal');
   } else { doReset(); }
 }
 
 /** ★ 회의 종료 및 AI 요약 */
 async function endAndSummarizeConf(){
-  if(meetingScript.length === 0){ showToast('요약할 회의 내용이 없습니다.'); return; }
+  if(meetingScript.length === 0){ showToast(t('toast_no_meeting')); return; }
 
   // 마이크 중지
   if(isConfRunning) stopConfMic();
@@ -6889,7 +7315,7 @@ async function endAndSummarizeConf(){
 ${scriptText}`;
 
   try{
-    showToast('📄 AI 회의록 요약 중...');
+    showToast(t('toast_summary_making'));
     const result = await callAI(prompt, systemRole, 'analyze');
     const wrap = document.getElementById('confSummaryWrap');
     const body = document.getElementById('confSummaryBody');
@@ -6898,9 +7324,9 @@ ${scriptText}`;
       wrap.style.display = 'block';
       wrap.scrollIntoView({behavior:'smooth', block:'nearest'});
     }
-    showToast('✅ 회의록 요약 완료');
+    showToast(t('toast_meeting_summary_ok'));
   }catch(err){
-    showToast('⚠️ 요약 실패: ' + err.message);
+    showToast(t('toast_meeting_summary_fail') + err.message);
   }finally{
     if(endBtn){ endBtn.disabled=false; endBtn.innerText=t('btn_end_meeting'); }
   }
@@ -6944,7 +7370,7 @@ function setTtsGender(gender){
   const btnF = document.getElementById('genderFemale');
   if(btnM) btnM.classList.toggle('active', gender==='male');
   if(btnF) btnF.classList.toggle('active', gender==='female');
-  showToast(gender==='male' ? '👨 남자 목소리 선택됨' : '👩 여자 목소리 선택됨');
+  showToast(gender==='male' ? t('toast_voice_male') : t('toast_voice_female'));
 }
 
 /**
@@ -6994,7 +7420,7 @@ function clearInterpLog(){
   const fo = document.getElementById('interpLogForeign');
   if(ko) ko.value = '';
   if(fo) fo.value = '';
-  showToast('통역 기록이 초기화됐습니다.');
+  showToast(t('toast_interp_cleared'));
 }
 
 /** appendToResultArea — interpLogForeign도 함께 지원 */
@@ -7046,11 +7472,11 @@ function setInterpMode(sub){ switchVoiceSubMode(sub); }
 function checkSpeechSupport(){
   const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
   if(!SR){
-    showToast('⚠️ 현재 브라우저는 음성 인식을 지원하지 않습니다. Chrome 혹은 Edge를 권장합니다.');
+    showToast(t('toast_mic_not_supported'));
     return false;
   }
   const apiKey = localStorage.getItem('gemini_api_key');
-  if(!apiKey){ showToast('🔑 API 키 등록이 필요합니다.'); return false; }
+  if(!apiKey){ showToast(t('toast_api_key_enter')); return false; }
   return true;
 }
 
@@ -7079,7 +7505,7 @@ async function startMyMic(){
   updateMicBtn('my', true);
   updateBidirStatusBar('my');
   initMyRecognition();
-  showToast('🎙️ 내 음성 인식 시작 — 한국어로 말씀하세요');
+  showToast(t('toast_my_mic_start'));
 }
 
 function stopMyMic(){
@@ -7088,7 +7514,7 @@ function stopMyMic(){
   if(myRecognition){ try{ myRecognition.stop(); }catch{} myRecognition=null; }
   hideBidirStatusBar();
   window.speechSynthesis.cancel();
-  showToast('⏸️ 내 음성 인식 중지');
+  showToast(t('toast_my_mic_stop'));
 }
 
 function initMyRecognition(){
@@ -7141,10 +7567,10 @@ function initMyRecognition(){
     if(e.error === 'aborted') return;
     if(e.error === 'no-speech'){ scheduleMyRestart(200); return; }
     if(e.error === 'not-allowed'){
-      showToast('⚠️ 마이크 권한이 차단되었습니다. 브라우저 설정에서 허용해 주세요.');
+      showToast(t('toast_mic_blocked'));
       stopMyMic(); return;
     }
-    if(e.error === 'network'){ showToast('⚠️ 네트워크 오류 — 음성 인식 재시도'); }
+    if(e.error === 'network'){ showToast(t('toast_net_error')); }
     console.warn('[STT My] 오류:', e.error);
     if(isInterpretingMy && !_myStopIntentional) scheduleMyRestart(400);
   };
@@ -7181,7 +7607,7 @@ async function startPeerMic(){
   updateMicBtn('peer', true);
   updateBidirStatusBar('peer');
   initPeerRecognition();
-  showToast(`🌐 상대방 음성 인식 시작 — ${transTargetName}로 말씀해 주세요`);
+  showToast(`🌐 ${t('toast_peer_mic_stop').replace('⏸️ ','🎙️ ')} — ${transTargetName}`);
 }
 
 function stopPeerMic(){
@@ -7190,7 +7616,7 @@ function stopPeerMic(){
   if(peerRecognition){ try{ peerRecognition.stop(); }catch{} peerRecognition=null; }
   hideBidirStatusBar();
   window.speechSynthesis.cancel();
-  showToast('⏸️ 상대방 음성 인식 중지');
+  showToast(t('toast_peer_mic_stop'));
 }
 
 function initPeerRecognition(){
@@ -7245,7 +7671,7 @@ function initPeerRecognition(){
       showToast('⚠️ 마이크 권한이 차단되었습니다. 브라우저 설정에서 허용해 주세요.');
       stopPeerMic(); return;
     }
-    if(e.error === 'network'){ showToast('⚠️ 네트워크 오류 — 음성 인식 재시도'); }
+    if(e.error === 'network'){ showToast(t('toast_net_error')); }
     console.warn('[STT Peer] 오류:', e.error);
     if(isInterpretingPeer && !_peerStopIntentional) schedulePeerRestart(400);
   };
@@ -7441,7 +7867,7 @@ async function genCollabMail(){
   const styleKey = (document.getElementById('collabTarget')?.value || currentCollabStyle || 'formal_bilingual');
   const rawContent = document.getElementById('collabContent')?.value || '';
   const content = rawContent.trim();
-  if(!content){ showToast('핵심 요청 내용을 입력하세요.'); return; }
+  if(!content){ showToast(t('toast_collab_required')); return; }
 
   const resultEl = document.getElementById('collabResult');
   if(!resultEl) return;
@@ -7492,7 +7918,7 @@ async function genCollabMail(){
   };
 
   const chosen = STYLE_PROMPTS[styleKey] || STYLE_PROMPTS.formal_bilingual;
-  const prompt = `부서장 보좌 AI 비서입니다.\n${chosen.guide}\n\n핵심 요청 내용: ${content}`;
+  const prompt = `부서장 보좌 AI 비서입니다.\n${chosen.guide}\n\n핵심 요청 내용: ${content}\n\n【추가 출력 규칙】\n- 내용과 관련된 이미지가 필요하다면: ![설명](https://image.pollinations.ai/prompt/{영문키워드}?width=800&height=400&nologo=true) 형식으로 삽입\n- 비교/현황 데이터는 마크다운 표(| 컬럼 |) 형식으로 정리`;
 
   // ★ 2.5-flash는 thinking 모델이라 30초 내 응답 불가 → abort 발생
   // gemini-2.0-flash-001 → gemini-1.5-flash-latest 순으로 시도
@@ -7523,14 +7949,34 @@ async function genCollabMail(){
       if(!text) throw new Error('AI 응답 없음');
 
       renderAiOutput(resultEl, text);
-      if(!resultEl.nextElementSibling?.classList.contains('collab-copy-btn')){
-        resultEl.insertAdjacentHTML('afterend',
-          `<button class="collab-copy-btn"
-            onclick="event.stopPropagation();copyRichText(document.getElementById('collabResult'),'📋 초안 복사 완료')"
-            style="margin-top:7px;padding:6px 14px;background:rgba(16,185,129,.12);color:#10b981;border:1px solid rgba(16,185,129,.3);border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;">
-            📄 초안 복사 (서식 유지)
-          </button>`
-        );
+
+      // ★ 결과 하단 액션 버튼 영역 (복사 + 수정 요청)
+      const existingActions = resultEl.nextElementSibling;
+      if(!existingActions?.classList.contains('collab-actions')){
+        resultEl.insertAdjacentHTML('afterend', `
+          <div class="collab-actions" style="margin-top:10px;display:flex;flex-direction:column;gap:8px;">
+            <div style="display:flex;gap:6px;">
+              <button
+                onclick="event.stopPropagation();copyRichText(document.getElementById('collabResult'),'📋 초안 복사 완료')"
+                style="flex:1;padding:8px 10px;background:rgba(16,185,129,.12);color:#10b981;border:1px solid rgba(16,185,129,.3);border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;">
+                📄 복사 (서식 유지)
+              </button>
+              <button
+                onclick="event.stopPropagation();document.getElementById('collabFixRow').style.display='flex';"
+                style="flex:1;padding:8px 10px;background:rgba(59,130,246,.12);color:#60a5fa;border:1px solid rgba(59,130,246,.3);border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;">
+                ✏️ 내용 수정 요청
+              </button>
+            </div>
+            <div id="collabFixRow" style="display:none;gap:6px;flex-direction:column;">
+              <textarea id="collabFixInput" placeholder="수정 또는 추가할 내용을 입력하세요. (예: 이미지 추가, 표로 정리, 3항 내용 강조 등)"
+                style="width:100%;min-height:60px;background:#0f172a;border:1px solid #334155;border-radius:6px;padding:8px 10px;color:#f1f5f9;font-size:12px;resize:vertical;line-height:1.5;"></textarea>
+              <button onclick="event.stopPropagation();applyCollabFix()"
+                style="padding:9px;background:linear-gradient(135deg,#2563eb,#3b82f6);color:#fff;border:none;border-radius:6px;font-size:12px;font-weight:700;cursor:pointer;">
+                🔄 수정 적용
+              </button>
+            </div>
+          </div>
+        `);
       }
       return; // ★ 성공 시 루프 탈출
     } catch(err){
@@ -7539,6 +7985,74 @@ async function genCollabMail(){
     }
   }
   resultEl.innerText = '⚠️ 생성 실패: ' + lastErr;
+}
+
+/** 유관부서 메일 초안 수정 요청 */
+async function applyCollabFix(){
+  if(!requireApiKey()) return;
+  const apiKey = localStorage.getItem('gemini_api_key');
+
+  const fixInput = document.getElementById('collabFixInput');
+  const fixText  = (fixInput?.value || '').trim();
+  if(!fixText){ showToast(t('toast_fix_required')); return; }
+
+  const resultEl = document.getElementById('collabResult');
+  const currentDraft = resultEl?.innerText || '';
+  if(!currentDraft){ showToast(t('toast_no_draft')); return; }
+
+  const fixBtn = document.querySelector('#collabFixRow button:last-child');
+  const origBtnText = fixBtn?.innerText || '🔄 수정 적용';
+  if(fixBtn){ fixBtn.disabled = true; fixBtn.innerText = '⏳ 수정 중...'; }
+
+  const prompt = `아래는 현재 작성된 협조 요청 메일 초안입니다.
+
+[현재 초안]
+${currentDraft}
+
+[수정/추가 요청]
+${fixText}
+
+위 요청을 반영하여 메일 초안을 수정·보완해 주세요.
+- 이미지 삽입 요청 시: ![설명](https://image.pollinations.ai/prompt/{영문키워드}?width=800&height=400&nologo=true) 형식으로 삽입
+- 표 요청 시: 마크다운 표(| 컬럼 | 컬럼 |) 형식으로 작성
+- 기존 내용 중 수정 불필요한 부분은 그대로 유지
+- 완성된 메일 본문 전체를 출력`;
+
+  try{
+    const MODELS = ['gemini-2.5-flash', 'gemini-2.0-flash'];
+    let lastErr = '';
+    for(const model of MODELS){
+      try{
+        const ctrl  = new AbortController();
+        const timer = setTimeout(() => ctrl.abort(), 60000);
+        const res   = await fetch(
+          `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`,
+          {
+            method:  'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body:    JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] }),
+            signal:  ctrl.signal,
+          }
+        );
+        clearTimeout(timer);
+        if(!res.ok) throw new Error(`API 오류 ${res.status}`);
+        const data = await res.json();
+        const text = data.candidates?.[0]?.content?.parts?.[0]?.text?.trim();
+        if(!text) throw new Error('AI 응답 없음');
+
+        renderAiOutput(resultEl, text);
+        if(fixInput) fixInput.value = '';
+        document.getElementById('collabFixRow').style.display = 'none';
+        showToast(t('toast_draft_ok'));
+        return;
+      } catch(e){
+        lastErr = e.message;
+      }
+    }
+    showToast(t('toast_draft_fail') + lastErr);
+  } finally{
+    if(fixBtn){ fixBtn.disabled = false; fixBtn.innerText = origBtnText; }
+  }
 }
 
 // ══════════════════════════════
@@ -7597,7 +8111,7 @@ function handlePptFileUpload(e){
   const ext = f.name.split('.').pop().toLowerCase();
   const reader = new FileReader();
   if(ext === 'txt' || ext === 'md'){
-    reader.onload = ev => { pptUploadedContent = ev.target.result; showToast('파일 텍스트 불러오기 완료'); };
+    reader.onload = ev => { pptUploadedContent = ev.target.result; showToast('✅ '+t('toast_copy_ok')); };
     reader.readAsText(f, 'UTF-8');
   } else {
     // pptx/docx는 바이너리 → 파일명과 크기만 참고, 내용은 사용자 요청으로 보완
@@ -7670,7 +8184,7 @@ function savePptSettings(){
   pptSettings.layout = document.getElementById('pptLayout').value;
   // bodyTmpl / arrangement는 selBodyTmpl/selArrange에서 실시간 반영
   closeModal('pptSettingsModal');
-  showToast('✅ 문서 설정이 저장됐습니다.');
+  showToast(t('toast_ppt_settings_saved'));
 }
 
 /** PPT 설계 실행 — JSON 파싱 강화 + 언어별 동적 프롬프트 */
@@ -7681,13 +8195,13 @@ async function runPptDesign(){
   let inputText = '';
   if(pptMode === 'new'){
     inputText = document.getElementById('pptInput').value.trim();
-    if(!inputText){ showToast('보고서 내용을 입력하세요.'); return; }
+    if(!inputText){ showToast(t('toast_ppt_input_required')); return; }
   } else {
     const editReq = document.getElementById('pptEditInput').value.trim();
     inputText = pptUploadedContent
       ? `[기존 파일 내용]\n${pptUploadedContent}\n\n[수정/보완 요청]\n${editReq||'전체 내용을 검토하여 개선해주세요.'}`
       : editReq;
-    if(!inputText){ showToast('파일을 업로드하거나 수정 요청을 입력하세요.'); return; }
+    if(!inputText){ showToast(t('toast_ppt_file_required')); return; }
   }
 
   const countRaw = parseInt(document.getElementById('pptCountInput').value)||8;
@@ -7777,10 +8291,10 @@ ${inputText}`;
 
     pptSlides = arr;
     renderPptSlides(arr);
-    showToast(`✅ ${arr.length}장 슬라이드 설계 완료`);
+    showToast(t('toast_ppt_ok').replace('${n}', arr.length));
   } catch(err){
     console.error('[PPT 설계 오류]', err);
-    showToast('⚠️ PPT 설계 실패: ' + err.message);
+    showToast(t('toast_ppt_fail') + err.message);
   } finally{
     btn.disabled = false; btn.innerText = t('ppt_run') || '▶ PPT 설계 시작';
   }
@@ -7861,7 +8375,7 @@ function collectPptSlides(){
 /** PPTX 또는 DOCX 다운로드 + 스타일 학습 — PptxGenJS v3.12 표준 준수 */
 async function downloadPpt(fmt){
   const useFmt = fmt || pptSettings.format;
-  if(!pptSlides.length){ showToast('먼저 문서를 설계해 주세요.'); return; }
+  if(!pptSlides.length){ showToast(t('toast_ppt_design_first')); return; }
   const slides = collectPptSlides();
   if(!slides.length) return;
 
@@ -8121,10 +8635,10 @@ async function downloadPpt(fmt){
     // ★ await로 완료 보장
     const fileName = `Timothy_AI_${new Date().toISOString().slice(0,10)}.pptx`;
     await pptx.writeFile({ fileName });
-    showToast(`✅ "${fileName}" 다운로드 완료 + 스타일 학습 저장`);
+    showToast(`✅ "${fileName}" ${t('toast_copy_ok')}`);
   } catch(err){
     console.error('[PPTX 생성 오류]', err);
-    showToast('⚠️ PPTX 생성 실패: ' + err.message);
+    showToast('⚠️ PPTX: ' + err.message);
   }
 }
 
@@ -8146,7 +8660,7 @@ function downloadAsDocxText(slides){
   a.href = URL.createObjectURL(blob);
   a.download = `Report_${new Date().toISOString().split('T')[0]}.txt`;
   a.click();
-  showToast('✅ 보고서 텍스트 파일 다운로드 완료');
+  showToast('✅ '+t('toast_copy_ok'));
 }
 
 // 구버전 호환 (슬라이드 카운트 선택 — 이미 새 방식으로 교체됨)
@@ -8428,7 +8942,7 @@ function dpRender(){
 }
 function dpSelect(ds){dpSelected=ds; dpRender();}
 function dpConfirm(){
-  if(!dpSelected){showToast('날짜를 선택해 주세요.');return;}
+  if(!dpSelected){showToast(t('toast_pick_date'));return;}
   document.getElementById(dpTargetField).value=dpSelected;
   const dispId=dpTargetBtn.replace('Btn','Display');
   const dispEl=document.getElementById(dispId);
@@ -8706,7 +9220,7 @@ function requireApiKey(openSettings = true){
   const k = localStorage.getItem('gemini_api_key');
   console.log('[Timothy] requireApiKey 호출 — 키 존재:', !!k);
   if(!k){
-    alert('🔑 API 키가 설정되지 않았습니다.\n설정 탭에서 Google Gemini API 키를 등록하세요.');
+    alert('🔑 '+t('toast_api_key_enter'));
     if(openSettings){
       setTimeout(()=>{ openSettingsModal(); switchSettingsTab('api'); }, 300);
     }
@@ -8783,7 +9297,7 @@ function loadApiKeyInputs(){
 function saveApiKey(provider){
   const cfg = API_KEY_MAP[provider];
   const val = (document.getElementById(cfg.inputId)?.value||'').trim();
-  if(!val){ showToast('API 키를 입력하세요.'); return; }
+  if(!val){ showToast(t('toast_api_key_enter')); return; }
   localStorage.setItem(cfg.storage, val);
   // gemini_api_key는 기존 로그인 시스템과 동기화
   if(provider==='gemini'){
@@ -8794,7 +9308,7 @@ function saveApiKey(provider){
   updateApiKeyStatus();
   syncFunctionLockState();
   syncModelSelectsToKeys(); // ★ DeepL 등 모델 셀렉트 즉시 갱신
-  showToast(`✅ ${provider.toUpperCase()} API 키 등록 완료`);
+  showToast(`✅ ${provider.toUpperCase()} ${t('toast_api_key_ok')}`);
 }
 
 /** [해제] 버튼 — 키 삭제 후 입력창으로 전환 */
@@ -8807,7 +9321,7 @@ function releaseApiKey(provider){
   }
   renderApiKeyState(provider);
   syncFunctionLockState();
-  showToast(`${provider.toUpperCase()} API 키가 해제됐습니다.`);
+  showToast(`${provider.toUpperCase()} ${t('toast_api_key_released')}`);
 }
 
 /** 기존 clearApiKey 호환 */
@@ -8924,7 +9438,7 @@ function setModelForTask(taskType, modelId){
   // 설정 배지 업데이트
   renderTaskModelBadges();
   const label = modelId === 'deepl' ? '🌿 DeepL' : (AI_MODELS.find(m=>m.id===modelId)?.label || modelId);
-  showToast(`✅ [${TASK_LABELS[taskType]}] 기본 모델: ${label}`);
+  showToast(`✅ [${TASK_LABELS[taskType]}] ${label}`);
 }
 
 /** 태스크별 기본값 리셋 */
@@ -8933,7 +9447,7 @@ function resetModelForTask(taskType){
   const sel = document.getElementById(`taskModelSel-${taskType}`);
   if(sel) sel.value = MODEL_DEFAULTS[taskType];
   renderTaskModelBadges();
-  showToast(`↩️ [${TASK_LABELS[taskType]}] 기본 모델로 초기화`);
+  showToast(`↩️ [${TASK_LABELS[taskType]}] reset`);
 }
 
 const TASK_LABELS = {
@@ -9027,15 +9541,15 @@ async function callAI(prompt, systemRole = '', taskType = 'auto'){
 
   // API 키 없으면 Gemini fallback + 안내
   if(provider === 'openai' && !openaiKey){
-    showToast(`⚠️ GPT API 키 없음 → Gemini로 대체 실행`);
+    showToast('⚠️ GPT key missing → Gemini fallback');
     provider = 'gemini'; modelId = 'gemini-2.5-flash';
   }
   if(provider === 'anthropic' && !anthropicKey){
-    showToast(`⚠️ Claude API 키 없음 → Gemini로 대체 실행`);
+    showToast('⚠️ Claude key missing → Gemini fallback');
     provider = 'gemini'; modelId = 'gemini-2.5-flash';
   }
   if(provider === 'gemini' && !geminiKey){
-    throw new Error('Gemini API 키가 없습니다. 설정에서 입력해 주세요.');
+    throw new Error('Gemini API key required');
   }
 
   // ─── Gemini ─────────────────────────────────────
@@ -9111,7 +9625,7 @@ function applyAiModel(modelId){
   currentAiModel = modelId;
   localStorage.setItem('ai_model', modelId);
   const label = AI_MODELS.find(m=>m.id===modelId)?.label || modelId;
-  showToast(`🤖 AI 모델: ${label}`);
+  showToast(t('toast_ai_model') + label);
 }
 
 function renderAiModelSelect(){
@@ -9176,18 +9690,18 @@ function syncAccountTab(){
 function saveUserProfile(){
   const name=(document.getElementById('settingsName')?.value||'').trim();
   const dept=(document.getElementById('settingsDept')?.value||'').trim();
-  if(!name&&!dept){ showToast('이름 또는 부서명을 입력하세요.'); return; }
+  if(!name&&!dept){ showToast(t('toast_name_or_dept_required')); return; }
   const data={name:name||'Timothy AI', dept:dept||''};
   localStorage.setItem('profile_data', JSON.stringify(data));
   const dn=document.getElementById('displayName'); if(dn) dn.innerText=data.name;
   const dd=document.getElementById('displayDept'); if(dd) dd.innerText=data.dept;
   const sdn=document.getElementById('settingsDisplayName'); if(sdn) sdn.innerText=data.name;
   const sdd=document.getElementById('settingsDisplayDept'); if(sdd) sdd.innerText=data.dept;
-  showToast('✅ 사용자 정보가 저장됐습니다.');
+  showToast(t('toast_profile_saved'));
 }
 
 /** 베타 서비스 알림 */
-function betaAlert(){ alert('현재 베타 서비스 중입니다.\n\n정식 출시 시 이메일로 안내드리겠습니다.'); }
+function betaAlert(){ alert(t('toast_beta')); }
 
 /** 설정 모달 열기 — 항상 account 탭으로 시작 */
 function openSettingsModal(){
@@ -9200,18 +9714,84 @@ function openSettingsModal(){
   openModal('settingsModal');
 }
 
+/** 설정 모달 탭 전환 — api 탭 열릴 때 주간 날씨 즉시 렌더 */
+const _switchSettingsTabOrig = switchSettingsTab;
+switchSettingsTab = function(tab){
+  _switchSettingsTabOrig(tab);
+  if(tab === 'api'){
+    // ★ 주간 날씨 그리드 갱신 (lastGeo 있으면 즉시, 없으면 현재 위치로 재시도)
+    setTimeout(()=>{
+      const geo = typeof _lastGeo !== 'undefined' && _lastGeo;
+      if(geo){
+        renderWeeklyWeatherInSettings(geo.lat, geo.lon, currentTimezone);
+      } else {
+        const loc = localStorage.getItem('user_location') || '청주 사업장';
+        geocode(loc).then(g=>{
+          if(g){ _lastGeo=g; renderWeeklyWeatherInSettings(g.lat, g.lon, g.tz||currentTimezone); }
+        });
+      }
+    }, 50);
+  }
+};
+
+/** Open-Meteo 7일 예보 → 설정 모달 주간 날씨 그리드 갱신 */
+async function renderWeeklyWeatherInSettings(lat, lon, tz){
+  const grid = document.getElementById('settingsWeeklyWeatherGrid');
+  if(!grid) return;
+  grid.innerHTML = `<div style="color:#475569;">${t('weather_loading')}</div>`;
+  try{
+    const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}`
+      + `&daily=weathercode,temperature_2m_max,temperature_2m_min`
+      + `&timezone=${encodeURIComponent(tz)}&forecast_days=7`;
+    const ctrl = new AbortController();
+    const timer = setTimeout(()=>ctrl.abort(), 7000);
+    const res = await fetch(url, {signal: ctrl.signal});
+    clearTimeout(timer);
+    if(!res.ok) throw new Error('HTTP '+res.status);
+    const data = await res.json();
+    const days  = data.daily?.time || [];
+    const codes = data.daily?.weathercode || [];
+    const maxT  = data.daily?.temperature_2m_max || [];
+    const minT  = data.daily?.temperature_2m_min || [];
+
+    const pack = LANG_PACKS[currentLang] || LANG_PACKS.KO;
+    const dayKeys = ['sun','mon','tue','wed','thu','fri','sat'];
+    const dayLabels = dayKeys.map(k => pack[k] || k);
+
+    grid.innerHTML = days.slice(0,7).map((dateStr, i) => {
+      const d   = new Date(dateStr + 'T00:00:00');
+      const dow = dayLabels[d.getDay()];
+      const [emoji, desc] = wmoToText(codes[i] ?? 0);
+      const hi  = Math.round(maxT[i] ?? 0);
+      const lo  = Math.round(minT[i] ?? 0);
+      return `<div style="display:flex;align-items:center;gap:5px;padding:2px 0;border-bottom:1px solid rgba(255,255,255,.04);">
+        <span style="font-weight:700;color:#94a3b8;min-width:18px;">${dow}</span>
+        <span>${emoji}</span>
+        <span style="color:#e2e8f0;flex:1;font-size:10px;">${desc}</span>
+        <span style="color:#f59e0b;font-weight:600;font-size:10px;white-space:nowrap;">${hi}° <span style="color:#475569;font-weight:400;">/ ${lo}°</span></span>
+      </div>`;
+    }).join('');
+  } catch(e){
+    grid.innerHTML = `<div style="color:#475569;">${t('weather_no_data')}</div>`;
+  }
+}
+
 /** ★ 장소 변경 — 완전 연동 */
 function applyLocation(){
   const val=(document.getElementById('settingsLocInput').value||'').trim();
-  if(!val){ showToast('위치를 입력하세요.'); return; }
+  if(!val){ showToast(t('toast_loc_required')); return; }
   localStorage.setItem('user_location', val);
   const locLabel=document.getElementById('currentLocLabel');
   if(locLabel) locLabel.innerText=`📍 ${val}`;
   const locDisp=document.getElementById('currentLocDisplay');
   if(locDisp) locDisp.innerText=`📍 ${val}`;
-  // ★ 날씨 + 시간대 즉시 업데이트
-  updateWeatherAndTime(val);
-  showToast(`✅ 위치가 '${val}'(으)로 변경됐습니다.`);
+  // ★ 날씨 + 시간대 즉시 업데이트 (+ 주간 예보 갱신)
+  updateWeatherAndTime(val).then(()=>{
+    if(typeof _lastGeo !== 'undefined' && _lastGeo){
+      renderWeeklyWeatherInSettings(_lastGeo.lat, _lastGeo.lon, currentTimezone);
+    }
+  });
+  showToast(t('toast_loc_changed').replace('${val}', val));
 }
 
 // 기존 changeLocation() 호환 유지
@@ -9222,7 +9802,7 @@ function saveSettings(){
   const fs=document.getElementById('fontSelect'); if(fs&&fs.value) applyFont(fs.value);
   const ms=document.getElementById('aiModelSelect'); if(ms&&ms.value) applyAiModel(ms.value);
   closeModal('settingsModal');
-  showToast('✅ 설정이 저장됐습니다.');
+  showToast(t('toast_settings_saved'));
 }
 
 // setLanguage 후 설정 모달 버튼도 동기화 (원본 함수 래핑)
@@ -9241,6 +9821,7 @@ setLanguage = function(lang){
 document.addEventListener('DOMContentLoaded', ()=>{
   const savedSkin=localStorage.getItem('app_skin');
   if(savedSkin) applySkin(savedSkin);
+  // ★ 위치 기본값: localStorage → '청주 사업장' (KO 기본값 유지, 언어 무관)
   const savedLoc=localStorage.getItem('user_location') || '청주 사업장';
   const el=document.getElementById('currentLocLabel');
   if(el) el.innerText=`📍 ${savedLoc}`;
@@ -9256,7 +9837,7 @@ document.addEventListener('DOMContentLoaded', ()=>{
   if(savedModel) currentAiModel=savedModel;
   // ★ 기능 버튼 잠금 상태 초기화
   syncFunctionLockState();
-  // ★ 날씨 + 시간대 초기 로드
+  // ★ 날씨 + 시간대 초기 로드 (비동기 — UI 블로킹 없음)
   updateWeatherAndTime(savedLoc);
 });
 
