@@ -4612,21 +4612,47 @@ async function copyRichText(el, toastMsg){
   // 완성된 HTML
   const htmlContent = `<!DOCTYPE html><html><body style="font-family:sans-serif;font-size:14px;color:#1e293b;line-height:1.6;">${clone.innerHTML}</body></html>`;
 
-  // ── 3. 순수 텍스트 추출 (줄바꿈·탭 보존) ──
-  const tmp = clone.cloneNode(true);
-  // 이미지 → [이미지: URL] 텍스트로 대체
-  tmp.querySelectorAll('img').forEach(img => {
-    img.replaceWith(`[이미지: ${img.src || img.getAttribute('src') || ''}]`);
+  // ── 3. 순수 텍스트 추출 — 표는 마크다운 형식으로 ──
+  const tmp2 = clone.cloneNode(true);
+
+  // ★ 표 → 마크다운 표 변환 (붙여넣기 시 번역란에서 표 구조 유지)
+  tmp2.querySelectorAll('table').forEach(table => {
+    let mdRows = [];
+    let headerDone = false;
+
+    table.querySelectorAll('thead tr').forEach(row => {
+      const cells = Array.from(row.querySelectorAll('th,td'));
+      if(!cells.length) return;
+      const texts = cells.map(c => (c.textContent||'').replace(/\n+/g,' ').replace(/\|/g,'⎸').trim());
+      mdRows.push('| ' + texts.join(' | ') + ' |');
+      mdRows.push('| ' + texts.map(()=>'---').join(' | ') + ' |');
+      headerDone = true;
+    });
+
+    table.querySelectorAll('tbody tr, tr').forEach((row, idx) => {
+      if(row.closest('thead')) return;
+      const cells = Array.from(row.querySelectorAll('td,th'));
+      if(!cells.length) return;
+      const texts = cells.map(c => (c.textContent||'').replace(/\n+/g,' ').replace(/\|/g,'⎸').trim());
+      mdRows.push('| ' + texts.join(' | ') + ' |');
+      if(!headerDone && idx === 0){
+        mdRows.push('| ' + texts.map(()=>'---').join(' | ') + ' |');
+        headerDone = true;
+      }
+    });
+
+    table.replaceWith(document.createTextNode('\n' + mdRows.join('\n') + '\n\n'));
   });
-  // tr/td → 탭 구분
-  tmp.querySelectorAll('td,th').forEach(e => e.append('\t'));
-  // 블록 요소 줄바꿈
-  tmp.querySelectorAll('br').forEach(e => e.replaceWith('\n'));
-  tmp.querySelectorAll('p,div,tr,li,h1,h2,h3,h4,h5,h6').forEach(e => {
-    e.prepend('\n'); e.append('\n');
+
+  // 이미지 → URL 텍스트
+  tmp2.querySelectorAll('img').forEach(img => {
+    const src = img.getAttribute('src') || '';
+    img.replaceWith(src.startsWith('http') ? `\n![이미지](${src})\n` : '');
   });
-  const plainText = (tmp.textContent || '')
-    .replace(/\t\n/g, '\n')
+  tmp2.querySelectorAll('br').forEach(e => e.replaceWith('\n'));
+  tmp2.querySelectorAll('p,div,li,h1,h2,h3,h4,h5,h6').forEach(e => e.append('\n'));
+
+  const plainText = (tmp2.textContent || '')
     .replace(/[ \t]+\n/g, '\n')
     .replace(/\n{3,}/g, '\n\n')
     .trim();
@@ -4820,7 +4846,12 @@ function handleTransInputPaste(e){
     }
     return;
   }
-  // ③ 일반 텍스트 → 기본 붙여넣기
+  // ③ 일반 텍스트 — 마크다운 표 형식이면 그대로 삽입
+  const plainData = e.clipboardData?.getData('text/plain') || '';
+  if(plainData && /^\|.+\|/m.test(plainData)){
+    // 마크다운 표 패턴 감지 → 기본 붙여넣기 허용 (표 구조 보존)
+    return; // 브라우저 기본 동작으로 처리
+  }
 }
 
 
@@ -7316,7 +7347,7 @@ async function genCollabMail(){
   const prompt = `부서장 보좌 AI 비서입니다.\n${chosen.guide}\n\n핵심 요청 내용: ${content}`;
 
   // ★ gemini-2.0-flash 사용 (2.5-flash는 thinking 모델이라 느려서 abort 발생)
-  const COLLAB_MODELS = ['gemini-2.0-flash', 'gemini-1.5-flash'];
+  const COLLAB_MODELS = ['gemini-2.0-flash-001', 'gemini-1.5-flash-latest'];
   let lastErr = '';
 
   for(const model of COLLAB_MODELS){
