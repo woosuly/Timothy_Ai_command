@@ -1528,7 +1528,7 @@ textarea::-webkit-scrollbar-thumb{background:#334155;border-radius:4px;}
       <!-- 언어 선택 + 제어 버튼 -->
       <div class="mode-lang-bar">
         <div class="mode-lang-item">
-          <label class="mode-lang-lbl">🇰🇷 내 언어</label>
+          <label class="mode-lang-lbl" data-i18n="my_lang_label">🇰🇷 내 언어</label>
           <select id="confMyLang" class="mode-lang-sel" onchange="onConfLangChange()">
             <option value="ko" data-i18n="lang_ko">🇰🇷 한국어</option>
             <option value="en" data-i18n="lang_en">🇺🇸 영어</option>
@@ -1538,7 +1538,7 @@ textarea::-webkit-scrollbar-thumb{background:#334155;border-radius:4px;}
         </div>
         <div style="font-size:16px;color:#475569;align-self:center;font-weight:600;">vs</div>
         <div class="mode-lang-item">
-          <label class="mode-lang-lbl">🌐 상대 언어</label>
+          <label class="mode-lang-lbl" data-i18n="peer_lang_label">🌐 상대 언어</label>
           <select id="confPeerLang" class="mode-lang-sel" onchange="onConfLangChange()">
             <option value="en" data-i18n="lang_en">🇺🇸 영어</option>
             <option value="ko" data-i18n="lang_ko">🇰🇷 한국어</option>
@@ -1550,25 +1550,25 @@ textarea::-webkit-scrollbar-thumb{background:#334155;border-radius:4px;}
         <!-- 제어 버튼 그룹 -->
         <div class="conf-ctrl-bar">
           <span class="conf-timer" id="confTimer" style="display:none;">00:00</span>
-          <span class="conf-buf-badge" id="confBufBadge">발화 0건</span>
+          <span class="conf-buf-badge" id="confBufBadge" data-i18n="conf_speech_cnt" data-i18n-n="0">발화 0건</span>
           <button id="confMicBtn" onclick="toggleConfMic()"
-            style="padding:8px 16px;background:rgba(16,185,129,.15);border:1.5px solid rgba(16,185,129,.4);color:#10b981;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;transition:.2s;">
+            style="padding:8px 16px;background:rgba(16,185,129,.15);border:1.5px solid rgba(16,185,129,.4);color:#10b981;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;transition:.2s;" data-i18n="conf_start_btn">
             🎤 회의 시작
           </button>
-          <button id="confEndBtn" onclick="endAndSummarizeConf()" style="display:none;" class="conf-end-btn">
+          <button id="confEndBtn" onclick="endAndSummarizeConf()" style="display:none;" class="conf-end-btn" data-i18n="btn_end_meeting">
             ⏹ 종료 및 요약
           </button>
         </div>
       </div>
 
       <!-- 안내 -->
-      <div style="background:rgba(59,130,246,.07);border:1px solid rgba(59,130,246,.2);border-radius:9px;padding:8px 13px;font-size:11px;color:#64748b;line-height:1.7;flex-shrink:0;">
+      <div id="confModeNote" style="background:rgba(59,130,246,.07);border:1px solid rgba(59,130,246,.2);border-radius:9px;padding:8px 13px;font-size:11px;color:#64748b;line-height:1.7;flex-shrink:0;">
         💡 <b style="color:#60a5fa;" data-i18n="conf_mode_label">회의 모드:</b> <span data-i18n="conf_mode_desc">상대 언어로 감지된 발화만 자막에 표시됩니다. 종료 시 AI가 전체 회의록을 자동 요약합니다.</span>
       </div>
 
       <!-- ★ TTS 성별 선택 (회의 모드) -->
       <div style="display:flex;align-items:center;gap:8px;padding:6px 2px;flex-shrink:0;">
-        <span style="font-size:11px;color:#64748b;">🔊 번역 목소리:</span>
+        <span style="font-size:11px;color:#64748b;" data-i18n="conf_tts_label">🔊 번역 목소리:</span>
         <button class="tv-gender-btn active" id="confGenderMale"
           onclick="setTtsGender('male');document.getElementById('confGenderMale').classList.add('active');document.getElementById('confGenderFemale').classList.remove('active');"
           data-i18n="voice_male">👨 남자</button>
@@ -1580,16 +1580,16 @@ textarea::-webkit-scrollbar-thumb{background:#334155;border-radius:4px;}
       <!-- 자막창 -->
       <div class="conf-caption-wrap">
         <div style="display:flex;align-items:center;justify-content:space-between;flex-shrink:0;margin-bottom:6px;">
-          <div style="font-size:12px;font-weight:700;color:#60a5fa;">📋 실시간 회의 자막</div>
+          <div style="font-size:12px;font-weight:700;color:#60a5fa;" data-i18n="conf_caption_title">📋 실시간 회의 자막</div>
           <div style="display:flex;align-items:center;gap:8px;">
-            <span id="confStatus" style="font-size:10px;color:#64748b;">● 대기 중</span>
+            <span id="confStatus" style="font-size:10px;color:#64748b;" data-i18n="conf_status_wait">● 대기 중</span>
             <button onclick="clearConfLog()" style="padding:3px 8px;background:rgba(244,63,94,.1);border:1px solid rgba(244,63,94,.25);color:#f43f5e;border-radius:5px;font-size:10px;cursor:pointer;">🗑</button>
           </div>
         </div>
         <div id="confCaptionLog" class="conf-caption-log">
           <div class="conf-caption-empty" data-i18n="conf_waiting">회의를 시작하면 자막이 여기에 표시됩니다.</div>
         </div>
-        <div id="confInterimBar" style="padding:6px 12px;background:rgba(30,41,59,.5);border-top:1px solid #1e293b;font-size:11px;color:#64748b;font-style:italic;min-height:30px;border-radius:0 0 10px 10px;">
+        <div id="confInterimBar" style="padding:6px 12px;background:rgba(30,41,59,.5);border-top:1px solid #1e293b;font-size:11px;color:#64748b;font-style:italic;min-height:30px;border-radius:0 0 10px 10px;" data-i18n="conf_interim_hint">
           인식 중...
         </div>
       </div>
@@ -1597,9 +1597,9 @@ textarea::-webkit-scrollbar-thumb{background:#334155;border-radius:4px;}
       <!-- 회의록 요약 결과 (종료 후 표시) -->
       <div class="conf-summary-wrap" id="confSummaryWrap" style="display:none;">
         <div class="conf-summary-hdr">
-          📄 회의록 AI 요약
+          <span data-i18n="conf_summary_title">📄 회의록 AI 요약</span>
           <button onclick="navigator.clipboard.writeText(document.getElementById('confSummaryBody').innerText).then(()=>showToast('📄 '+t('toast_copy_ok')))"
-            style="padding:3px 10px;background:rgba(59,130,246,.12);color:#3b82f6;border:1px solid rgba(59,130,246,.25);border-radius:5px;font-size:10px;cursor:pointer;">📄 복사</button>
+            style="padding:3px 10px;background:rgba(59,130,246,.12);color:#3b82f6;border:1px solid rgba(59,130,246,.25);border-radius:5px;font-size:10px;cursor:pointer;" data-i18n="conf_copy_btn">📄 복사</button>
         </div>
         <div class="conf-summary-body" id="confSummaryBody"></div>
       </div>
@@ -1645,7 +1645,7 @@ textarea::-webkit-scrollbar-thumb{background:#334155;border-radius:4px;}
           <div class="field-label" style="margin-bottom:5px;">슬라이드 분량</div>
           <div class="ppt-count-custom">
             <input type="number" id="pptCountInput" class="ppt-count-input" value="8" min="1" max="50" placeholder="장">
-            <span style="font-size:11px;color:#64748b;">장</span>
+            <span style="font-size:11px;color:#64748b;" data-i18n="ppt_unit_page">장</span>
             <div class="ppt-count-quick">
               <button class="ppt-count-qbtn" onclick="setPptCount(5)">5</button>
               <button class="ppt-count-qbtn" onclick="setPptCount(8)">8</button>
@@ -2009,14 +2009,14 @@ textarea::-webkit-scrollbar-thumb{background:#334155;border-radius:4px;}
             <div class="field-label" style="margin-bottom:3px;">제목 크기</div>
             <div class="font-size-row">
               <input type="number" id="pptTitleSize" class="font-size-input" value="24" min="14" max="48">
-              <span style="font-size:10px;color:#64748b;">pt</span>
+              <span style="font-size:10px;color:#64748b;" data-i18n="font_size_pt">pt</span>
             </div>
           </div>
           <div>
             <div class="field-label" style="margin-bottom:3px;">본문 크기</div>
             <div class="font-size-row">
               <input type="number" id="pptBodySize" class="font-size-input" value="14" min="8" max="32">
-              <span style="font-size:10px;color:#64748b;">pt</span>
+              <span style="font-size:10px;color:#64748b;" data-i18n="font_size_pt">pt</span>
             </div>
           </div>
         </div>
@@ -2509,6 +2509,22 @@ const LANG_PACKS = {
     no_deadline_mail:'납기가 있는 메일이 없습니다.',
     no_tracking:'등록된 업무가 없습니다.', no_learning:'아직 저장된 문체 스타일이 없습니다.',
     conf_waiting:'회의를 시작하면 자막이 여기에 표시됩니다.',
+    weather_loading:'날씨 불러오는 중...',
+    ppt_unit_page:'장',
+    font_size_pt:'pt',
+    meeting_ph:'또는 회의록·STT 전사 텍스트를 직접 붙여넣으세요.',
+    conf_start_btn:'🎤 회의 시작',
+    conf_stop_btn:'⏸ 회의 중지',
+    conf_status_wait:'● 대기 중',
+    conf_status_listen:'🎙 인식 중',
+    conf_status_translating:'🌐 번역 중...',
+    conf_interim_hint:'인식 중...',
+    conf_speech_cnt:'발화 ${n}건',
+    conf_tts_label:'🔊 번역 목소리:',
+    conf_summary_title:'📄 회의록 AI 요약',
+    conf_copy_btn:'📄 복사',
+    conf_mode_interp:'💡 <b style="color:#60a5fa;">통역 모드</b>: 상대방 언어를 인식해 즉시 번역합니다. 이어폰 착용을 권장합니다.',
+    conf_mode_minutes:'📋 <b style="color:#34d399;">회의록 모드</b>: 번역 없이 발화 내용을 회의록으로 정리합니다.',
     login_status:'로그인 전', guest_name:'Guest',
     // 상태/진행 메시지
     status_listening:'인식 중...',
@@ -2792,6 +2808,22 @@ const LANG_PACKS = {
     no_deadline_mail:'没有有截止日期的邮件。',
     no_tracking:'暂无登记的任务。', no_learning:'尚无保存的文体风格。',
     conf_waiting:'开始会议后，字幕将显示在此处。',
+    weather_loading:'天气加载中...',
+    ppt_unit_page:'张',
+    font_size_pt:'pt',
+    meeting_ph:'或直接粘贴会议记录·STT转录文本。',
+    conf_start_btn:'🎤 开始会议',
+    conf_stop_btn:'⏸ 暂停会议',
+    conf_status_wait:'● 待机中',
+    conf_status_listen:'🎙 识别中',
+    conf_status_translating:'🌐 翻译中...',
+    conf_interim_hint:'识别中...',
+    conf_speech_cnt:'发话 ${n}件',
+    conf_tts_label:'🔊 翻译语音:',
+    conf_summary_title:'📄 会议纪要 AI 总结',
+    conf_copy_btn:'📄 复制',
+    conf_mode_interp:'💡 <b style="color:#60a5fa;">口译模式</b>: 识别对方语言并立即翻译。建议佩戴耳机。',
+    conf_mode_minutes:'📋 <b style="color:#34d399;">会议记录模式</b>: 不翻译，直接整理发言内容为会议纪要。',
     login_status:'未登录', guest_name:'Guest',
     status_listening:'识别中...',
     status_analyzing:'AI分析进行中...',
@@ -3071,6 +3103,22 @@ const LANG_PACKS = {
     no_deadline_mail:'No emails with deadlines.',
     no_tracking:'No tasks registered.', no_learning:'No style data saved yet.',
     conf_waiting:'Start a meeting to see captions here.',
+    weather_loading:'Loading weather...',
+    ppt_unit_page:'slides',
+    font_size_pt:'pt',
+    meeting_ph:'Or paste meeting notes or STT transcript here.',
+    conf_start_btn:'🎤 Start Meeting',
+    conf_stop_btn:'⏸ Pause Meeting',
+    conf_status_wait:'● Ready',
+    conf_status_listen:'🎙 Listening',
+    conf_status_translating:'🌐 Translating...',
+    conf_interim_hint:'Listening...',
+    conf_speech_cnt:'${n} utterances',
+    conf_tts_label:'🔊 Voice:',
+    conf_summary_title:'📄 Meeting Summary',
+    conf_copy_btn:'📄 Copy',
+    conf_mode_interp:'💡 <b style="color:#60a5fa;">Interpretation Mode</b>: Recognizes peer language and translates instantly. Earphones recommended.',
+    conf_mode_minutes:'📋 <b style="color:#34d399;">Minutes Mode</b>: Records speech as meeting notes without translation.',
     login_status:'Not logged in', guest_name:'Guest',
     status_listening:'Listening...',
     status_analyzing:'AI Analysis in progress...',
@@ -3306,6 +3354,22 @@ const LANG_PACKS = {
     no_deadline_mail:'納期のあるメールがありません。',
     no_tracking:'登録された業務がありません。', no_learning:'まだスタイルデータがありません。',
     conf_waiting:'会議を開始するとここに字幕が表示されます。',
+    weather_loading:'天気を読み込み中...',
+    ppt_unit_page:'枚',
+    font_size_pt:'pt',
+    meeting_ph:'または議事録・STT文字起こしテキストを直接貼り付けてください。',
+    conf_start_btn:'🎤 会議開始',
+    conf_stop_btn:'⏸ 会議一時停止',
+    conf_status_wait:'● 待機中',
+    conf_status_listen:'🎙 認識中',
+    conf_status_translating:'🌐 翻訳中...',
+    conf_interim_hint:'認識中...',
+    conf_speech_cnt:'発話 ${n}件',
+    conf_tts_label:'🔊 翻訳音声:',
+    conf_summary_title:'📄 議事録 AI 要約',
+    conf_copy_btn:'📄 コピー',
+    conf_mode_interp:'💡 <b style="color:#60a5fa;">通訳モード</b>: 相手の言語を認識して即座に翻訳します。イヤホン着用を推奨します。',
+    conf_mode_minutes:'📋 <b style="color:#34d399;">議事録モード</b>: 翻訳なしで発話内容を議事録としてまとめます。',
     login_status:'ログイン前', guest_name:'Guest',
     status_listening:'認識中...',
     status_analyzing:'AI分析進行中...',
@@ -4677,6 +4741,27 @@ function updateUI(){
   // html lang 속성
   const langMap = {KO:'ko', ZH:'zh', EN:'en', JA:'ja'};
   document.documentElement.lang = langMap[lang] || 'ko';
+
+  // ★ 회의 모드 동적 UI 요소 언어 동기화
+  const confMicBtn = document.getElementById('confMicBtn');
+  if(confMicBtn && !isConfRunning){
+    confMicBtn.innerText = pack.conf_start_btn || '🎤 회의 시작';
+  } else if(confMicBtn && isConfRunning){
+    confMicBtn.innerText = pack.conf_stop_btn || '⏸ 회의 중지';
+  }
+  const confStatusEl = document.getElementById('confStatus');
+  if(confStatusEl && !isConfRunning){
+    confStatusEl.innerText = pack.conf_status_wait || '● 대기 중';
+  }
+  const confInterimEl = document.getElementById('confInterimBar');
+  if(confInterimEl && !isConfRunning){
+    confInterimEl.innerText = pack.conf_interim_hint || '인식 중...';
+  }
+  const confBadge = document.getElementById('confBufBadge');
+  if(confBadge){
+    const n = typeof meetingScript !== 'undefined' ? meetingScript.length : 0;
+    confBadge.innerText = (pack.conf_speech_cnt || '발화 ${n}건').replace('${n}', n);
+  }
 
   // Dynamic Font Scaling
   const root = document.documentElement;
@@ -6936,9 +7021,9 @@ function onConfLangChange(){
   const isBilingual = my !== peer;
   if(modeNote){
     if(isBilingual){
-      modeNote.innerHTML = `💡 <b style="color:#60a5fa;">통역 모드</b>: 상대방 언어를 인식해 즉시 번역합니다. 이어폰 착용을 권장합니다.`;
+      modeNote.innerHTML = t('conf_mode_interp');
     } else {
-      modeNote.innerHTML = `📋 <b style="color:#34d399;">회의록 모드</b>: 번역 없이 발화 내용을 회의록으로 정리합니다.`;
+      modeNote.innerHTML = t('conf_mode_minutes');
     }
   }
 
@@ -6981,8 +7066,8 @@ async function startConfMic(){
   onConfStart();
   const btn = document.getElementById('confMicBtn');
   const status = document.getElementById('confStatus');
-  if(btn){ btn.innerText='⏹ 회의 중지'; btn.style.background='rgba(244,63,94,.15)'; btn.style.borderColor='rgba(244,63,94,.5)'; btn.style.color='#f43f5e'; }
-  if(status) status.innerText='🔴 인식 중';
+  if(btn){ btn.innerText=t('conf_stop_btn'); btn.style.background='rgba(244,63,94,.15)'; btn.style.borderColor='rgba(244,63,94,.5)'; btn.style.color='#f43f5e'; }
+  if(status) status.innerText=t('conf_status_listen');
   initConfRecognition();
 
   const myL   = document.getElementById('confMyLang')?.value   || 'ko';
@@ -7001,10 +7086,10 @@ function stopConfMic(){
   if(window._confRecognition2){ try{window._confRecognition2.stop();}catch{} window._confRecognition2=null; }
   const btn = document.getElementById('confMicBtn');
   const status = document.getElementById('confStatus');
-  if(btn){ btn.innerText='🎤 회의 시작'; btn.style.background='rgba(16,185,129,.15)'; btn.style.borderColor='rgba(16,185,129,.4)'; btn.style.color='#10b981'; }
-  if(status) status.innerText='● 대기 중';
+  if(btn){ btn.innerText=t('conf_start_btn'); btn.style.background='rgba(16,185,129,.15)'; btn.style.borderColor='rgba(16,185,129,.4)'; btn.style.color='#10b981'; }
+  if(status) status.innerText=t('conf_status_wait');
   const interim = document.getElementById('confInterimBar');
-  if(interim) interim.innerText = '인식 중...';
+  if(interim) interim.innerText = t('conf_interim_hint');
   window.speechSynthesis.cancel();
   showToast(t('toast_conf_stop'));
 }
@@ -7064,21 +7149,28 @@ function initConfRecognition(){
 
     r.onresult = (e) => {
       const bar = document.getElementById('confInterimBar');
+      const statusEl = document.getElementById('confStatus');
       for(let i = e.resultIndex; i < e.results.length; i++){
         const res  = e.results[i];
         const text = res[0].transcript.trim();
         if(!text) continue;
 
         if(res.isFinal){
-          if(bar) bar.innerText = '🎙️ 인식 대기 중...';
+          if(bar) bar.innerText = t('conf_interim_hint');
+          if(statusEl) statusEl.innerText = t('conf_status_translating');
           if(isBilingual){
             _queue.push({ text, from: fromLang, to: toLang });
-            drainQueue();
+            drainQueue().finally(()=>{
+              if(isConfRunning && statusEl) statusEl.innerText = t('conf_status_listen');
+            });
           } else {
             addConfCaption(text, null, myLang);
+            if(statusEl) statusEl.innerText = t('conf_status_listen');
           }
         } else {
+          // Interim: 실시간으로 부드럽게 출력
           if(bar) bar.innerText = '🎙️ ' + text;
+          if(statusEl) statusEl.innerText = t('conf_status_listen');
           if(isBilingual && INSTANT_PUNCT.test(text)){
             const partial = text.replace(INSTANT_PUNCT,'').trim();
             if(partial.length >= 2){
@@ -7165,6 +7257,10 @@ async function translateConfCaption(text, fromLang, toLang){
     addConfCaption(text, result, fromLang);
     speakBidir(result, LANG_BCP47[toLang] || 'ko-KR');
 
+    // ★ 번역 완료 후 상태를 인식 대기로 복귀
+    const statusEl = document.getElementById('confStatus');
+    if(statusEl && isConfRunning) statusEl.innerText = t('conf_status_listen');
+
   } catch(err){
     if(err.name !== 'AbortError') console.warn('[Conf 번역]', err.message);
   }
@@ -7211,7 +7307,7 @@ function onConfStop(){
 /** 발화 수 배지 업데이트 */
 function updateConfBadge(){
   const el = document.getElementById('confBufBadge');
-  if(el) el.innerText = `발화 ${meetingScript.length}건`;
+  if(el) el.innerText = t('conf_speech_cnt').replace('${n}', meetingScript.length);
 }
 
 /** ★ 자막 추가 + meetingScript 버퍼 저장 */
@@ -7223,7 +7319,9 @@ function addConfCaption(original, translated, lang){
 
   const langCls   = lang==='ko'?'ko':lang==='en'?'en':lang==='zh'?'zh':'ja';
   const langLabel = { ko:'KR', en:'EN', zh:'CN', ja:'JP' }[lang] || lang.toUpperCase();
-  const timeStr   = new Date().toLocaleTimeString('ko-KR',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+  const _localeMap = {KO:'ko-KR', ZH:'zh-CN', EN:'en-US', JA:'ja-JP'};
+  const _locale    = _localeMap[currentLang] || 'ko-KR';
+  const timeStr   = new Date().toLocaleTimeString(_locale,{hour:'2-digit',minute:'2-digit',second:'2-digit'});
 
   const item = document.createElement('div');
   item.className = 'conf-caption-item';
@@ -7264,7 +7362,7 @@ function clearConfLog(){
     meetingScript = [];
     updateConfBadge();
     const log = document.getElementById('confCaptionLog');
-    if(log) log.innerHTML = `<div class="conf-caption-empty" data-i18n="conf_waiting">회의를 시작하면 자막이 여기에 표시됩니다.</div>`;
+    if(log) log.innerHTML = `<div class="conf-caption-empty" data-i18n="conf_waiting">${t('conf_waiting')}</div>`;
     const sw = document.getElementById('confSummaryWrap');
     if(sw) sw.style.display = 'none';
   };
@@ -7324,6 +7422,18 @@ ${scriptText}`;
       wrap.style.display = 'block';
       wrap.scrollIntoView({behavior:'smooth', block:'nearest'});
     }
+
+    // ★ 대시보드 요약 콜백 — 분석 카드 결과창에도 자동 출력
+    try{
+      const dashResult = document.getElementById('result');
+      if(dashResult){
+        const summaryHeader = `## 🏢 ${t('conf_trans_tab')||'회의 모드'} — AI 요약\n\n`;
+        renderAiOutput(dashResult, summaryHeader + result);
+        // 대시보드로 자동 이동하지 않고 토스트만 안내
+        showToast('📊 ' + (t('toast_meeting_summary_ok')||'회의록 요약 완료'));
+      }
+    }catch(dashErr){ console.warn('[Conf] 대시보드 콜백 오류:', dashErr.message); }
+
     showToast(t('toast_meeting_summary_ok'));
   }catch(err){
     showToast(t('toast_meeting_summary_fail') + err.message);
@@ -9801,6 +9911,8 @@ function saveSettings(){
   applyLocation();
   const fs=document.getElementById('fontSelect'); if(fs&&fs.value) applyFont(fs.value);
   const ms=document.getElementById('aiModelSelect'); if(ms&&ms.value) applyAiModel(ms.value);
+  // ★ 언어 변경 시 UI 전체 즉시 갱신 (data-i18n 요소 포함)
+  updateUI();
   closeModal('settingsModal');
   showToast(t('toast_settings_saved'));
 }
