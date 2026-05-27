@@ -1374,7 +1374,7 @@ textarea::-webkit-scrollbar-thumb{background:#334155;border-radius:4px;}
           </select>
         </div>
         <div style="flex:1;"></div>
-        <button onclick="clearTrans()" style="padding:5px 11px;background:rgba(244,63,94,.12);border:1px solid rgba(244,63,94,.35);color:#f43f5e;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;flex-shrink:0;" data-i18n="btn_reset">🗑 초기화</button>
+        <button onclick="clearTrans()" style="padding:5px 11px;background:rgba(244,63,94,.12);border:1px solid rgba(244,63,94,.35);color:#f43f5e;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;flex-shrink:0;" data-i18n="btn_reset" data-i18n="btn_reset">🗑 초기화</button>
       </div>
 
       <!-- 3 Depth: 텍스트 / 파일 -->
@@ -1436,9 +1436,9 @@ textarea::-webkit-scrollbar-thumb{background:#334155;border-radius:4px;}
         <input type="hidden" id="collabTarget" value="formal_bilingual">
         <div class="collab-content-row">
           <div class="field-label" style="margin-bottom:5px;" data-i18n="collab_content_label">핵심 요청 내용</div>
-          <textarea id="collabContent" class="field-textarea" style="min-height:70px;" placeholder="예: 5월 20일까지 설비 점검 결과 보고 요청 등"></textarea>
+          <textarea id="collabContent" class="field-textarea" style="min-height:70px;" placeholder="예: 5월 20일까지 설비 점검 결과 보고 요청 등" data-i18n-placeholder="ph_collab_content"></textarea>
         </div>
-        <button onclick="event.stopPropagation();genCollabMail()" style="padding:10px 22px;background:linear-gradient(135deg,#d97706,#f59e0b);color:#0f172a;border:none;border-radius:8px;font-size:13px;font-weight:bold;cursor:pointer;">▶ 맞춤형 초안 생성</button>
+        <button onclick="event.stopPropagation();genCollabMail()" style="padding:10px 22px;background:linear-gradient(135deg,#d97706,#f59e0b);color:#0f172a;border:none;border-radius:8px;font-size:13px;font-weight:bold;cursor:pointer;" data-i18n="collab_gen_btn">▶ 맞춤형 초안 생성</button>
         <div id="collabResult" class="collab-result" style="margin-top:12px;display:none;"></div>
       </div>
     </div><!-- /panelDoc -->
@@ -1458,7 +1458,7 @@ textarea::-webkit-scrollbar-thumb{background:#334155;border-radius:4px;}
         </div>
         <div style="font-size:18px;color:#334155;align-self:center;">↔</div>
         <div class="mode-lang-item">
-          <label class="mode-lang-lbl">🌐 상대 언어</label>
+          <label class="mode-lang-lbl" data-i18n="peer_lang_label">🌐 상대 언어</label>
           <select id="voicePeerLang" class="mode-lang-sel" onchange="onVoiceLangChange()">
             <option value="en" data-i18n="lang_en">🇺🇸 영어</option>
             <option value="ko" data-i18n="lang_ko">🇰🇷 한국어</option>
@@ -1491,7 +1491,7 @@ textarea::-webkit-scrollbar-thumb{background:#334155;border-radius:4px;}
       <!-- 단방향 마이크 -->
       <div id="voiceOneCtrl" style="display:flex;justify-content:center;padding:8px 0;flex-shrink:0;">
         <button class="bidir-mic-btn" id="myMicBtn" onclick="toggleMyMic()" style="padding:12px 32px;font-size:13px;border-radius:12px;">
-          <span class="bidir-mic-dot"></span><span id="myMicIcon">🎙️</span><span id="myMicText">내 음성 통역 시작</span>
+          <span class="bidir-mic-dot"></span><span id="myMicIcon">🎙️</span><span id="myMicText" data-i18n="voice_my_start_one">내 음성 통역 시작</span>
         </button>
       </div>
 
@@ -1499,10 +1499,10 @@ textarea::-webkit-scrollbar-thumb{background:#334155;border-radius:4px;}
       <div id="voiceBothCtrl" style="display:none;flex-shrink:0;">
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:8px 0;">
           <button class="bidir-mic-btn" id="myMicBtnB" onclick="toggleMyMic()" style="padding:12px 0;font-size:13px;border-radius:12px;justify-content:center;">
-            <span class="bidir-mic-dot"></span><span id="myMicIconB">🎙️</span><span id="myMicTextB">🇰🇷 내 음성</span>
+            <span class="bidir-mic-dot"></span><span id="myMicIconB">🎙️</span><span id="myMicTextB" data-i18n="voice_my_start_both">🇰🇷 내 음성</span>
           </button>
           <button class="bidir-mic-btn" id="peerMicBtn" onclick="togglePeerMic()" style="padding:12px 0;font-size:13px;border-radius:12px;justify-content:center;">
-            <span class="bidir-mic-dot"></span><span id="peerMicIcon">🎙️</span><span id="peerMicText">🌐 상대방 음성</span>
+            <span class="bidir-mic-dot"></span><span id="peerMicIcon">🎙️</span><span id="peerMicText" data-i18n="voice_peer_start">🌐 상대방 음성</span>
           </button>
         </div>
       </div>
@@ -1512,12 +1512,12 @@ textarea::-webkit-scrollbar-thumb{background:#334155;border-radius:4px;}
         <div class="trans-panel">
           <div style="display:flex;align-items:center;justify-content:space-between;flex-shrink:0;">
             <div class="trans-panel-title" id="transSrcTitle" data-i18n="voice_my_title">🇰🇷 내 발화</div>
-            <button onclick="clearInterpLog()" style="padding:3px 8px;background:rgba(244,63,94,.1);border:1px solid rgba(244,63,94,.25);color:#f43f5e;border-radius:5px;font-size:10px;cursor:pointer;">🗑 초기화</button>
+            <button onclick="clearInterpLog()" style="padding:3px 8px;background:rgba(244,63,94,.1);border:1px solid rgba(244,63,94,.25);color:#f43f5e;border-radius:5px;font-size:10px;cursor:pointer;" data-i18n="btn_reset">🗑 초기화</button>
           </div>
           <textarea id="interpLogKo" class="trans-textarea" style="flex:1;resize:none;font-size:12px;" placeholder="통역 시작 후 내 음성이 기록됩니다..." data-i18n-placeholder="interp_log_ph" readonly></textarea>
         </div>
         <div class="trans-panel">
-          <div class="trans-panel-title" id="transResultTitle">🌐 번역 결과</div>
+          <div class="trans-panel-title" id="transResultTitle" data-i18n="trans_result_title">🌐 번역 결과</div>
           <textarea id="interpLogForeign" class="trans-textarea" style="flex:1;resize:none;font-size:12px;" placeholder="번역된 내용이 기록됩니다..." readonly></textarea>
         </div>
       </div>
@@ -1613,36 +1613,36 @@ textarea::-webkit-scrollbar-thumb{background:#334155;border-radius:4px;}
     <!-- ── 좌측 컨트롤 패널 ── -->
     <div class="ppt-left">
       <div class="ppt-card">
-        <h3>📊 문서 자동 매니저</h3>
+        <h3 data-i18n="ppt_manager_title">📊 문서 자동 매니저</h3>
 
         <!-- 모드 탭: 새로 만들기 / 기존 파일 보완 -->
         <div class="ppt-mode-tabs">
-          <div class="ppt-mode-tab active" id="pptTab-new" onclick="switchPptMode('new')">✨ 새로 만들기</div>
-          <div class="ppt-mode-tab" id="pptTab-edit" onclick="switchPptMode('edit')">📂 기존 파일 보완</div>
+          <div class="ppt-mode-tab active" id="pptTab-new" onclick="switchPptMode('new')" data-i18n="ppt_tab_new">✨ 새로 만들기</div>
+          <div class="ppt-mode-tab" id="pptTab-edit" onclick="switchPptMode('edit')" data-i18n="ppt_tab_edit">📂 기존 파일 보완</div>
         </div>
 
         <!-- 새로 만들기 패널 -->
         <div id="pptPanel-new">
-          <div class="field-label" style="margin-bottom:4px;">보고서 원문 / 개요 입력</div>
-          <textarea id="pptInput" class="ppt-textarea" placeholder="보고서 내용, 회의 결과, 프로젝트 현황 등을 붙여넣으세요.&#10;AI가 슬라이드 구조를 자동 설계합니다."></textarea>
+          <div class="field-label" style="margin-bottom:4px;" data-i18n="ppt_input_label">보고서 원문 / 개요 입력</div>
+          <textarea id="pptInput" class="ppt-textarea" data-i18n-placeholder="ppt_input_ph" placeholder="보고서 내용, 회의 결과, 프로젝트 현황 등을 붙여넣으세요.&#10;AI가 슬라이드 구조를 자동 설계합니다."></textarea>
         </div>
 
         <!-- 기존 파일 보완 패널 -->
         <div id="pptPanel-edit" style="display:none;">
-          <div class="field-label" style="margin-bottom:5px;">기존 PPT / 텍스트 파일 업로드</div>
+          <div class="field-label" style="margin-bottom:5px;" data-i18n="ppt_upload_label">기존 PPT / 텍스트 파일 업로드</div>
           <div class="ppt-upload-zone" id="pptUploadZone">
             <input type="file" id="pptFileInput" accept=".pptx,.ppt,.txt,.md,.docx" onchange="handlePptFileUpload(event)">
             <div class="ppt-upload-icon">📂</div>
-            <div class="ppt-upload-label"><b>클릭</b>하거나 파일을 끌어다 놓으세요<br><span style="font-size:10px;">.pptx · .ppt · .txt · .md · .docx</span></div>
+            <div class="ppt-upload-label"><b data-i18n="ppt_upload_hint">클릭</b>하거나 파일을 끌어다 놓으세요<br><span style="font-size:10px;">.pptx · .ppt · .txt · .md · .docx</span></div>
           </div>
           <div id="pptUploadBadge" class="ppt-upload-badge"></div>
-          <div class="field-label" style="margin:8px 0 4px;">보완/수정 요청 사항</div>
-          <textarea id="pptEditInput" class="ppt-textarea" style="min-height:70px;" placeholder="예: 3슬라이드 데이터 최신화, 결론 슬라이드 추가, 전체 어조를 격식체로 변경 등"></textarea>
+          <div class="field-label" style="margin:8px 0 4px;" data-i18n="ppt_edit_label">보완/수정 요청 사항</div>
+          <textarea id="pptEditInput" class="ppt-textarea" style="min-height:70px;" data-i18n-placeholder="ppt_edit_ph" placeholder="예: 3슬라이드 데이터 최신화, 결론 슬라이드 추가, 전체 어조를 격식체로 변경 등"></textarea>
         </div>
 
         <!-- 슬라이드 분량: 직접 입력 + 빠른 선택 -->
         <div style="margin:10px 0 4px;" id="pptCountSection">
-          <div class="field-label" style="margin-bottom:5px;">슬라이드 분량</div>
+          <div class="field-label" style="margin-bottom:5px;" data-i18n="ppt_count_label">슬라이드 분량</div>
           <div class="ppt-count-custom">
             <input type="number" id="pptCountInput" class="ppt-count-input" value="8" min="1" max="50" placeholder="장">
             <span style="font-size:11px;color:#64748b;" data-i18n="ppt_unit_page">장</span>
@@ -1658,11 +1658,11 @@ textarea::-webkit-scrollbar-thumb{background:#334155;border-radius:4px;}
 
         <label class="ppt-style-check">
           <input type="checkbox" id="pptUseStyle" checked>
-          학습된 문체 스타일 반영
+          <span data-i18n="ppt_style_check">학습된 문체 스타일 반영</span>
         </label>
 
         <!-- 설정 + 실행 버튼 -->
-        <button class="ppt-settings-btn" onclick="openPptSettings();openModal('pptSettingsModal');" style="margin-top:8px;">
+        <button class="ppt-settings-btn" onclick="openPptSettings();openModal('pptSettingsModal');" style="margin-top:8px;" data-i18n="ppt_settings">
           ⚙️ 출력 형식 · 템플릿 · 폰트 설정
         </button>
         <button id="pptRunBtn" class="ppt-run-btn" onclick="runPptDesign()" data-i18n="ppt_run">▶ 문서 설계 시작</button>
@@ -1670,12 +1670,11 @@ textarea::-webkit-scrollbar-thumb{background:#334155;border-radius:4px;}
 
       <!-- 사용법 안내 -->
       <div style="background:rgba(30,41,59,.3);border:1px solid #1e293b;border-radius:10px;padding:11px;font-size:11px;color:#64748b;line-height:1.8;flex-shrink:0;">
-        <div style="color:#a855f7;font-weight:bold;margin-bottom:5px;">💡 사용 가이드</div>
+        <div style="color:#a855f7;font-weight:bold;margin-bottom:5px;" data-i18n="ppt_guide_title">💡 사용 가이드</div>
         <div>
-          <b style="color:#cbd5e1;">새로 만들기:</b> 원문 입력 → 분량 설정 → 설계 시작<br>
-          <b style="color:#cbd5e1;">기존 파일 보완:</b> 파일 업로드 → 수정 요청 입력 → 설계 시작<br>
-          <b style="color:#cbd5e1;">편집 후 저장:</b> 우측 카드 텍스트 직접 편집 →<br>
-          &nbsp;&nbsp;💾 버튼으로 PPTX 또는 Word 문서 다운로드
+          <b style="color:#cbd5e1;" data-i18n="ppt_guide_new">새로 만들기: 원문 입력 → 분량 설정 → 설계 시작</b><br>
+          <b style="color:#cbd5e1;" data-i18n="ppt_guide_edit">기존 파일 보완: 파일 업로드 → 수정 요청 입력 → 설계 시작</b><br>
+          <b style="color:#cbd5e1;" data-i18n="ppt_guide_save">편집 후 저장: 우측 카드 텍스트 직접 편집 → 💾 버튼으로 다운로드</b>
         </div>
       </div>
     </div>
@@ -1687,12 +1686,12 @@ textarea::-webkit-scrollbar-thumb{background:#334155;border-radius:4px;}
           <span id="pptSlideCount" style="font-size:10px;color:#64748b;"></span>
         </span>
         <div style="display:flex;gap:6px;">
-          <button class="ppt-dl-btn" style="width:auto;padding:6px 14px;margin-top:0;font-size:11px;" onclick="downloadPpt('pptx')">💾 PPTX 저장</button>
-          <button class="ppt-dl-btn" style="width:auto;padding:6px 14px;margin-top:0;font-size:11px;background:rgba(59,130,246,.18);color:#3b82f6;border-color:rgba(59,130,246,.3);" onclick="downloadPpt('docx')">📄 Word 저장</button>
+          <button class="ppt-dl-btn" style="width:auto;padding:6px 14px;margin-top:0;font-size:11px;" onclick="downloadPpt('pptx')" data-i18n="ppt_save_pptx">💾 PPTX 저장</button>
+          <button class="ppt-dl-btn" style="width:auto;padding:6px 14px;margin-top:0;font-size:11px;background:rgba(59,130,246,.18);color:#3b82f6;border-color:rgba(59,130,246,.3);" onclick="downloadPpt('docx')" data-i18n="ppt_save_docx">📄 Word 저장</button>
         </div>
       </div>
       <div id="pptSlidesContainer" class="ppt-slides-scroll">
-        <div style="color:#64748b;text-align:center;padding:50px 20px;font-size:12px;border:1px dashed #1e293b;border-radius:10px;">
+        <div style="color:#64748b;text-align:center;padding:50px 20px;font-size:12px;border:1px dashed #1e293b;border-radius:10px;" data-i18n="ppt_empty_hint">
           좌측에서 내용을 입력하고 PPT 설계를 시작하세요.
         </div>
       </div>
@@ -1735,8 +1734,8 @@ textarea::-webkit-scrollbar-thumb{background:#334155;border-radius:4px;}
     <div class="field-group">
       <div class="field-label" data-i18n="lbl_work_type">업무 유형</div>
       <div class="seg-row">
-        <button class="seg-btn active-지시" id="workType-지시" onclick="selectWorkType('지시')" data-i18n="lbl_work_directive">⚡ 지시사항</button>
-        <button class="seg-btn" id="workType-요청" onclick="selectWorkType('요청')" data-i18n="lbl_work_request">📋 요청사항</button>
+        <button class="seg-btn active-지시" id="workType-지시" onclick="selectWorkType('지시')" data-i18n="work_type_directive">⚡ 지시사항</button>
+        <button class="seg-btn" id="workType-요청" onclick="selectWorkType('요청')" data-i18n="work_type_request">📋 요청사항</button>
       </div>
     </div>
     <div class="field-group"><div class="field-label" data-i18n="lbl_title">제목</div><input type="text" id="workTitle" class="field-input" placeholder="업무 제목" data-i18n-placeholder="ph_work_title"></div>
@@ -1769,15 +1768,15 @@ textarea::-webkit-scrollbar-thumb{background:#334155;border-radius:4px;}
     <div class="field-group">
       <div class="field-label" data-i18n="lbl_event_type">일정 유형</div>
       <div class="seg-row" style="gap:5px;">
-        <button class="seg-btn active-보고" id="calType-보고" onclick="selectCalType('보고')">📋 보고</button>
-        <button class="seg-btn" id="calType-회의" onclick="selectCalType('회의')">💬 회의</button>
-        <button class="seg-btn" id="calType-문서작성" onclick="selectCalType('문서작성')">📝 문서작성</button>
-        <button class="seg-btn" id="calType-평가" onclick="selectCalType('평가')">⭐ 평가</button>
-        <button class="seg-btn" id="calType-공사" onclick="selectCalType('공사')">🔧 공사</button>
-        <button class="seg-btn" id="calType-회식" onclick="selectCalType('회식')">🍻 회식</button>
-        <button class="seg-btn" id="calType-조직강화" onclick="selectCalType('조직강화')">🏃 조직강화활동</button>
-        <button class="seg-btn" id="calType-월례조회" onclick="selectCalType('월례조회')">📢 월례조회</button>
-        <button class="seg-btn" id="calType-기타" onclick="selectCalType('기타')">✏️ 기타/수기</button>
+        <button class="seg-btn active-보고" id="calType-보고" onclick="selectCalType('보고')" data-i18n="cal_type_report">📋 보고</button>
+        <button class="seg-btn" id="calType-회의" onclick="selectCalType('회의')" data-i18n="cal_type_meeting">💬 회의</button>
+        <button class="seg-btn" id="calType-문서작성" onclick="selectCalType('문서작성')" data-i18n="cal_type_doc">📝 문서작성</button>
+        <button class="seg-btn" id="calType-평가" onclick="selectCalType('평가')" data-i18n="cal_type_eval">⭐ 평가</button>
+        <button class="seg-btn" id="calType-공사" onclick="selectCalType('공사')" data-i18n="cal_type_const">🔧 공사</button>
+        <button class="seg-btn" id="calType-회식" onclick="selectCalType('회식')" data-i18n="cal_type_dinner">🍻 회식</button>
+        <button class="seg-btn" id="calType-조직강화" onclick="selectCalType('조직강화')" data-i18n="cal_type_team">🏃 조직강화활동</button>
+        <button class="seg-btn" id="calType-월례조회" onclick="selectCalType('월례조회')" data-i18n="cal_type_monthly">📢 월례조회</button>
+        <button class="seg-btn" id="calType-기타" onclick="selectCalType('기타')" data-i18n="cal_type_etc">✏️ 기타/수기</button>
       </div>
     </div>
     <div id="meetingExtra" class="meeting-extra">
@@ -1825,19 +1824,19 @@ textarea::-webkit-scrollbar-thumb{background:#334155;border-radius:4px;}
     <div class="field-group">
       <div class="field-label" data-i18n="lbl_mail_type">메일 유형</div>
       <div class="seg-row">
-        <button class="seg-btn active-보고" id="styleType-보고" onclick="selectStyleType('보고')">📋 보고</button>
-        <button class="seg-btn" id="styleType-지시" onclick="selectStyleType('지시')">⚡ 지시</button>
-        <button class="seg-btn" id="styleType-공유" onclick="selectStyleType('공유')">📢 공유</button>
+        <button class="seg-btn active-보고" id="styleType-보고" onclick="selectStyleType('보고')" data-i18n="style_type_report">📋 보고</button>
+        <button class="seg-btn" id="styleType-지시" onclick="selectStyleType('지시')" data-i18n="style_type_directive">⚡ 지시</button>
+        <button class="seg-btn" id="styleType-공유" onclick="selectStyleType('공유')" data-i18n="style_type_share">📢 공유</button>
       </div>
     </div>
     <div class="field-group">
       <div class="field-label" data-i18n="lbl_font_tone">폰트 / 어조</div>
       <div class="style-font-row">
-        <button class="style-font-btn active" id="styleFont-간결체" onclick="selSF('간결체')">간결체</button>
-        <button class="style-font-btn" id="styleFont-격식체" onclick="selSF('격식체')">격식체</button>
-        <button class="style-font-btn" id="styleFont-부드러운체" onclick="selSF('부드러운체')">부드러운체</button>
-        <button class="style-font-btn" id="styleFont-직접적지시체" onclick="selSF('직접적지시체')">직접적지시체</button>
-        <button class="style-font-btn" id="styleFont-정중체" onclick="selSF('정중체')">정중체</button>
+        <button class="style-font-btn active" id="styleFont-간결체" onclick="selSF('간결체')" data-i18n="style_font_concise">간결체</button>
+        <button class="style-font-btn" id="styleFont-격식체" onclick="selSF('격식체')" data-i18n="style_font_formal">격식체</button>
+        <button class="style-font-btn" id="styleFont-부드러운체" onclick="selSF('부드러운체')" data-i18n="style_font_soft">부드러운체</button>
+        <button class="style-font-btn" id="styleFont-직접적지시체" onclick="selSF('직접적지시체')" data-i18n="style_font_direct">직접적지시체</button>
+        <button class="style-font-btn" id="styleFont-정중체" onclick="selSF('정중체')" data-i18n="style_font_polite">정중체</button>
       </div>
     </div>
     <div class="field-group">
@@ -1848,7 +1847,7 @@ textarea::-webkit-scrollbar-thumb{background:#334155;border-radius:4px;}
       <textarea id="styleBodyInput" class="field-textarea"
         style="min-height:320px;max-height:none;height:320px;resize:vertical;overflow-y:auto;font-size:13px;line-height:1.75;"
         placeholder="예시 메일 본문을 붙여넣거나 직접 입력하세요.&#10;글자 수 제한이 없습니다. 전체 메일을 그대로 붙여넣을 수 있습니다."
-        oninput="document.getElementById('styleCharCount').innerText=this.value.length+'자'"></textarea>
+        oninput="document.getElementById('styleCharCount').innerText=this.value.length+t('char_unit')"></textarea>
     </div>
     <button class="modal-save-btn" data-i18n="btn_ai_save" onclick="saveStyleData()">💾 AI 학습 저장</button>
   </div>
@@ -1912,75 +1911,75 @@ textarea::-webkit-scrollbar-thumb{background:#334155;border-radius:4px;}
 <div class="modal-overlay" id="pptSettingsModal">
   <div class="modal-box ppt-settings-box">
     <div class="modal-hdr">
-      <h3>⚙️ PPT 출력 설정</h3>
+      <h3 data-i18n="ppt_settings_modal_title">⚙️ PPT 출력 설정</h3>
       <button class="modal-close-x" onclick="closeModal('pptSettingsModal')">×</button>
     </div>
 
     <!-- 출력 형식 -->
     <div class="field-group">
-      <div class="field-label">출력 형식</div>
+      <div class="field-label" data-i18n="ppt_output_fmt_label">출력 형식</div>
       <div class="ppt-format-row">
-        <button class="ppt-fmt-btn active" id="pptFmt-pptx" onclick="selPptFmt('pptx')">📊 PPTX (파워포인트)</button>
-        <button class="ppt-fmt-btn" id="pptFmt-docx" onclick="selPptFmt('docx')">📄 DOCX (워드 문서)</button>
+        <button class="ppt-fmt-btn active" id="pptFmt-pptx" onclick="selPptFmt('pptx')" data-i18n="ppt_fmt_pptx">📊 PPTX (파워포인트)</button>
+        <button class="ppt-fmt-btn" id="pptFmt-docx" onclick="selPptFmt('docx')" data-i18n="ppt_fmt_docx">📄 DOCX (워드 문서)</button>
       </div>
-      <div style="font-size:10px;color:#64748b;margin-top:5px;" id="pptFmtDesc">비즈니스 프레젠테이션용 .pptx 파일로 저장됩니다.</div>
+      <div style="font-size:10px;color:#64748b;margin-top:5px;" id="pptFmtDesc" data-i18n="ppt_fmt_desc_pptx">비즈니스 프레젠테이션용 .pptx 파일로 저장됩니다.</div>
     </div>
 
     <div class="settings-grid">
       <!-- 템플릿 -->
       <div class="settings-section" style="grid-column:1/-1;">
-        <div class="settings-section-title">🎨 슬라이드 템플릿</div>
+        <div class="settings-section-title" data-i18n="ppt_slide_tmpl_label">🎨 슬라이드 템플릿</div>
         <div class="template-grid">
           <button class="tmpl-btn active" id="tmpl-dark" onclick="selTmpl('dark')">
             <div class="tmpl-preview" style="background:linear-gradient(135deg,#0F172A,#1E293B);">
               <div style="font-size:9px;font-weight:bold;color:#E2E8F0;margin-bottom:2px;">제목</div>
               <div style="font-size:7px;color:#94A3B8;">• 불릿포인트</div>
             </div>
-            <div class="tmpl-name">다크 네이비</div>
+            <div class="tmpl-name" data-i18n="ppt_tmpl_dark">다크 네이비</div>
           </button>
           <button class="tmpl-btn" id="tmpl-navy" onclick="selTmpl('navy')">
             <div class="tmpl-preview" style="background:linear-gradient(135deg,#1e3a5f,#2563eb);">
               <div style="font-size:9px;font-weight:bold;color:#fff;margin-bottom:2px;">제목</div>
               <div style="font-size:7px;color:#bfdbfe;">• 불릿포인트</div>
             </div>
-            <div class="tmpl-name">코발트 블루</div>
+            <div class="tmpl-name" data-i18n="ppt_tmpl_navy">코발트 블루</div>
           </button>
           <button class="tmpl-btn" id="tmpl-clean" onclick="selTmpl('clean')">
             <div class="tmpl-preview" style="background:#f8fafc;border:1px solid #e2e8f0;">
               <div style="font-size:9px;font-weight:bold;color:#0f172a;margin-bottom:2px;">제목</div>
               <div style="font-size:7px;color:#475569;">• 불릿포인트</div>
             </div>
-            <div class="tmpl-name">클린 화이트</div>
+            <div class="tmpl-name" data-i18n="ppt_tmpl_clean">클린 화이트</div>
           </button>
           <button class="tmpl-btn" id="tmpl-gray" onclick="selTmpl('gray')">
             <div class="tmpl-preview" style="background:linear-gradient(135deg,#1f2937,#374151);">
               <div style="font-size:9px;font-weight:bold;color:#f9fafb;margin-bottom:2px;">제목</div>
               <div style="font-size:7px;color:#d1d5db;">• 불릿포인트</div>
             </div>
-            <div class="tmpl-name">모던 그레이</div>
+            <div class="tmpl-name" data-i18n="ppt_tmpl_gray">모던 그레이</div>
           </button>
           <button class="tmpl-btn" id="tmpl-green" onclick="selTmpl('green')">
             <div class="tmpl-preview" style="background:linear-gradient(135deg,#064e3b,#059669);">
               <div style="font-size:9px;font-weight:bold;color:#ecfdf5;margin-bottom:2px;">제목</div>
               <div style="font-size:7px;color:#a7f3d0;">• 불릿포인트</div>
             </div>
-            <div class="tmpl-name">에메랄드</div>
+            <div class="tmpl-name" data-i18n="ppt_tmpl_green">에메랄드</div>
           </button>
           <button class="tmpl-btn" id="tmpl-purple" onclick="selTmpl('purple')">
             <div class="tmpl-preview" style="background:linear-gradient(135deg,#2e1065,#7c3aed);">
               <div style="font-size:9px;font-weight:bold;color:#f5f3ff;margin-bottom:2px;">제목</div>
               <div style="font-size:7px;color:#ddd6fe;">• 불릿포인트</div>
             </div>
-            <div class="tmpl-name">딥 퍼플</div>
+            <div class="tmpl-name" data-i18n="ppt_tmpl_purple">딥 퍼플</div>
           </button>
         </div>
       </div>
 
       <!-- 폰트 설정 -->
       <div class="settings-section">
-        <div class="settings-section-title">🔤 폰트 설정</div>
+        <div class="settings-section-title" data-i18n="ppt_font_settings_label">🔤 폰트 설정</div>
         <div style="margin-bottom:7px;">
-          <div class="field-label" style="margin-bottom:3px;">제목 폰트</div>
+          <div class="field-label" style="margin-bottom:3px;" data-i18n="ppt_title_font_label">제목 폰트</div>
           <select id="pptTitleFont" class="font-select">
             <option value="Malgun Gothic">맑은 고딕 (기본)</option>
             <option value="NanumGothic">나눔고딕</option>
@@ -1993,7 +1992,7 @@ textarea::-webkit-scrollbar-thumb{background:#334155;border-radius:4px;}
           </select>
         </div>
         <div style="margin-bottom:7px;">
-          <div class="field-label" style="margin-bottom:3px;">본문 폰트</div>
+          <div class="field-label" style="margin-bottom:3px;" data-i18n="ppt_body_font_label">본문 폰트</div>
           <select id="pptBodyFont" class="font-select">
             <option value="Malgun Gothic">맑은 고딕 (기본)</option>
             <option value="NanumGothic">나눔고딕</option>
@@ -2006,14 +2005,14 @@ textarea::-webkit-scrollbar-thumb{background:#334155;border-radius:4px;}
         </div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;">
           <div>
-            <div class="field-label" style="margin-bottom:3px;">제목 크기</div>
+            <div class="field-label" style="margin-bottom:3px;" data-i18n="ppt_title_size_label">제목 크기</div>
             <div class="font-size-row">
               <input type="number" id="pptTitleSize" class="font-size-input" value="24" min="14" max="48">
               <span style="font-size:10px;color:#64748b;" data-i18n="font_size_pt">pt</span>
             </div>
           </div>
           <div>
-            <div class="field-label" style="margin-bottom:3px;">본문 크기</div>
+            <div class="field-label" style="margin-bottom:3px;" data-i18n="ppt_body_size_label">본문 크기</div>
             <div class="font-size-row">
               <input type="number" id="pptBodySize" class="font-size-input" value="14" min="8" max="32">
               <span style="font-size:10px;color:#64748b;" data-i18n="font_size_pt">pt</span>
@@ -2024,7 +2023,7 @@ textarea::-webkit-scrollbar-thumb{background:#334155;border-radius:4px;}
 
       <!-- 강조 색상 -->
       <div class="settings-section">
-        <div class="settings-section-title">🎨 강조 색상</div>
+        <div class="settings-section-title" data-i18n="ppt_accent_color_label">🎨 강조 색상</div>
         <div class="color-swatches" id="accentSwatches">
           <div class="color-swatch active" style="background:#3b82f6;" data-color="3B82F6" onclick="selAccent(this,'3B82F6')"></div>
           <div class="color-swatch" style="background:#a855f7;" data-color="A855F7" onclick="selAccent(this,'A855F7')"></div>
@@ -2036,12 +2035,12 @@ textarea::-webkit-scrollbar-thumb{background:#334155;border-radius:4px;}
           <div class="color-swatch" style="background:#84cc16;" data-color="84CC16" onclick="selAccent(this,'84CC16')"></div>
         </div>
         <div style="margin-top:10px;">
-          <div class="field-label" style="margin-bottom:4px;">레이아웃 스타일</div>
+          <div class="field-label" style="margin-bottom:4px;" data-i18n="ppt_layout_label">레이아웃 스타일</div>
           <select id="pptLayout" class="font-select">
-            <option value="title-bullets">제목 + 불릿포인트 (기본)</option>
-            <option value="title-two-col">제목 + 2단 구성</option>
-            <option value="title-only">제목 + 본문 텍스트</option>
-            <option value="section-break">섹션 구분 슬라이드 포함</option>
+            <option value="title-bullets" data-i18n="ppt_layout_bullets">제목 + 불릿포인트 (기본)</option>
+            <option value="title-two-col" data-i18n="ppt_layout_twocol">제목 + 2단 구성</option>
+            <option value="title-only" data-i18n="ppt_layout_textonly">제목 + 본문 텍스트</option>
+            <option value="section-break" data-i18n="ppt_layout_section">섹션 구분 슬라이드 포함</option>
           </select>
         </div>
       </div>
@@ -2049,60 +2048,60 @@ textarea::-webkit-scrollbar-thumb{background:#334155;border-radius:4px;}
 
     <!-- ★ 본문 슬라이드 템플릿 -->
     <div class="settings-section" style="margin-top:12px;">
-      <div class="settings-section-title">📄 본문 슬라이드 템플릿</div>
+      <div class="settings-section-title" data-i18n="ppt_body_tmpl_label">📄 본문 슬라이드 템플릿</div>
       <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;" id="bodyTmplGrid">
         <button class="tmpl-btn active" id="bodyTmpl-minimal" onclick="selBodyTmpl('minimal')">
           <div class="tmpl-preview" style="background:#f8fafc;border:1px solid #e2e8f0;">
             <div style="font-size:8px;font-weight:bold;color:#1e293b;margin-bottom:2px;">미니멀 라이트</div>
             <div style="font-size:7px;color:#64748b;">• 깔끔한 여백</div>
           </div>
-          <div class="tmpl-name">미니멀 라이트</div>
+          <div class="tmpl-name" data-i18n="ppt_btmpl_minimal">미니멀 라이트</div>
         </button>
         <button class="tmpl-btn" id="bodyTmpl-tech" onclick="selBodyTmpl('tech')">
           <div class="tmpl-preview" style="background:#0f172a;border:1px solid #3b82f6;">
             <div style="font-size:8px;font-weight:bold;color:#e2e8f0;margin-bottom:2px;">테크니컬 다크</div>
             <div style="font-size:7px;color:#94a3b8;">• 기술 중심</div>
           </div>
-          <div class="tmpl-name">테크니컬 다크</div>
+          <div class="tmpl-name" data-i18n="ppt_btmpl_tech">테크니컬 다크</div>
         </button>
         <button class="tmpl-btn" id="bodyTmpl-formal" onclick="selBodyTmpl('formal')">
           <div class="tmpl-preview" style="background:#1e3a5f;border:1px solid #2563eb;">
             <div style="font-size:8px;font-weight:bold;color:#fff;margin-bottom:2px;">기업 격식 세로형</div>
             <div style="font-size:7px;color:#bfdbfe;">• 공식 보고</div>
           </div>
-          <div class="tmpl-name">기업 격식</div>
+          <div class="tmpl-name" data-i18n="ppt_btmpl_formal">기업 격식</div>
         </button>
         <button class="tmpl-btn" id="bodyTmpl-warm" onclick="selBodyTmpl('warm')">
           <div class="tmpl-preview" style="background:#fff7ed;border:1px solid #f59e0b;">
             <div style="font-size:8px;font-weight:bold;color:#92400e;margin-bottom:2px;">웜 스타일</div>
             <div style="font-size:7px;color:#b45309;">• 발표/영업용</div>
           </div>
-          <div class="tmpl-name">웜 스타일</div>
+          <div class="tmpl-name" data-i18n="ppt_btmpl_warm">웜 스타일</div>
         </button>
         <button class="tmpl-btn" id="bodyTmpl-data" onclick="selBodyTmpl('data')">
           <div class="tmpl-preview" style="background:#020617;border:1px solid #10b981;">
             <div style="font-size:8px;font-weight:bold;color:#6ee7b7;margin-bottom:2px;">데이터 분석</div>
             <div style="font-size:7px;color:#6ee7b7;">• 수치/도표 중심</div>
           </div>
-          <div class="tmpl-name">데이터 분석</div>
+          <div class="tmpl-name" data-i18n="ppt_btmpl_data">데이터 분석</div>
         </button>
         <button class="tmpl-btn" id="bodyTmpl-custom" onclick="selBodyTmpl('custom')">
           <div class="tmpl-preview" style="background:linear-gradient(135deg,#334155,#0f172a);border:1px solid #a855f7;">
             <div style="font-size:8px;font-weight:bold;color:#ddd6fe;margin-bottom:2px;">커스텀</div>
             <div style="font-size:7px;color:#a855f7;">• 표지 템플릿 동일</div>
           </div>
-          <div class="tmpl-name">표지 동일</div>
+          <div class="tmpl-name" data-i18n="ppt_btmpl_custom">표지 동일</div>
         </button>
       </div>
     </div>
 
     <!-- ★ 레이아웃 배치 설정 -->
     <div class="settings-section" style="margin-top:12px;">
-      <div class="settings-section-title">📐 레이아웃 배치 설정</div>
+      <div class="settings-section-title" data-i18n="ppt_arrange_label">📐 레이아웃 배치 설정</div>
       <div class="ppt-format-row" id="arrangeRow">
-        <button class="ppt-fmt-btn active" id="arrange-split" onclick="selArrange('split')">↔ 반반씩 좌우 분할 (50:50)</button>
-        <button class="ppt-fmt-btn" id="arrange-full" onclick="selArrange('full')">⬜ 한 페이지 전체 넓게 (Full)</button>
-        <button class="ppt-fmt-btn" id="arrange-topdown" onclick="selArrange('topdown')">⬇ 상단 요약 + 하단 불릿</button>
+        <button class="ppt-fmt-btn active" id="arrange-split" onclick="selArrange('split')" data-i18n="ppt_arrange_split">↔ 반반씩 좌우 분할 (50:50)</button>
+        <button class="ppt-fmt-btn" id="arrange-full" onclick="selArrange('full')" data-i18n="ppt_arrange_full">⬜ 한 페이지 전체 넓게 (Full)</button>
+        <button class="ppt-fmt-btn" id="arrange-topdown" onclick="selArrange('topdown')" data-i18n="ppt_arrange_topdown">⬇ 상단 요약 + 하단 불릿</button>
       </div>
     </div>
 
@@ -2149,7 +2148,7 @@ textarea::-webkit-scrollbar-thumb{background:#334155;border-radius:4px;}
       <!-- 로그인 박스 (깔끔하게 정리) -->
       <div style="background:rgba(2,6,23,.5);border:1px solid #1e293b;border-radius:12px;padding:20px 18px;">
         <div style="font-size:14px;font-weight:800;color:#f1f5f9;margin-bottom:4px;text-align:center;">🔐 Timothy AI</div>
-        <div style="font-size:11px;color:#475569;text-align:center;margin-bottom:18px;">로그인하여 서비스를 이용하세요</div>
+        <div style="font-size:11px;color:#475569;text-align:center;margin-bottom:18px;" data-i18n="login_prompt">로그인하여 서비스를 이용하세요</div>
 
         <div class="field-group" style="margin-bottom:9px;">
           <div class="field-label" style="margin-bottom:4px;" data-i18n="lbl_id">아이디</div>
@@ -2199,31 +2198,31 @@ textarea::-webkit-scrollbar-thumb{background:#334155;border-radius:4px;}
       <div style="background:rgba(59,130,246,.06);border:1px solid rgba(59,130,246,.2);border-radius:10px;padding:12px 14px;margin-bottom:10px;">
         <div style="display:flex;flex-direction:column;gap:8px;">
           <div style="display:grid;grid-template-columns:80px 1fr 80px;gap:6px;align-items:center;">
-            <div style="font-size:11px;font-weight:600;color:#e2e8f0;">📊 AI 분석</div>
+            <div style="font-size:11px;font-weight:600;color:#e2e8f0;" data-i18n="lbl_task_analyze">📊 AI 분석</div>
             <select id="taskModelSel-analyze" class="field-input" style="font-size:11px;cursor:pointer;" onchange="setModelForTask('analyze',this.value)"></select>
             <div style="display:flex;gap:3px;align-items:center;">
               <span id="taskModelBadge-analyze" style="font-size:9px;padding:2px 5px;border-radius:3px;"></span>
-              <button onclick="resetModelForTask('analyze')" style="padding:2px 6px;background:rgba(30,41,59,.6);border:1px solid #334155;color:#64748b;border-radius:4px;font-size:10px;cursor:pointer;" title="기본값 복원">↩</button>
+              <button onclick="resetModelForTask('analyze')" style="padding:2px 6px;background:rgba(30,41,59,.6);border:1px solid #334155;color:#64748b;border-radius:4px;font-size:10px;cursor:pointer;" data-i18n-title="lbl_reset_default" title="기본값 복원">↩</button>
             </div>
           </div>
           <div style="display:grid;grid-template-columns:80px 1fr 80px;gap:6px;align-items:center;">
-            <div style="font-size:11px;font-weight:600;color:#e2e8f0;">✉️ 문서 작성</div>
+            <div style="font-size:11px;font-weight:600;color:#e2e8f0;" data-i18n="lbl_task_write">✉️ 문서 작성</div>
             <select id="taskModelSel-write" class="field-input" style="font-size:11px;cursor:pointer;" onchange="setModelForTask('write',this.value)"></select>
             <div style="display:flex;gap:3px;align-items:center;">
               <span id="taskModelBadge-write" style="font-size:9px;padding:2px 5px;border-radius:3px;"></span>
-              <button onclick="resetModelForTask('write')" style="padding:2px 6px;background:rgba(30,41,59,.6);border:1px solid #334155;color:#64748b;border-radius:4px;font-size:10px;cursor:pointer;" title="기본값 복원">↩</button>
+              <button onclick="resetModelForTask('write')" style="padding:2px 6px;background:rgba(30,41,59,.6);border:1px solid #334155;color:#64748b;border-radius:4px;font-size:10px;cursor:pointer;" data-i18n-title="lbl_reset_default" title="기본값 복원">↩</button>
             </div>
           </div>
           <div style="display:grid;grid-template-columns:80px 1fr 80px;gap:6px;align-items:center;">
-            <div style="font-size:11px;font-weight:600;color:#e2e8f0;">🌐 번역/통역</div>
+            <div style="font-size:11px;font-weight:600;color:#e2e8f0;" data-i18n="lbl_task_translate">🌐 번역/통역</div>
             <select id="taskModelSel-translate" class="field-input" style="font-size:11px;cursor:pointer;" onchange="setModelForTask('translate',this.value)"></select>
             <div style="display:flex;gap:3px;align-items:center;">
               <span id="taskModelBadge-translate" style="font-size:9px;padding:2px 5px;border-radius:3px;"></span>
-              <button onclick="resetModelForTask('translate')" style="padding:2px 6px;background:rgba(30,41,59,.6);border:1px solid #334155;color:#64748b;border-radius:4px;font-size:10px;cursor:pointer;" title="기본값 복원">↩</button>
+              <button onclick="resetModelForTask('translate')" style="padding:2px 6px;background:rgba(30,41,59,.6);border:1px solid #334155;color:#64748b;border-radius:4px;font-size:10px;cursor:pointer;" data-i18n-title="lbl_reset_default" title="기본값 복원">↩</button>
             </div>
           </div>
         </div>
-        <div style="font-size:10px;color:#475569;margin-top:7px;">기본값: 분석=Gemini Pro / 작성=Claude / 번역=GPT-4o</div>
+        <div style="font-size:10px;color:#475569;margin-top:7px;" data-i18n="model_default_hint">기본값: 분석=Gemini Pro / 작성=Claude / 번역=GPT-4o</div>
       </div>
 
       <!-- API 키 관리 — 상태 토글 방식 -->
@@ -2232,57 +2231,57 @@ textarea::-webkit-scrollbar-thumb{background:#334155;border-radius:4px;}
 
         <!-- Gemini -->
         <div class="api-key-row">
-          <div class="api-key-label"><span>🟦</span> Google Gemini (필수)</div>
+          <div class="api-key-label" data-i18n="api_lbl_gemini"><span>🟦</span> Google Gemini (필수)</div>
           <div class="api-state-registered" id="apiReg-gemini" style="display:none;">
-            <div class="api-registered-msg">🔐 API 키가 등록되었습니다.</div>
-            <button class="api-release-btn" onclick="releaseApiKey('gemini')">해제</button>
+            <div class="api-registered-msg" data-i18n="api_registered_msg">🔐 API 키가 등록되었습니다.</div>
+            <button class="api-release-btn" onclick="releaseApiKey('gemini')" data-i18n="api_release_btn">해제</button>
           </div>
           <div class="api-state-input" id="apiInput-gemini">
             <input type="password" id="inputGeminiKey" class="key-input api-key-input" placeholder="AIza... (aistudio.google.com)">
-            <button class="api-save-btn" onclick="saveApiKey('gemini')">등록</button>
+            <button class="api-save-btn" onclick="saveApiKey('gemini')" data-i18n="api_register_btn">등록</button>
           </div>
         </div>
 
         <!-- OpenAI -->
         <div class="api-key-row">
-          <div class="api-key-label"><span>🟩</span> OpenAI (GPT-4o, 번역 기본)</div>
+          <div class="api-key-label" data-i18n="api_lbl_openai"><span>🟩</span> OpenAI (GPT-4o, 번역 기본)</div>
           <div class="api-state-registered" id="apiReg-openai" style="display:none;">
-            <div class="api-registered-msg">🔐 API 키가 등록되었습니다.</div>
-            <button class="api-release-btn" onclick="releaseApiKey('openai')">해제</button>
+            <div class="api-registered-msg" data-i18n="api_registered_msg">🔐 API 키가 등록되었습니다.</div>
+            <button class="api-release-btn" onclick="releaseApiKey('openai')" data-i18n="api_release_btn">해제</button>
           </div>
           <div class="api-state-input" id="apiInput-openai">
             <input type="password" id="inputOpenaiKey" class="key-input api-key-input" placeholder="sk-... (platform.openai.com)">
-            <button class="api-save-btn" onclick="saveApiKey('openai')">등록</button>
+            <button class="api-save-btn" onclick="saveApiKey('openai')" data-i18n="api_register_btn">등록</button>
           </div>
         </div>
 
         <!-- Anthropic -->
         <div class="api-key-row">
-          <div class="api-key-label"><span>🟧</span> Anthropic (Claude, 작성 기본)</div>
+          <div class="api-key-label" data-i18n="api_lbl_anthropic"><span>🟧</span> Anthropic (Claude, 작성 기본)</div>
           <div class="api-state-registered" id="apiReg-anthropic" style="display:none;">
-            <div class="api-registered-msg">🔐 API 키가 등록되었습니다.</div>
-            <button class="api-release-btn" onclick="releaseApiKey('anthropic')">해제</button>
+            <div class="api-registered-msg" data-i18n="api_registered_msg">🔐 API 키가 등록되었습니다.</div>
+            <button class="api-release-btn" onclick="releaseApiKey('anthropic')" data-i18n="api_release_btn">해제</button>
           </div>
           <div class="api-state-input" id="apiInput-anthropic">
             <input type="password" id="inputAnthropicKey" class="key-input api-key-input" placeholder="sk-ant-... (console.anthropic.com)">
-            <button class="api-save-btn" onclick="saveApiKey('anthropic')">등록</button>
+            <button class="api-save-btn" onclick="saveApiKey('anthropic')" data-i18n="api_register_btn">등록</button>
           </div>
         </div>
 
         <!-- DeepL -->
         <div class="api-key-row">
-          <div class="api-key-label"><span>🌿</span> DeepL (고품질 번역, 선택)</div>
+          <div class="api-key-label" data-i18n="api_lbl_deepl"><span>🌿</span> DeepL (고품질 번역, 선택)</div>
           <div class="api-state-registered" id="apiReg-deepl" style="display:none;">
-            <div class="api-registered-msg">🔐 API 키가 등록되었습니다.</div>
-            <button class="api-release-btn" onclick="releaseApiKey('deepl')">해제</button>
+            <div class="api-registered-msg" data-i18n="api_registered_msg">🔐 API 키가 등록되었습니다.</div>
+            <button class="api-release-btn" onclick="releaseApiKey('deepl')" data-i18n="api_release_btn">해제</button>
           </div>
           <div class="api-state-input" id="apiInput-deepl">
             <input type="password" id="inputDeeplKey" class="key-input api-key-input" placeholder="Free: ...​:fx  /  Pro: 일반 키 (deepl.com/pro-api)">
-            <button class="api-save-btn" onclick="saveApiKey('deepl')">등록</button>
+            <button class="api-save-btn" onclick="saveApiKey('deepl')" data-i18n="api_register_btn">등록</button>
           </div>
         </div>
       </div>
-      <div style="font-size:10px;color:#475569;margin-top:6px;line-height:1.6;">
+      <div style="font-size:10px;color:#475569;margin-top:6px;line-height:1.6;" data-i18n="api_key_note">
         * Gemini 키 없으면 분석·번역 기능이 비활성화됩니다.<br>
         * OpenAI·Claude 키 없으면 Gemini로 자동 대체 실행됩니다.<br>
         * DeepL Free 키는 끝에 <code style="color:#34d399;">:fx</code> 가 붙습니다 (예: <code style="color:#34d399;">abc123:fx</code>).<br>
@@ -2311,7 +2310,7 @@ textarea::-webkit-scrollbar-thumb{background:#334155;border-radius:4px;}
     <div class="stab-panel" id="stabPanel-appear" style="display:none;">
 
       <!-- 스킨 -->
-      <div class="settings-section-hdr"><span data-i18n="theme_skin_title">🎨 테마 스킨</span> <span style="font-size:9px;font-weight:400;color:#475569;text-transform:none;letter-spacing:0;">다크 10종 · 라이트 10종</span></div>
+      <div class="settings-section-hdr"><span data-i18n="theme_skin_title">🎨 테마 스킨</span> <span style="font-size:9px;font-weight:400;color:#475569;text-transform:none;letter-spacing:0;" data-i18n="skin_count_note">다크 10종 · 라이트 10종</span></div>
       <div class="skin-grid" id="skinGrid"></div>
 
       <!-- 폰트 -->
@@ -2328,32 +2327,29 @@ textarea::-webkit-scrollbar-thumb{background:#334155;border-radius:4px;}
 
     <!-- 💾 데이터 백업 & 복구 -->
     <div style="margin-top:12px;background:rgba(2,6,23,.5);border:1px solid #1e293b;border-radius:10px;padding:12px 14px;">
-      <div style="font-size:11px;font-weight:700;color:#60a5fa;margin-bottom:10px;">💾 데이터 백업 &amp; 복구
-        <span style="font-size:9px;font-weight:400;color:#475569;margin-left:6px;">앱 버전 <span id="appVersionBadge" style="color:#10b981;"></span></span>
+      <div style="font-size:11px;font-weight:700;color:#60a5fa;margin-bottom:10px;">
+        <span data-i18n="backup_section_title">💾 데이터 백업 &amp; 복구</span>
+        <span style="font-size:9px;font-weight:400;color:#475569;margin-left:6px;"><span data-i18n="backup_app_ver">앱 버전</span> <span id="appVersionBadge" style="color:#10b981;"></span></span>
       </div>
       <div style="display:flex;gap:8px;flex-wrap:wrap;">
-        <!-- 내보내기 -->
         <button onclick="exportBackup()"
-          style="flex:1;min-width:120px;padding:9px 12px;background:rgba(16,185,129,.12);color:#10b981;border:1px solid rgba(16,185,129,.3);border-radius:7px;font-size:11px;font-weight:700;cursor:pointer;">
-          📥 백업 다운로드
-        </button>
-        <!-- 가져오기 -->
+          style="flex:1;min-width:120px;padding:9px 12px;background:rgba(16,185,129,.12);color:#10b981;border:1px solid rgba(16,185,129,.3);border-radius:7px;font-size:11px;font-weight:700;cursor:pointer;"
+          data-i18n="backup_download_btn">📥 백업 다운로드</button>
         <label style="flex:1;min-width:120px;">
           <input type="file" id="backupFileInput" accept=".json" style="display:none;" onchange="importBackup(event)">
           <div onclick="document.getElementById('backupFileInput').click()"
-            style="padding:9px 12px;background:rgba(245,158,11,.1);color:#f59e0b;border:1px solid rgba(245,158,11,.3);border-radius:7px;font-size:11px;font-weight:700;cursor:pointer;text-align:center;">
-            📤 백업 복구
-          </div>
+            style="padding:9px 12px;background:rgba(245,158,11,.1);color:#f59e0b;border:1px solid rgba(245,158,11,.3);border-radius:7px;font-size:11px;font-weight:700;cursor:pointer;text-align:center;"
+            data-i18n="backup_restore_btn">📤 백업 복구</div>
         </label>
       </div>
-      <div style="font-size:10px;color:#475569;margin-top:7px;line-height:1.7;">
+      <div style="font-size:10px;color:#475569;margin-top:7px;line-height:1.7;" data-i18n="backup_desc">
         • 백업: 분석 메일·일정·업무·설정을 JSON으로 저장<br>
         • 복구: 기존 데이터를 백업 파일로 덮어씌웁니다
       </div>
     </div>
 
     <!-- PWA 안내 (고정 하단) -->
-    <div style="margin-top:10px;padding:9px 12px;background:rgba(16,185,129,.07);border:1px solid rgba(16,185,129,.2);border-radius:8px;font-size:10px;color:#64748b;line-height:1.7;">
+    <div style="margin-top:10px;padding:9px 12px;background:rgba(16,185,129,.07);border:1px solid rgba(16,185,129,.2);border-radius:8px;font-size:10px;color:#64748b;line-height:1.7;" data-i18n="pwa_hint">
       📲 <b style="color:#10b981;">앱처럼 사용하기:</b> 크롬 메뉴 <b style="color:#10b981;">⋮</b> → <b style="color:#10b981;">'홈 화면에 추가'</b>를 누르면 마이크 권한이 영구 유지됩니다.
     </div>
   </div>
@@ -2458,6 +2454,22 @@ const LANG_PACKS = {
     tracking_title:'📋 업무 Tracking', weekly_title:'📆 주간 일정 요약',
     this_week:'금주', next_week:'차주',
     ppt_run:'▶ 문서 설계 시작', ppt_settings:'⚙️ 출력 형식 · 템플릿 · 폰트 설정',
+    ppt_manager_title:'📊 문서 자동 매니저',
+    ppt_tab_new:'✨ 새로 만들기', ppt_tab_edit:'📂 기존 파일 보완',
+    ppt_input_label:'보고서 원문 / 개요 입력',
+    ppt_input_ph:'보고서 내용, 회의 결과, 프로젝트 현황 등을 붙여넣으세요.\nAI가 슬라이드 구조를 자동 설계합니다.',
+    ppt_upload_label:'기존 PPT / 텍스트 파일 업로드',
+    ppt_upload_hint:'클릭하거나 파일을 끌어다 놓으세요',
+    ppt_edit_label:'보완/수정 요청 사항',
+    ppt_edit_ph:'예: 3슬라이드 데이터 최신화, 결론 슬라이드 추가, 전체 어조를 격식체로 변경 등',
+    ppt_count_label:'슬라이드 분량',
+    ppt_style_check:'학습된 문체 스타일 반영',
+    ppt_guide_title:'💡 사용 가이드',
+    ppt_guide_new:'새로 만들기: 원문 입력 → 분량 설정 → 설계 시작',
+    ppt_guide_edit:'기존 파일 보완: 파일 업로드 → 수정 요청 입력 → 설계 시작',
+    ppt_guide_save:'편집 후 저장: 우측 카드 텍스트 직접 편집 → 💾 버튼으로 다운로드',
+    ppt_empty_hint:'좌측에서 내용을 입력하고 PPT 설계를 시작하세요.',
+    ppt_save_pptx:'💾 PPTX 저장', ppt_save_docx:'📄 Word 저장',
     // 대시보드 섹션 타이틀
     mail_section_title:'✉️ AI 수신 발신처별 브리핑',
     status_panel_title:'✅ 메일 처리 현황',
@@ -2523,8 +2535,8 @@ const LANG_PACKS = {
     conf_tts_label:'🔊 번역 목소리:',
     conf_summary_title:'📄 회의록 AI 요약',
     conf_copy_btn:'📄 복사',
-    conf_mode_interp:'💡 <b style="color:#60a5fa;">통역 모드</b>: 상대방 언어를 인식해 즉시 번역합니다. 이어폰 착용을 권장합니다.',
-    conf_mode_minutes:'📋 <b style="color:#34d399;">회의록 모드</b>: 번역 없이 발화 내용을 회의록으로 정리합니다.',
+    conf_mode_interp:'💡 <b style="color:#60a5fa;">통역 모드</b>: <b style="color:#f59e0b;">{peer}</b> 발화 → <b style="color:#10b981;">{my}</b> 번역. 이어폰 착용을 권장합니다.',
+    conf_mode_minutes:'📋 <b style="color:#34d399;">회의록 모드</b>: <b style="color:#60a5fa;">{my}</b> 발화를 회의록으로 정리합니다.',
     login_status:'로그인 전', guest_name:'Guest',
     // 상태/진행 메시지
     status_listening:'인식 중...',
@@ -2622,7 +2634,20 @@ const LANG_PACKS = {
     sidebar_logo_main:'AI 비서',
     user_dept_init:'로그인 전',
     api_key_notice_title:'API 키 미등록',
+    api_registered_msg:'🔐 API 키가 등록되었습니다.',
+    api_release_btn:'해제',
+    api_register_btn:'등록',
+    login_prompt:'로그인하여 서비스를 이용하세요',
+
     api_key_notice_desc:'⚙️ 설정 → API 설정에서 등록하세요.',
+    backup_section_title:'💾 데이터 백업 &amp; 복구',
+    backup_app_ver:'앱 버전',
+    backup_download_btn:'📥 백업 다운로드',
+    backup_restore_btn:'📤 백업 복구',
+    backup_desc:'• 백업: 분석 메일·일정·업무·설정을 JSON으로 저장\n• 복구: 기존 데이터를 백업 파일로 덮어씌웁니다',
+    pwa_hint:'📲 앱처럼 사용하기: 크롬 메뉴 ⋮ → \'홈 화면에 추가\'를 누르면 마이크 권한이 영구 유지됩니다.',
+    skin_count_note:'다크 10종 · 라이트 10종',
+    api_note_main:'* Gemini 키 없으면 분석·번역 기능이 비활성화됩니다.\n* OpenAI·Claude 키 없으면 Gemini로 자동 대체 실행됩니다.\n* DeepL Free 키는 끝에 :fx 가 붙습니다 (예: abc123:fx).',
     loc_default:'📍 청주 사업장',
     // ── 사이드바 nav (data-i18n 없는 것) ──
     nav_ppt_tooltip:'고도화 작업 중 — 곧 공개됩니다',
@@ -2701,6 +2726,42 @@ const LANG_PACKS = {
     toast_my_mic_stop:'⏸️ 내 음성 인식 중지',
     toast_peer_mic_stop:'⏸️ 상대방 음성 인식 중지',
     toast_conf_stop:'⏹ 회의 모드 중지',
+    clipboard_image:'🖼️ 클립보드 이미지',
+    mail_banner_count:'📬 메일 일정 ${n}건',
+    cal_month_label:'${year}년 ${month}월',
+    dp_title_label:'${year}년 ${month}월',
+    del_all_styles_msg:'저장된 <b style="color:#f43f5e;">모든 스타일 학습 데이터</b>를 삭제하시겠습니까?<br><span style="font-size:10px;color:#64748b;">복구 불가</span>',
+    trans_file_loaded:'📄 ${name} — 텍스트 로드 완료',
+    trans_file_attached:'📎 ${name} (${size}KB) — 번역 시 자동 첨부',
+    trans_file_docx_warn:'⚠️ ${name} — docx는 텍스트를 복사해 붙여넣기 권장',
+    trans_file_hint_short:'이미지·PDF·txt·md 업로드 가능',
+    conf_clear_confirm:'회의 기록 <b style="color:#f43f5e;">${n}건</b>을 모두 삭제하시겠습니까?',
+    collab_gen_fail:'⚠️ 생성 실패: ',
+    collab_fixing_btn:'⏳ 수정 중...',
+    // ── 음성 통역 버튼/상태 ──
+    voice_my_stop:'🇰🇷 인식 중지',
+    voice_my_start_one:'🇰🇷 내 음성 통역 시작',
+    voice_my_start_both:'🇰🇷 내 음성 인식',
+    voice_peer_stop:'🌐 인식 중지',
+    voice_peer_start:'🌐 상대방 음성 인식',
+    voice_status_my:'🇰🇷 내 음성 인식 중',
+    voice_status_peer:'🌐 상대방 음성 인식 중',
+    // ── 날짜/시간 피커 ──
+    lbl_date_pick:'날짜 선택',
+    lbl_time_pick:'시간 선택',
+    // ── API 에러 메시지 ──
+    err_api_400:'API Key가 잘못됐거나 요청 형식 오류입니다.',
+    err_api_401:'API Key 권한 오류입니다. Key를 확인해 주세요.',
+    err_api_429:'API 호출 한도 초과입니다. 잠시 후 다시 시도해 주세요.',
+    err_api_500:'Gemini 서버 오류입니다. 잠시 후 다시 시도해 주세요.',
+    err_network:'네트워크 연결을 확인해 주세요.',
+    // ── 트래커 ──
+    track_total_count:'총 ${n}건',
+    // ── PPT 슬라이드 카운트 ──
+    ppt_slide_count:'(${n}${unit})',
+    // ── 상태 ──
+    status_api_missing:'API 키 미등록',
+    status_processing_btn:'처리 중...',
     toast_summary_making:'📄 AI 회의록 요약 중...',
     toast_action_items_ok:'✅ ${n}건 Action Item이 트래커에 등록됐습니다.',
     toast_no_action_items:'등록할 Action Item이 없습니다.',
@@ -2736,9 +2797,145 @@ const LANG_PACKS = {
     btn_reset:'🗑 초기화',
     lang_ko:'🇰🇷 한국어', lang_en:'🇺🇸 영어', lang_zh:'🇨🇳 중국어', lang_ja:'🇯🇵 일본어',
     trans_input_ph:'번역할 텍스트를 입력하거나 파일을 첨부하세요...',
+    trans_img_attached_hint:'🖼️ 이미지 첨부됨 — 번역하기를 누르세요.',
+    trans_file_attached_hint:'${name} 파일을 첨부했습니다.\n번역하기를 누르면 파일 내용을 분석·번역합니다.\n추가 지시사항이 있으면 여기에 입력하세요.',
+    trans_docx_copy_hint:'docx 파일은 내용을 직접 복사해 붙여넣어 주세요.',
     btn_copy_trans:'📄 복사', btn_swap:'⇄ 교체',
-    collab_formal:'📋 격식체', collab_direct:'⚡ 직접 지시체', collab_concise:'📌 간결체',
-    collab_official:'📜 공식 서한체', collab_data:'📊 데이터 중심체', collab_polite:'🤝 정중체',
+    // collab 스타일 키는 아래 추가 키 블록에서 정의됨
+    // ── PPT 설정 모달 ──
+    ppt_settings_modal_title:'⚙️ PPT 출력 설정',
+    ppt_output_fmt_label:'출력 형식',
+    ppt_fmt_pptx:'📊 PPTX (파워포인트)',
+    ppt_fmt_docx:'📄 DOCX (워드 문서)',
+    ppt_fmt_desc_pptx:'비즈니스 프레젠테이션용 .pptx 파일로 저장됩니다.',
+    ppt_fmt_desc_docx:'편집 가능한 Word .docx 문서로 저장됩니다. (보고서/문서 형태)',
+    ppt_slide_tmpl_label:'🎨 슬라이드 템플릿',
+    ppt_tmpl_dark:'다크 네이비', ppt_tmpl_navy:'코발트 블루', ppt_tmpl_clean:'클린 화이트',
+    ppt_tmpl_gray:'모던 그레이', ppt_tmpl_green:'에메랄드', ppt_tmpl_purple:'딥 퍼플',
+    ppt_font_settings_label:'🔤 폰트 설정',
+    ppt_title_font_label:'제목 폰트', ppt_body_font_label:'본문 폰트',
+    ppt_title_size_label:'제목 크기', ppt_body_size_label:'본문 크기',
+    ppt_accent_color_label:'🎨 강조 색상',
+    ppt_layout_label:'레이아웃 스타일',
+    ppt_layout_bullets:'제목 + 불릿포인트 (기본)', ppt_layout_twocol:'제목 + 2단 구성',
+    ppt_layout_textonly:'제목 + 본문 텍스트', ppt_layout_section:'섹션 구분 슬라이드 포함',
+    ppt_body_tmpl_label:'📄 본문 슬라이드 템플릿',
+    ppt_btmpl_minimal:'미니멀 라이트', ppt_btmpl_tech:'테크니컬 다크',
+    ppt_btmpl_formal:'기업 격식', ppt_btmpl_warm:'웜 스타일',
+    ppt_btmpl_data:'데이터 분석', ppt_btmpl_custom:'표지 동일',
+    ppt_arrange_label:'📐 레이아웃 배치 설정',
+    ppt_arrange_split:'↔ 반반씩 좌우 분할 (50:50)',
+    ppt_arrange_full:'⬜ 한 페이지 전체 넓게 (Full)',
+    ppt_arrange_topdown:'⬇ 상단 요약 + 하단 불릿',
+    settings_save_btn:'✅ 설정 저장',
+    ppt_slide_label:'슬라이드', ppt_section_badge:'섹션',
+    ppt_slide_title_ph:'슬라이드 제목', ppt_slide_sub_ph:'부제목 (선택)',
+    ppt_slide_bullets_ph:'불릿포인트 (줄바꿈으로 구분)', ppt_no_title:'(제목 없음)',
+    // ── 일정/업무/스타일 모달 유형 버튼 ──
+    cal_type_report:'📋 보고', cal_type_meeting:'💬 회의', cal_type_doc:'📝 문서작성',
+    cal_type_eval:'⭐ 평가', cal_type_const:'🔧 공사', cal_type_dinner:'🍻 회식',
+    cal_type_team:'🏃 조직강화활동', cal_type_monthly:'📢 월례조회', cal_type_etc:'✏️ 기타/수기',
+    cal_type_etc_ph:'예: 팀빌딩, 외부 세미나, 개인 일정 등 자유 입력',
+    style_type_report:'📋 보고', style_type_directive:'⚡ 지시', style_type_share:'📢 공유',
+    style_font_concise:'간결체', style_font_formal:'격식체', style_font_soft:'부드러운체',
+    style_font_direct:'직접적지시체', style_font_polite:'정중체',
+    work_type_directive:'⚡ 지시사항', work_type_request:'📋 요청사항',
+    work_type_label_지시:'지시', work_type_label_요청:'요청',
+    // ── calDetail 팝업 ──
+    cal_detail_date:'날짜', cal_detail_time:'시간', cal_detail_place:'장소',
+    cal_detail_worker:'담당자', cal_detail_no_info:'세부 정보 없음',
+    cal_detail_deadline:'납기일', cal_detail_desc:'설명', cal_detail_sender:'발신자',
+    cal_detail_dept:'부서', cal_detail_directive_day:'지시일', cal_detail_due:'납기일',
+    cal_detail_reg_day:'등록일', cal_detail_no_title:'(제목없음)',
+    cal_detail_mail_deadline:'📩 메일 납기',
+    cal_detail_done:'✅ 처리완료 상태입니다.',
+    cal_detail_pending:'⏳ 미처리 상태입니다. 처리 완료 시 버튼을 누르세요.',
+    cal_detail_change_pend:'↩️ 미처리로 변경', cal_detail_mark_done:'✅ 처리 완료',
+    cal_detail_edit:'✏️ 수정', cal_detail_delete:'🗑️ 삭제', cal_detail_close:'✕ 닫기',
+    // ── confirmDelete ──
+    confirm_del_mail:'이 분석 메일을 삭제하시겠습니까?',
+    confirm_del_track:'이 업무를 삭제하시겠습니까?',
+    confirm_del_style:'이 문체 데이터를 삭제하시겠습니까?',
+    confirm_del_calev:'이 일정을 삭제하시겠습니까?',
+    confirm_del_fallback:'삭제?', confirm_no_recovery:'복구 불가',
+    // ── API 설정 ──
+    model_default_hint:'기본값: 분석=Gemini Pro / 작성=Claude / 번역=GPT-4o',
+    api_key_btn_locked:'API 키 등록 후 사용 가능합니다',
+    deepl_registered:'🌿 DeepL (고품질)', deepl_not_registered:'🌿 DeepL (키 미등록)',
+    // ── 처리 상태 ──
+    status_proc_done:'처리', status_proc_pend:'미처리',
+    // ── 주간/캘린더 ──
+    weekly_mail_label:'메일', weekly_empty:'없음',
+    cal_done_tip:'처리완료', cal_pend_tip:'미처리', cal_directive_day_short:'지시일',
+    // ── 학습관 ──
+    learn_verify_done:'학습 검증 완료',
+    learn_verify_count:'현재 학습된 데이터: <b style="color:#60a5fa;">${n}개</b>',
+    learn_verify_dist:'스타일 분포',
+    learn_verify_avg:'평균 본문 길이: ${n}자 / AI 컨텍스트 주입: 최신 50개',
+    learn_verify_state:'학습 적용 상태',
+    learn_active:'활성화', learn_inactive:'비활성화',
+    btn_edit_short:'✏️ 수정', btn_del_short:'🗑', learn_row_click_tip:'클릭하여 전체 내용 보기',
+    // ── 메일/STT 아코디언 ──
+    mail_acc_summary:'💡 Timothy AI 핵심 요약', mail_acc_guide:'📋 지시 가이드',
+    mail_acc_tracker_btn:'트래커 연동', mail_acc_dept:'🏢 유관 부서',
+    mail_acc_reply:'✉️ 추천 회신 초안', mail_reply_none:'(없음)',
+    stt_acc_conclusion:'🎙️ 회의 핵심 결론 및 결정사항', stt_acc_no_conclusion:'결론 없음',
+    stt_tracker_reg:'트래커 등록 (${n}건)', stt_no_actions:'등록된 Action Item이 없습니다.',
+    stt_acc_dept:'🏢 유관부서별 대응방안', stt_acc_reply:'✉️ 추천 회신 / 후속 안내 초안',
+    // ── 피드백/SAG ──
+    feedback_ph:'수정 요청, 논리 보강, 검색 등을 자유롭게 입력하세요. (Shift+Enter: 줄바꿈)',
+    feedback_fix_btn:'🔄 수정 요청', feedback_logic_btn:'🧠 논리 보강',
+    sag_step1:'🔍 분석 중', sag_step2:'🌐 자료 검색 중', sag_step3:'✍️ 본문 반영 중',
+    sag_searching:'검색 중...', sag_search_done:'✅ 검색 자료 반영 완료',
+    sag_logic_done:'✅ 논리 보강 완료', sag_fix_done:'✅ 수정 완료',
+    // ── 파일/이미지 ──
+    file_reading:'읽는 중...', file_loading:'로딩...',
+    file_excel_converted:'(Excel 변환됨)', file_excel_toast:'→ 텍스트 변환 완료. 분석 시작하세요.',
+    file_docx_converted:'(DOCX 변환됨)', file_docx_toast:'→ 텍스트 추출 완료. 분석 시작하세요.',
+    paste_image_name:'붙여넣기 이미지', img_placeholder:'이미지', img_attached_msg:'이미지 첨부됨',
+    // ── STT 카드 ──
+    stt_no_result:'분석 결과 없음', stt_default_title:'회의 분석 결과',
+    stt_meeting_prefix:'회의', stt_task_type:'회의록', stt_task_prefix:'회의',
+    // ── PPT 기타 ──
+    pptx_making:'PPTX 생성 중...',
+    pptlib_error:'PptxGenJS 라이브러리가 로드되지 않았습니다. 인터넷 연결을 확인하세요.',
+    // ── 스킨 이름 (KO) ──
+    skin_dark_blue:'다크 블루', skin_deep_navy:'딥 네이비', skin_midnight:'미드나잇',
+    skin_dark_purple:'다크 퍼플', skin_dark_teal:'다크 틸', skin_dark_slate:'슬레이트',
+    skin_dark_emerald:'에메랄드', skin_dark_rose:'다크 로즈', skin_dark_amber:'앰버',
+    skin_charcoal:'차콜',
+    skin_light_white:'순백 라이트', skin_light_blue:'아이스 블루', skin_light_sage:'세이지 그린',
+    skin_light_lavend:'라벤더', skin_light_rose:'로즈 핑크', skin_light_amber:'크림 앰버',
+    skin_light_teal:'민트 틸', skin_light_slate:'웜 슬레이트', skin_light_peach:'피치 오렌지',
+    skin_light_gray:'모던 그레이',
+    // ── 글자 수 단위 ──
+    char_unit:'자',
+    toast_proc_done_changed:'✅ 처리 완료로 변경됐습니다.',
+    toast_proc_pend_changed:'↩️ 미처리로 변경됐습니다.',
+    // ── 캘린더/트래킹 동적 텍스트 ──
+    cal_due_label:'납기',
+    stt_badge_label:'🎙️ STT',
+    // ── 태스크 레이블 (API 설정 탭) ──
+    lbl_task_analyze:'📊 AI 분석',
+    lbl_task_write:'✉️ 문서 작성',
+    lbl_task_translate:'🌐 번역/통역',
+    lbl_task_voice:'🎙️ 음성 통역',
+    lbl_task_conf:'🏢 회의 모드',
+    lbl_reset_default:'기본값 복원',
+    // ── API 키 라벨 ──
+    api_lbl_gemini:'🟦 Google Gemini (필수)',
+    api_lbl_openai:'🟩 OpenAI (GPT-4o, 번역 기본)',
+    api_lbl_anthropic:'🟧 Anthropic (Claude, 작성 기본)',
+    api_lbl_deepl:'🌿 DeepL (고품질 번역, 선택)',
+    api_key_note:'* Gemini 키 없으면 분석·번역 기능이 비활성화됩니다.<br>* OpenAI·Claude 키 없으면 Gemini로 자동 대체 실행됩니다.<br>* DeepL Free 키는 끝에 <code style="color:#34d399;">:fx</code> 가 붙습니다 (예: <code style="color:#34d399;">abc123:fx</code>).<br>* DeepL 등록 후 위 번역/통역 모델 선택란에서 🌿 DeepL을 선택하세요.',
+    // ── collab 스타일 버튼 및 placeholder ──
+    collab_formal:'📋 격식체',
+    collab_direct:'⚡ 직접 지시체',
+    collab_concise:'📌 간결체',
+    collab_official:'📜 공식 서한체',
+    collab_data:'📊 데이터 중심체',
+    collab_polite:'🤝 정중체',
+    ph_collab_content:'예: 5월 20일까지 설비 점검 결과 보고 요청 등',
   },
   ZH: {
     tab_mail:'📩 邮件分析', tab_stt:'🎙️ STT语音分析',
@@ -2759,6 +2956,22 @@ const LANG_PACKS = {
     tracking_title:'📋 任务跟踪', weekly_title:'📆 周计划摘要',
     this_week:'本周', next_week:'下周',
     ppt_run:'▶ 开始文档设计', ppt_settings:'⚙️ 输出格式·模板·字体设置',
+    ppt_manager_title:'📊 文档自动管理器',
+    ppt_tab_new:'✨ 新建', ppt_tab_edit:'📂 完善现有文件',
+    ppt_input_label:'报告原文 / 大纲输入',
+    ppt_input_ph:'粘贴报告内容、会议结果、项目现状等。\nAI将自动设计幻灯片结构。',
+    ppt_upload_label:'上传现有PPT / 文本文件',
+    ppt_upload_hint:'点击或拖放文件',
+    ppt_edit_label:'补充/修改请求事项',
+    ppt_edit_ph:'例：更新第3页数据、添加结论页、将整体语气改为正式体等',
+    ppt_count_label:'幻灯片数量',
+    ppt_style_check:'反映学习的文体风格',
+    ppt_guide_title:'💡 使用指南',
+    ppt_guide_new:'新建：输入原文 → 设置数量 → 开始设计',
+    ppt_guide_edit:'完善现有文件：上传文件 → 输入修改请求 → 开始设计',
+    ppt_guide_save:'编辑后保存：直接编辑右侧卡片文字 → 💾 按钮下载',
+    ppt_empty_hint:'在左侧输入内容并开始PPT设计。',
+    ppt_save_pptx:'💾 保存PPTX', ppt_save_docx:'📄 保存Word',
     mail_section_title:'✉️ AI邮件来源分类简报',
     status_panel_title:'✅ 邮件处理状况',
     track_count_label:'共',
@@ -2822,8 +3035,8 @@ const LANG_PACKS = {
     conf_tts_label:'🔊 翻译语音:',
     conf_summary_title:'📄 会议纪要 AI 总结',
     conf_copy_btn:'📄 复制',
-    conf_mode_interp:'💡 <b style="color:#60a5fa;">口译模式</b>: 识别对方语言并立即翻译。建议佩戴耳机。',
-    conf_mode_minutes:'📋 <b style="color:#34d399;">会议记录模式</b>: 不翻译，直接整理发言内容为会议纪要。',
+    conf_mode_interp:'💡 <b style="color:#60a5fa;">口译模式</b>: 识别 <b style="color:#f59e0b;">{peer}</b> 发言并翻译成 <b style="color:#10b981;">{my}</b>。建议佩戴耳机。',
+    conf_mode_minutes:'📋 <b style="color:#34d399;">会议记录模式</b>: 整理 <b style="color:#60a5fa;">{my}</b> 发言为会议纪要，无需翻译。',
     login_status:'未登录', guest_name:'Guest',
     status_listening:'识别中...',
     status_analyzing:'AI分析进行中...',
@@ -2891,6 +3104,10 @@ const LANG_PACKS = {
     collab_gen_btn:'▶ 生成定制草稿',
     trans_file_hint:'可上传 Excel·Word·CSV·图片·PDF·txt 文件',
     conf_mode_label:'💡 会议模式:',
+    trans_img_attached_hint:'🖼️ 已附加图片 — 请点击翻译按钮。',
+    trans_input_ph:'请输入翻译文本或附加文件...',
+    trans_file_attached_hint:'已附加文件 ${name}。\n点击翻译按钮分析·翻译文件内容。\n如有额外指示请在此输入。',
+    trans_docx_copy_hint:'docx文件请直接复制粘贴内容。',
     conf_mode_desc:'仅显示以对方语言检测到的发言字幕。结束时AI会自动摘要整个会议记录。',
     conf_caption_title:'📋 实时会议字幕',
     theme_skin_title:'🎨 主题皮肤',
@@ -2965,7 +3182,20 @@ const LANG_PACKS = {
     sidebar_logo_main:'AI 助理',
     user_dept_init:'未登录',
     api_key_notice_title:'API密钥未注册',
+    api_registered_msg:'🔐 API密钥已注册。',
+    api_release_btn:'解除',
+    api_register_btn:'注册',
+    login_prompt:'请登录以使用服务',
+
     api_key_notice_desc:'⚙️ 设置 → API设置中注册。',
+    backup_section_title:'💾 数据备份 &amp; 恢复',
+    backup_app_ver:'应用版本',
+    backup_download_btn:'📥 下载备份',
+    backup_restore_btn:'📤 恢复备份',
+    backup_desc:'• 备份：将分析邮件、日程、任务、设置保存为JSON\n• 恢复：用备份文件覆盖现有数据',
+    pwa_hint:'📲 像应用一样使用：Chrome菜单 ⋮ → \'添加到主屏幕\'可永久保留麦克风权限。',
+    skin_count_note:'深色10种 · 浅色10种',
+    api_note_main:'* 没有Gemini密钥将禁用分析·翻译功能。\n* 没有OpenAI·Claude密钥将自动使用Gemini替代。\n* DeepL Free密钥末尾带:fx（例：abc123:fx）。',
     loc_default:'📍 当前位置',
     nav_ppt_tooltip:'升级中 — 即将公开', nav_ppt_label:'📊 文档自动管理器', nav_ppt_badge:'(即将)',
     // ── JS 토스트 ──
@@ -3019,6 +3249,27 @@ const LANG_PACKS = {
     toast_interp_cleared:'通译记录已重置。',
     toast_my_mic_start:'🎙️ 开始我的语音识别', toast_my_mic_stop:'⏸️ 停止我的语音识别',
     toast_peer_mic_stop:'⏸️ 停止对方语音识别', toast_conf_stop:'⏹ 会议模式停止',
+    clipboard_image:'🖼️ 剪贴板图像',
+    mail_banner_count:'📬 邮件日程 ${n}件',
+    cal_month_label:'${year}年${month}月',
+    dp_title_label:'${year}年${month}月',
+    del_all_styles_msg:'删除所有已保存的<b style="color:#f43f5e;">文体学习数据</b>？<br><span style="font-size:10px;color:#64748b;">无法恢复</span>',
+    trans_file_loaded:'📄 ${name} — 文本加载完成',
+    trans_file_attached:'📎 ${name} (${size}KB) — 翻译时自动附加',
+    trans_file_docx_warn:'⚠️ ${name} — docx建议复制粘贴文本',
+    trans_file_hint_short:'可上传图片·PDF·txt·md',
+    conf_clear_confirm:'确定删除 <b style="color:#f43f5e;">${n}条</b>会议记录吗？',
+    collab_gen_fail:'⚠️ 生成失败：',
+    collab_fixing_btn:'⏳ 修改中...',
+    voice_my_stop:'🇰🇷 停止识别', voice_my_start_one:'🇰🇷 开始我的语音口译', voice_my_start_both:'🇰🇷 识别我的语音',
+    voice_peer_stop:'🌐 停止识别', voice_peer_start:'🌐 识别对方语音',
+    voice_status_my:'🇰🇷 正在识别我的语音', voice_status_peer:'🌐 正在识别对方语音',
+    lbl_date_pick:'选择日期', lbl_time_pick:'选择时间',
+    err_api_400:'API Key格式错误或请求格式有误。', err_api_401:'API Key权限错误，请确认Key。',
+    err_api_429:'超出API调用限制，请稍后重试。', err_api_500:'Gemini服务器错误，请稍后重试。',
+    err_network:'请检查网络连接。',
+    track_total_count:'共 ${n} 件', ppt_slide_count:'(${n}${unit})',
+    status_api_missing:'未注册API密钥', status_processing_btn:'处理中...',
     toast_summary_making:'📄 AI会议记录摘要中...', toast_action_items_ok:'✅ ${n}件Action Item已登记到追踪器。',
     toast_no_action_items:'没有可登记的Action Item。', toast_analyze_ok:'✅ 分析完成',
     toast_analyze_fail:'⚠️ 分析失败：', toast_stt_ok:'✅ STT深度分析完成·结果卡片已生成',
@@ -3034,6 +3285,116 @@ const LANG_PACKS = {
     doc_trans_tab:'📄 文档/文本翻译', voice_trans_tab:'🎙️ 实时语音口译', conf_trans_tab:'🏢 会议模式',
     my_lang_label:'📝 我的语言', peer_lang_label:'🌐 对方语言',
     doc_text_tab:'📝 直接输入文本', doc_file_tab:'📎 文档/音频文件', btn_reset:'🗑 重置',
+    // ── 유형 버튼 ──
+    work_type_directive:'⚡ 指示事项', work_type_request:'📋 请求事项',
+    cal_type_report:'📋 报告', cal_type_meeting:'💬 会议', cal_type_doc:'📝 文件编写',
+    cal_type_eval:'⭐ 评价', cal_type_const:'🔧 施工', cal_type_dinner:'🍻 聚餐',
+    cal_type_team:'🏃 组织活动', cal_type_monthly:'📢 月例会', cal_type_etc:'✏️ 其他/手动',
+    style_type_report:'📋 报告', style_type_directive:'⚡ 指示', style_type_share:'📢 共享',
+    style_font_concise:'简洁体', style_font_formal:'正式体', style_font_soft:'柔和体',
+    style_font_direct:'直接指示体', style_font_polite:'恭敬体',
+    // ── 스킨 이름 ──
+    skin_dark_blue:'深蓝', skin_deep_navy:'深海蓝', skin_midnight:'午夜',
+    skin_dark_purple:'深紫', skin_dark_teal:'深青', skin_dark_slate:'岩石',
+    skin_dark_emerald:'翡翠', skin_dark_rose:'深玫瑰', skin_dark_amber:'琥珀', skin_charcoal:'炭灰',
+    skin_light_white:'纯白', skin_light_blue:'冰蓝', skin_light_sage:'鼠尾草绿',
+    skin_light_lavend:'薰衣草', skin_light_rose:'玫瑰粉', skin_light_amber:'奶油琥珀',
+    skin_light_teal:'薄荷青', skin_light_slate:'暖岩', skin_light_peach:'蜜桃橙', skin_light_gray:'摩登灰',
+    // ── 기타 공통 키 ──
+    ppt_settings_modal_title:'⚙️ PPT输出设置', ppt_output_fmt_label:'输出格式',
+    ppt_fmt_pptx:'📊 PPTX (PowerPoint)', ppt_fmt_docx:'📄 DOCX (Word文档)',
+    ppt_fmt_desc_pptx:'保存为商务演示文稿.pptx文件。',
+    ppt_fmt_desc_docx:'保存为可编辑的Word.docx文档。(报告/文档形式)',
+    ppt_slide_tmpl_label:'🎨 幻灯片模板',
+    ppt_tmpl_dark:'深色海军', ppt_tmpl_navy:'钴蓝', ppt_tmpl_clean:'简洁白',
+    ppt_tmpl_gray:'现代灰', ppt_tmpl_green:'翡翠绿', ppt_tmpl_purple:'深紫',
+    ppt_font_settings_label:'🔤 字体设置',
+    ppt_title_font_label:'标题字体', ppt_body_font_label:'正文字体',
+    ppt_title_size_label:'标题大小', ppt_body_size_label:'正文大小',
+    ppt_accent_color_label:'🎨 强调色',
+    ppt_layout_label:'布局样式',
+    ppt_layout_bullets:'标题+要点(默认)', ppt_layout_twocol:'标题+双列',
+    ppt_layout_textonly:'标题+正文', ppt_layout_section:'含章节分隔页',
+    ppt_body_tmpl_label:'📄 正文幻灯片模板',
+    ppt_btmpl_minimal:'简洁亮色', ppt_btmpl_tech:'技术暗色',
+    ppt_btmpl_formal:'企业正式', ppt_btmpl_warm:'暖色风格',
+    ppt_btmpl_data:'数据分析', ppt_btmpl_custom:'同封面',
+    ppt_arrange_label:'📐 版式布局', ppt_arrange_split:'↔ 左右各半 (50:50)',
+    ppt_arrange_full:'⬜ 全页宽布局 (Full)', ppt_arrange_topdown:'⬇ 上摘要+下要点',
+    settings_save_btn:'✅ 保存设置',
+    ppt_slide_label:'幻灯片', ppt_section_badge:'章节',
+    ppt_slide_title_ph:'幻灯片标题', ppt_slide_sub_ph:'副标题(可选)',
+    ppt_slide_bullets_ph:'要点(换行分隔)', ppt_no_title:'(无标题)',
+    cal_type_etc_ph:'例：团建、外部研讨会、个人日程等',
+    cal_detail_date:'日期', cal_detail_time:'时间', cal_detail_place:'地点',
+    cal_detail_worker:'负责人', cal_detail_no_info:'无详细信息',
+    cal_detail_deadline:'截止日', cal_detail_desc:'说明', cal_detail_sender:'发件人',
+    cal_detail_dept:'部门', cal_detail_directive_day:'指示日', cal_detail_due:'截止日',
+    cal_detail_reg_day:'登记日', cal_detail_no_title:'(无标题)',
+    cal_detail_mail_deadline:'📩 邮件截止',
+    cal_detail_done:'✅ 已处理完成。', cal_detail_pending:'⏳ 未处理。处理完成时请点击按钮。',
+    cal_detail_change_pend:'↩️ 改为未处理', cal_detail_mark_done:'✅ 处理完成',
+    cal_detail_edit:'✏️ 修改', cal_detail_delete:'🗑️ 删除', cal_detail_close:'✕ 关闭',
+    confirm_del_mail:'确定删除此分析邮件吗？', confirm_del_track:'确定删除此任务吗？',
+    confirm_del_style:'确定删除此文体数据吗？', confirm_del_calev:'确定删除此日程吗？',
+    confirm_del_fallback:'删除？', confirm_no_recovery:'无法恢复',
+    model_default_hint:'默认：分析=Gemini Pro / 文档=Claude / 翻译=GPT-4o',
+    api_key_btn_locked:'请先注册API密钥后使用',
+    status_proc_done:'已处理', status_proc_pend:'未处理',
+    weekly_mail_label:'邮件', weekly_empty:'无',
+    cal_done_tip:'处理完成', cal_pend_tip:'未处理', cal_directive_day_short:'指示日',
+    learn_verify_done:'学习验证完成',
+    learn_verify_count:'当前学习数据：<b style="color:#60a5fa;">${n}个</b>',
+    learn_verify_dist:'风格分布', learn_verify_avg:'平均正文长度：${n}字 / AI注入：最近50条',
+    learn_verify_state:'学习应用状态', learn_active:'已激活', learn_inactive:'已停用',
+    btn_edit_short:'✏️ 修改', btn_del_short:'🗑', learn_row_click_tip:'点击查看全文',
+    mail_acc_summary:'💡 Timothy AI核心摘要', mail_acc_guide:'📋 指示指南',
+    mail_acc_tracker_btn:'关联追踪', mail_acc_dept:'🏢 相关部门',
+    mail_acc_reply:'✉️ 推荐回复草稿', mail_reply_none:'(无)',
+    stt_acc_conclusion:'🎙️ 会议核心结论', stt_acc_no_conclusion:'无结论',
+    stt_tracker_reg:'注册追踪 (${n}件)', stt_no_actions:'无可注册的Action Item。',
+    stt_acc_dept:'🏢 相关部门应对方案', stt_acc_reply:'✉️ 推荐回复/后续通知草稿',
+    feedback_ph:'请输入修改请求、逻辑补强、搜索等。(Shift+Enter: 换行)',
+    feedback_fix_btn:'🔄 修改请求', feedback_logic_btn:'🧠 逻辑补强',
+    sag_step1:'🔍 分析中', sag_step2:'🌐 资料搜索中', sag_step3:'✍️ 正文反映中',
+    sag_searching:'搜索中...', sag_search_done:'✅ 搜索资料反映完成',
+    sag_logic_done:'✅ 逻辑补强完成', sag_fix_done:'✅ 修改完成',
+    file_reading:'读取中...', file_loading:'加载中...',
+    file_excel_converted:'(Excel转换完成)', file_excel_toast:'→ 文本转换完成。请开始分析。',
+    file_docx_converted:'(DOCX转换完成)', file_docx_toast:'→ 文本提取完成。请开始分析。',
+    paste_image_name:'粘贴图片', img_placeholder:'图片', img_attached_msg:'图片已附加',
+    stt_no_result:'无分析结果', stt_default_title:'会议分析结果',
+    stt_meeting_prefix:'会议', stt_task_type:'会议记录', stt_task_prefix:'会议',
+    pptx_making:'PPTX生成中...',
+    pptlib_error:'PptxGenJS库未加载。请检查网络连接。',
+    char_unit:'字',
+    toast_proc_done_changed:'✅ 已标记为处理完成。',
+    toast_proc_pend_changed:'↩️ 已改为未处理。',
+    // ── 캘린더/트래킹 동적 텍스트 ──
+    cal_due_label:'截止日',
+    stt_badge_label:'🎙️ STT',
+    work_type_label_지시:'指示', work_type_label_요청:'请求',
+    // ── 태스크 레이블 ──
+    lbl_task_analyze:'📊 AI分析',
+    lbl_task_write:'✉️ 文档撰写',
+    lbl_task_translate:'🌐 翻译/口译',
+    lbl_task_voice:'🎙️ 语音口译',
+    lbl_task_conf:'🏢 会议模式',
+    lbl_reset_default:'恢复默认值',
+    // ── API 키 라벨 ──
+    api_lbl_gemini:'🟦 Google Gemini (必须)',
+    api_lbl_openai:'🟩 OpenAI (GPT-4o, 翻译默认)',
+    api_lbl_anthropic:'🟧 Anthropic (Claude, 文档默认)',
+    api_lbl_deepl:'🌿 DeepL (高质量翻译, 可选)',
+    api_key_note:'* 无Gemini密钥则分析·翻译功能将停用。<br>* 无OpenAI·Claude密钥则自动切换至Gemini。<br>* DeepL Free密钥末尾带 <code style="color:#34d399;">:fx</code>（例：<code style="color:#34d399;">abc123:fx</code>）。<br>* 注册DeepL后，请在上方翻译/口译模型选择框中选择 🌿 DeepL。',
+    // ── collab 스타일 ──
+    collab_formal:'📋 正式体',
+    collab_direct:'⚡ 直接指示体',
+    collab_concise:'📌 简洁体',
+    collab_official:'📜 公式信函体',
+    collab_data:'📊 数据导向体',
+    collab_polite:'🤝 恭敬体',
+    ph_collab_content:'例：请求在5月20日前提交设备检查结果报告等',
   },
   EN: {
     tab_mail:'📩 Mail Analysis', tab_stt:'🎙️ STT Analysis',
@@ -3054,6 +3415,22 @@ const LANG_PACKS = {
     tracking_title:'📋 Task Tracking', weekly_title:'📆 Weekly Schedule',
     this_week:'This Week', next_week:'Next Week',
     ppt_run:'▶ Start Doc Design', ppt_settings:'⚙️ Format · Template · Font Settings',
+    ppt_manager_title:'📊 Document Auto Manager',
+    ppt_tab_new:'✨ Create New', ppt_tab_edit:'📂 Enhance Existing',
+    ppt_input_label:'Report Content / Outline Input',
+    ppt_input_ph:'Paste report content, meeting results, project status, etc.\nAI will automatically design the slide structure.',
+    ppt_upload_label:'Upload Existing PPT / Text File',
+    ppt_upload_hint:'Click or drag & drop a file',
+    ppt_edit_label:'Revision / Enhancement Request',
+    ppt_edit_ph:'e.g. Update slide 3 data, add conclusion slide, change tone to formal, etc.',
+    ppt_count_label:'Number of Slides',
+    ppt_style_check:'Apply learned writing style',
+    ppt_guide_title:'💡 Usage Guide',
+    ppt_guide_new:'Create New: Input content → Set count → Start design',
+    ppt_guide_edit:'Enhance: Upload file → Enter revision request → Start design',
+    ppt_guide_save:'After editing: Edit cards directly → Download with 💾 button',
+    ppt_empty_hint:'Enter content on the left and start PPT design.',
+    ppt_save_pptx:'💾 Save PPTX', ppt_save_docx:'📄 Save Word',
     mail_section_title:'✉️ AI Mail Briefing by Source',
     status_panel_title:'✅ Mail Processing Status',
     track_count_label:'Total',
@@ -3117,8 +3494,8 @@ const LANG_PACKS = {
     conf_tts_label:'🔊 Voice:',
     conf_summary_title:'📄 Meeting Summary',
     conf_copy_btn:'📄 Copy',
-    conf_mode_interp:'💡 <b style="color:#60a5fa;">Interpretation Mode</b>: Recognizes peer language and translates instantly. Earphones recommended.',
-    conf_mode_minutes:'📋 <b style="color:#34d399;">Minutes Mode</b>: Records speech as meeting notes without translation.',
+    conf_mode_interp:'💡 <b style="color:#60a5fa;">Interpretation Mode</b>: Recognizes <b style="color:#f59e0b;">{peer}</b> speech → translates to <b style="color:#10b981;">{my}</b>. Earphones recommended.',
+    conf_mode_minutes:'📋 <b style="color:#34d399;">Minutes Mode</b>: Records <b style="color:#60a5fa;">{my}</b> speech as meeting notes without translation.',
     login_status:'Not logged in', guest_name:'Guest',
     status_listening:'Listening...',
     status_analyzing:'AI Analysis in progress...',
@@ -3186,6 +3563,10 @@ const LANG_PACKS = {
     collab_gen_btn:'▶ Generate Custom Draft',
     trans_file_hint:'Upload Excel·Word·CSV·Image·PDF·TXT files',
     conf_mode_label:'💡 Conference Mode:',
+    trans_input_ph:'Enter text to translate or attach a file...',
+    trans_img_attached_hint:'🖼️ Image attached — Press Translate.',
+    trans_file_attached_hint:'File ${name} attached.\nPress Translate to analyze and translate the file.\nAdd any extra instructions here.',
+    trans_docx_copy_hint:'For docx files, please copy and paste the text directly.',
     conf_mode_desc:'Only captions detected in the peer language are shown. AI auto-summarizes the meeting when done.',
     conf_caption_title:'📋 Live Meeting Captions',
     theme_skin_title:'🎨 Theme Skin',
@@ -3216,7 +3597,20 @@ const LANG_PACKS = {
     sidebar_logo_main:'AI Assistant',
     user_dept_init:'Not logged in',
     api_key_notice_title:'API Key Not Registered',
+    api_registered_msg:'🔐 API Key registered.',
+    api_release_btn:'Remove',
+    api_register_btn:'Register',
+    login_prompt:'Log in to use the service',
+
     api_key_notice_desc:'⚙️ Register in Settings → API Settings.',
+    backup_section_title:'💾 Data Backup &amp; Restore',
+    backup_app_ver:'App Version',
+    backup_download_btn:'📥 Download Backup',
+    backup_restore_btn:'📤 Restore Backup',
+    backup_desc:'• Backup: Save emails, schedules, tasks, settings as JSON\n• Restore: Overwrite current data with backup file',
+    pwa_hint:'📲 Use like an app: Chrome menu ⋮ → \'Add to Home Screen\' to keep mic permission permanently.',
+    skin_count_note:'10 Dark · 10 Light',
+    api_note_main:'* Without Gemini key, analysis and translation are disabled.\n* Without OpenAI·Claude keys, Gemini is used as fallback.\n* DeepL Free key ends with :fx (e.g. abc123:fx).',
     loc_default:'📍 Current Location',
     nav_ppt_tooltip:'Under development — Coming soon', nav_ppt_label:'📊 Doc Auto Manager', nav_ppt_badge:'(Soon)',
     // ── JS Toasts ──
@@ -3270,6 +3664,27 @@ const LANG_PACKS = {
     toast_interp_cleared:'Interpretation log cleared.',
     toast_my_mic_start:'🎙️ My voice recognition started', toast_my_mic_stop:'⏸️ My voice recognition stopped',
     toast_peer_mic_stop:'⏸️ Peer voice recognition stopped', toast_conf_stop:'⏹ Conference mode stopped',
+    clipboard_image:'🖼️ Clipboard Image',
+    mail_banner_count:'📬 Mail Deadlines: ${n}',
+    cal_month_label:'${month} ${year}',
+    dp_title_label:'${month} ${year}',
+    del_all_styles_msg:'Delete <b style="color:#f43f5e;">all style learning data</b>?<br><span style="font-size:10px;color:#64748b;">Cannot be undone</span>',
+    trans_file_loaded:'📄 ${name} — Text loaded',
+    trans_file_attached:'📎 ${name} (${size}KB) — Auto-attached on translation',
+    trans_file_docx_warn:'⚠️ ${name} — For docx, copy-paste text is recommended',
+    trans_file_hint_short:'Image·PDF·txt·md supported',
+    conf_clear_confirm:'Delete all <b style="color:#f43f5e;">${n}</b> meeting records?',
+    collab_gen_fail:'⚠️ Generation failed: ',
+    collab_fixing_btn:'⏳ Revising...',
+    voice_my_stop:'🇰🇷 Stop Recognition', voice_my_start_one:'🇰🇷 Start My Voice Interpretation', voice_my_start_both:'🇰🇷 My Voice',
+    voice_peer_stop:'🌐 Stop Recognition', voice_peer_start:'🌐 Peer Voice Recognition',
+    voice_status_my:'🇰🇷 Recognizing my voice', voice_status_peer:'🌐 Recognizing peer voice',
+    lbl_date_pick:'Select Date', lbl_time_pick:'Select Time',
+    err_api_400:'Invalid API Key or malformed request.', err_api_401:'API Key authorization failed.',
+    err_api_429:'API quota exceeded. Please try again later.', err_api_500:'Gemini server error. Please try again.',
+    err_network:'Please check your network connection.',
+    track_total_count:'${n} total', ppt_slide_count:'(${n} ${unit})',
+    status_api_missing:'API Key not registered', status_processing_btn:'Processing...',
     toast_summary_making:'📄 Summarizing meeting minutes...', toast_action_items_ok:'✅ ${n} action item(s) added to tracker.',
     toast_no_action_items:'No action items to register.', toast_analyze_ok:'✅ Analysis complete',
     toast_analyze_fail:'⚠️ Analysis failed: ', toast_stt_ok:'✅ STT analysis complete · Cards generated',
@@ -3285,6 +3700,115 @@ const LANG_PACKS = {
     doc_trans_tab:'📄 Doc/Text Translation', voice_trans_tab:'🎙️ Live Voice Interpretation', conf_trans_tab:'🏢 Conference Mode',
     my_lang_label:'📝 My Language', peer_lang_label:'🌐 Peer Language',
     doc_text_tab:'📝 Type Text Directly', doc_file_tab:'📎 Doc/Audio File', btn_reset:'🗑 Reset',
+    // ── 유형 버튼 ──
+    work_type_directive:'⚡ Directive', work_type_request:'📋 Request',
+    cal_type_report:'📋 Report', cal_type_meeting:'💬 Meeting', cal_type_doc:'📝 Document',
+    cal_type_eval:'⭐ Review', cal_type_const:'🔧 Construction', cal_type_dinner:'🍻 Dinner',
+    cal_type_team:'🏃 Team Activity', cal_type_monthly:'📢 Monthly Meeting', cal_type_etc:'✏️ Other/Manual',
+    style_type_report:'📋 Report', style_type_directive:'⚡ Directive', style_type_share:'📢 Share',
+    style_font_concise:'Concise', style_font_formal:'Formal', style_font_soft:'Soft',
+    style_font_direct:'Direct', style_font_polite:'Polite',
+    // ── 스킨 이름 ──
+    skin_dark_blue:'Dark Blue', skin_deep_navy:'Deep Navy', skin_midnight:'Midnight',
+    skin_dark_purple:'Dark Purple', skin_dark_teal:'Dark Teal', skin_dark_slate:'Slate',
+    skin_dark_emerald:'Emerald', skin_dark_rose:'Dark Rose', skin_dark_amber:'Amber', skin_charcoal:'Charcoal',
+    skin_light_white:'Pure White', skin_light_blue:'Ice Blue', skin_light_sage:'Sage Green',
+    skin_light_lavend:'Lavender', skin_light_rose:'Rose Pink', skin_light_amber:'Cream Amber',
+    skin_light_teal:'Mint Teal', skin_light_slate:'Warm Slate', skin_light_peach:'Peach Orange', skin_light_gray:'Modern Gray',
+    // ── 기타 공통 키 ──
+    ppt_settings_modal_title:'⚙️ PPT Output Settings', ppt_output_fmt_label:'Output Format',
+    ppt_fmt_pptx:'📊 PPTX (PowerPoint)', ppt_fmt_docx:'📄 DOCX (Word Document)',
+    ppt_fmt_desc_pptx:'Save as .pptx file for business presentation.',
+    ppt_fmt_desc_docx:'Save as editable Word .docx document. (Report/Document format)',
+    ppt_slide_tmpl_label:'🎨 Slide Template',
+    ppt_tmpl_dark:'Dark Navy', ppt_tmpl_navy:'Cobalt Blue', ppt_tmpl_clean:'Clean White',
+    ppt_tmpl_gray:'Modern Gray', ppt_tmpl_green:'Emerald', ppt_tmpl_purple:'Deep Purple',
+    ppt_font_settings_label:'🔤 Font Settings',
+    ppt_title_font_label:'Title Font', ppt_body_font_label:'Body Font',
+    ppt_title_size_label:'Title Size', ppt_body_size_label:'Body Size',
+    ppt_accent_color_label:'🎨 Accent Color', ppt_layout_label:'Layout Style',
+    ppt_layout_bullets:'Title + Bullets (Default)', ppt_layout_twocol:'Title + 2 Columns',
+    ppt_layout_textonly:'Title + Body Text', ppt_layout_section:'Include Section Slides',
+    ppt_body_tmpl_label:'📄 Body Slide Template',
+    ppt_btmpl_minimal:'Minimal Light', ppt_btmpl_tech:'Technical Dark',
+    ppt_btmpl_formal:'Corporate Formal', ppt_btmpl_warm:'Warm Style',
+    ppt_btmpl_data:'Data Analysis', ppt_btmpl_custom:'Match Cover',
+    ppt_arrange_label:'📐 Layout Arrangement', ppt_arrange_split:'↔ 50:50 Split',
+    ppt_arrange_full:'⬜ Full Width (Full)', ppt_arrange_topdown:'⬇ Summary Top + Bullets',
+    settings_save_btn:'✅ Save Settings',
+    ppt_slide_label:'Slide', ppt_section_badge:'Section',
+    ppt_slide_title_ph:'Slide Title', ppt_slide_sub_ph:'Subtitle (Optional)',
+    ppt_slide_bullets_ph:'Bullet Points (newline separated)', ppt_no_title:'(No Title)',
+    cal_type_etc_ph:'e.g. Team building, seminar, personal schedule, etc.',
+    cal_detail_date:'Date', cal_detail_time:'Time', cal_detail_place:'Location',
+    cal_detail_worker:'Assignee', cal_detail_no_info:'No details',
+    cal_detail_deadline:'Due Date', cal_detail_desc:'Description', cal_detail_sender:'Sender',
+    cal_detail_dept:'Dept', cal_detail_directive_day:'Start Date', cal_detail_due:'Due Date',
+    cal_detail_reg_day:'Registered', cal_detail_no_title:'(No Title)',
+    cal_detail_mail_deadline:'📩 Mail Deadline',
+    cal_detail_done:'✅ This item has been processed.', cal_detail_pending:'⏳ Pending. Click button when done.',
+    cal_detail_change_pend:'↩️ Mark as Pending', cal_detail_mark_done:'✅ Mark as Done',
+    cal_detail_edit:'✏️ Edit', cal_detail_delete:'🗑️ Delete', cal_detail_close:'✕ Close',
+    confirm_del_mail:'Delete this analyzed mail?', confirm_del_track:'Delete this task?',
+    confirm_del_style:'Delete this style data?', confirm_del_calev:'Delete this event?',
+    confirm_del_fallback:'Delete?', confirm_no_recovery:'Cannot be undone',
+    model_default_hint:'Default: Analysis=Gemini Pro / Write=Claude / Translate=GPT-4o',
+    api_key_btn_locked:'Register API key to use this feature',
+    status_proc_done:'Done', status_proc_pend:'Pending',
+    weekly_mail_label:'Mail', weekly_empty:'None',
+    cal_done_tip:'Completed', cal_pend_tip:'Pending', cal_directive_day_short:'Start',
+    learn_verify_done:'Learning Verified',
+    learn_verify_count:'Current data: <b style="color:#60a5fa;">${n} items</b>',
+    learn_verify_dist:'Style Distribution', learn_verify_avg:'Avg body length: ${n} chars / Injected: last 50',
+    learn_verify_state:'Learning Status', learn_active:'Active', learn_inactive:'Inactive',
+    btn_edit_short:'✏️ Edit', btn_del_short:'🗑', learn_row_click_tip:'Click to view full content',
+    mail_acc_summary:'💡 Timothy AI Key Summary', mail_acc_guide:'📋 Action Guide',
+    mail_acc_tracker_btn:'Link Tracker', mail_acc_dept:'🏢 Related Depts',
+    mail_acc_reply:'✉️ Suggested Reply Draft', mail_reply_none:'(None)',
+    stt_acc_conclusion:'🎙️ Meeting Key Conclusions', stt_acc_no_conclusion:'No conclusions',
+    stt_tracker_reg:'Register to Tracker (${n})', stt_no_actions:'No Action Items to register.',
+    stt_acc_dept:'🏢 Dept Response Plan', stt_acc_reply:'✉️ Suggested Reply / Follow-up Draft',
+    feedback_ph:'Enter edit request, logic boost, or search. (Shift+Enter: newline)',
+    feedback_fix_btn:'🔄 Edit Request', feedback_logic_btn:'🧠 Logic Boost',
+    sag_step1:'🔍 Analyzing', sag_step2:'🌐 Searching', sag_step3:'✍️ Applying',
+    sag_searching:'Searching...', sag_search_done:'✅ Search results applied',
+    sag_logic_done:'✅ Logic boost complete', sag_fix_done:'✅ Edit complete',
+    file_reading:'Reading...', file_loading:'Loading...',
+    file_excel_converted:'(Excel converted)', file_excel_toast:'→ Text conversion done. Start analysis.',
+    file_docx_converted:'(DOCX converted)', file_docx_toast:'→ Text extraction done. Start analysis.',
+    paste_image_name:'Pasted Image', img_placeholder:'Image', img_attached_msg:'Image attached',
+    stt_no_result:'No analysis result', stt_default_title:'Meeting Analysis',
+    stt_meeting_prefix:'Meeting', stt_task_type:'Minutes', stt_task_prefix:'Meeting',
+    pptx_making:'Generating PPTX...',
+    pptlib_error:'PptxGenJS library not loaded. Check internet connection.',
+    char_unit:'chars',
+    toast_proc_done_changed:'✅ Marked as done.',
+    toast_proc_pend_changed:'↩️ Marked as pending.',
+    // ── 캘린더/트래킹 동적 텍스트 ──
+    cal_due_label:'Due',
+    stt_badge_label:'🎙️ STT',
+    work_type_label_지시:'Directive', work_type_label_요청:'Request',
+    // ── 태스크 레이블 ──
+    lbl_task_analyze:'📊 AI Analysis',
+    lbl_task_write:'✉️ Doc Writing',
+    lbl_task_translate:'🌐 Translate/Interpret',
+    lbl_task_voice:'🎙️ Voice Interpret',
+    lbl_task_conf:'🏢 Conference Mode',
+    lbl_reset_default:'Reset to Default',
+    // ── API 키 라벨 ──
+    api_lbl_gemini:'🟦 Google Gemini (Required)',
+    api_lbl_openai:'🟩 OpenAI (GPT-4o, Translation Default)',
+    api_lbl_anthropic:'🟧 Anthropic (Claude, Writing Default)',
+    api_lbl_deepl:'🌿 DeepL (High-Quality Translation, Optional)',
+    api_key_note:'* Without Gemini key, analysis & translation are disabled.<br>* Without OpenAI/Claude key, Gemini is used as fallback.<br>* DeepL Free keys end with <code style="color:#34d399;">:fx</code> (e.g. <code style="color:#34d399;">abc123:fx</code>).<br>* After registering DeepL, select 🌿 DeepL in the translation model selector.',
+    // ── collab 스타일 ──
+    collab_formal:'📋 Formal',
+    collab_direct:'⚡ Direct Directive',
+    collab_concise:'📌 Concise',
+    collab_official:'📜 Official Letter',
+    collab_data:'📊 Data-Driven',
+    collab_polite:'🤝 Polite',
+    ph_collab_content:'e.g. Request equipment inspection report by May 20, etc.',
   },
   JA: {
     tab_mail:'📩 メール分析', tab_stt:'🎙️ STT音声分析',
@@ -3305,6 +3829,22 @@ const LANG_PACKS = {
     tracking_title:'📋 タスクトラッキング', weekly_title:'📆 週間スケジュール',
     this_week:'今週', next_week:'来週',
     ppt_run:'▶ 文書設計開始', ppt_settings:'⚙️ 出力形式・テンプレート・フォント設定',
+    ppt_manager_title:'📊 文書自動マネージャー',
+    ppt_tab_new:'✨ 新規作成', ppt_tab_edit:'📂 既存ファイル補完',
+    ppt_input_label:'報告書原文 / 概要入力',
+    ppt_input_ph:'報告書の内容、会議結果、プロジェクト状況などを貼り付けてください。\nAIがスライド構造を自動設計します。',
+    ppt_upload_label:'既存PPT / テキストファイルアップロード',
+    ppt_upload_hint:'クリックまたはファイルをドラッグ＆ドロップ',
+    ppt_edit_label:'補完/修正依頼事項',
+    ppt_edit_ph:'例：3枚目データ更新、結論スライド追加、全体トーンを格式体に変更など',
+    ppt_count_label:'スライド枚数',
+    ppt_style_check:'学習した文体スタイルを反映',
+    ppt_guide_title:'💡 使用ガイド',
+    ppt_guide_new:'新規作成：原文入力 → 枚数設定 → 設計開始',
+    ppt_guide_edit:'既存補完：ファイルアップロード → 修正依頼入力 → 設計開始',
+    ppt_guide_save:'編集後保存：右側カードテキスト直接編集 → 💾 ボタンでダウンロード',
+    ppt_empty_hint:'左側に内容を入力してPPT設計を開始してください。',
+    ppt_save_pptx:'💾 PPTX保存', ppt_save_docx:'📄 Word保存',
     mail_section_title:'✉️ AI受信メール発信元別ブリーフィング',
     status_panel_title:'✅ メール処理状況',
     track_count_label:'合計',
@@ -3368,8 +3908,8 @@ const LANG_PACKS = {
     conf_tts_label:'🔊 翻訳音声:',
     conf_summary_title:'📄 議事録 AI 要約',
     conf_copy_btn:'📄 コピー',
-    conf_mode_interp:'💡 <b style="color:#60a5fa;">通訳モード</b>: 相手の言語を認識して即座に翻訳します。イヤホン着用を推奨します。',
-    conf_mode_minutes:'📋 <b style="color:#34d399;">議事録モード</b>: 翻訳なしで発話内容を議事録としてまとめます。',
+    conf_mode_interp:'💡 <b style="color:#60a5fa;">通訳モード</b>: <b style="color:#f59e0b;">{peer}</b>の発話を <b style="color:#10b981;">{my}</b>に翻訳します。イヤホン着用推奨。',
+    conf_mode_minutes:'📋 <b style="color:#34d399;">議事録モード</b>: <b style="color:#60a5fa;">{my}</b>の発話を翻訳なしで議事録としてまとめます。',
     login_status:'ログイン前', guest_name:'Guest',
     status_listening:'認識中...',
     status_analyzing:'AI分析進行中...',
@@ -3437,6 +3977,10 @@ const LANG_PACKS = {
     collab_gen_btn:'▶ カスタム草稿生成',
     trans_file_hint:'Excel·Word·CSV·画像·PDFのアップロード可',
     conf_mode_label:'💡 会議モード:',
+    trans_input_ph:'翻訳するテキストを入力またはファイルを添付してください...',
+    trans_img_attached_hint:'🖼️ 画像を添付しました — 翻訳ボタンを押してください。',
+    trans_file_attached_hint:'ファイル ${name} を添付しました。\n翻訳ボタンを押すとファイル内容を分析・翻訳します。\n追加指示があればここに入力してください。',
+    trans_docx_copy_hint:'docxファイルは内容を直接コピー貼り付けしてください。',
     conf_mode_desc:'相手言語で検出された発話のみ字幕表示。終了時AIが議事録を自動要約します。',
     conf_caption_title:'📋 リアルタイム会議字幕',
     theme_skin_title:'🎨 テーマスキン',
@@ -3467,7 +4011,20 @@ const LANG_PACKS = {
     sidebar_logo_main:'AI アシスタント',
     user_dept_init:'ログイン前',
     api_key_notice_title:'APIキー未登録',
+    api_registered_msg:'🔐 APIキーが登録されました。',
+    api_release_btn:'解除',
+    api_register_btn:'登録',
+    login_prompt:'ログインしてサービスをご利用ください',
+
     api_key_notice_desc:'⚙️ 設定 → API設定で登録してください。',
+    backup_section_title:'💾 データバックアップ &amp; 復元',
+    backup_app_ver:'アプリバージョン',
+    backup_download_btn:'📥 バックアップダウンロード',
+    backup_restore_btn:'📤 バックアップ復元',
+    backup_desc:'• バックアップ：分析メール・日程・業務・設定をJSONで保存\n• 復元：既存データをバックアップファイルで上書き',
+    pwa_hint:'📲 アプリとして使用：Chromeメニュー ⋮ → \'ホーム画面に追加\'でマイク権限が永続的に維持されます。',
+    skin_count_note:'ダーク10種 · ライト10種',
+    api_note_main:'* Geminiキーがないと分析・翻訳機能が無効になります。\n* OpenAI·Claudeキーがない場合はGeminiで自動代替実行されます。\n* DeepL Freeキーは末尾に:fxが付きます（例：abc123:fx）。',
     loc_default:'📍 現在地',
     nav_ppt_tooltip:'アップグレード中 — まもなく公開', nav_ppt_label:'📊 文書自動マネージャー', nav_ppt_badge:'(予定)',
     // ── JS 토스트 ──
@@ -3521,6 +4078,27 @@ const LANG_PACKS = {
     toast_interp_cleared:'通訳記録をリセットしました。',
     toast_my_mic_start:'🎙️ 自分の音声認識開始', toast_my_mic_stop:'⏸️ 自分の音声認識停止',
     toast_peer_mic_stop:'⏸️ 相手の音声認識停止', toast_conf_stop:'⏹ 会議モード停止',
+    clipboard_image:'🖼️ クリップボード画像',
+    mail_banner_count:'📬 メール日程 ${n}件',
+    cal_month_label:'${year}年${month}月',
+    dp_title_label:'${year}年${month}月',
+    del_all_styles_msg:'保存された<b style="color:#f43f5e;">すべての文体学習データ</b>を削除しますか？<br><span style="font-size:10px;color:#64748b;">復元不可</span>',
+    trans_file_loaded:'📄 ${name} — テキスト読み込み完了',
+    trans_file_attached:'📎 ${name} (${size}KB) — 翻訳時に自動添付',
+    trans_file_docx_warn:'⚠️ ${name} — docxはテキストのコピー貼り付けを推奨',
+    trans_file_hint_short:'画像·PDF·txt·mdアップロード可',
+    conf_clear_confirm:'会議記録 <b style="color:#f43f5e;">${n}件</b>をすべて削除しますか？',
+    collab_gen_fail:'⚠️ 生成失敗：',
+    collab_fixing_btn:'⏳ 修正中...',
+    voice_my_stop:'🇰🇷 認識停止', voice_my_start_one:'🇰🇷 自分の音声通訳開始', voice_my_start_both:'🇰🇷 自分の音声',
+    voice_peer_stop:'🌐 認識停止', voice_peer_start:'🌐 相手の音声認識',
+    voice_status_my:'🇰🇷 自分の音声認識中', voice_status_peer:'🌐 相手の音声認識中',
+    lbl_date_pick:'日付選択', lbl_time_pick:'時間選択',
+    err_api_400:'APIキーが不正またはリクエスト形式エラーです。', err_api_401:'APIキー権限エラーです。キーをご確認ください。',
+    err_api_429:'API呼び出し制限を超えました。しばらくしてから再試行してください。', err_api_500:'Geminiサーバーエラーです。しばらくしてから再試行してください。',
+    err_network:'ネットワーク接続を確認してください。',
+    track_total_count:'合計 ${n}件', ppt_slide_count:'(${n}${unit})',
+    status_api_missing:'APIキー未登録', status_processing_btn:'処理中...',
     toast_summary_making:'📄 AI議事録要約中...', toast_action_items_ok:'✅ ${n}件のアクションアイテムをトラッカーに登録しました。',
     toast_no_action_items:'登録できるアクションアイテムがありません。', toast_analyze_ok:'✅ 分析完了',
     toast_analyze_fail:'⚠️ 分析失敗：', toast_stt_ok:'✅ STT深度分析完了・結果カード生成済み',
@@ -3536,6 +4114,115 @@ const LANG_PACKS = {
     doc_trans_tab:'📄 文書/テキスト翻訳', voice_trans_tab:'🎙️ リアルタイム音声通訳', conf_trans_tab:'🏢 会議モード',
     my_lang_label:'📝 自分の言語', peer_lang_label:'🌐 相手の言語',
     doc_text_tab:'📝 テキスト直接入力', doc_file_tab:'📎 文書/音声ファイル', btn_reset:'🗑 リセット',
+    // ── 유형 버튼 ──
+    work_type_directive:'⚡ 指示事項', work_type_request:'📋 依頼事項',
+    cal_type_report:'📋 報告', cal_type_meeting:'💬 会議', cal_type_doc:'📝 文書作成',
+    cal_type_eval:'⭐ 評価', cal_type_const:'🔧 工事', cal_type_dinner:'🍻 会食',
+    cal_type_team:'🏃 組織強化', cal_type_monthly:'📢 月例朝礼', cal_type_etc:'✏️ その他/手記',
+    style_type_report:'📋 報告', style_type_directive:'⚡ 指示', style_type_share:'📢 共有',
+    style_font_concise:'簡潔体', style_font_formal:'格式体', style_font_soft:'柔らか体',
+    style_font_direct:'直接指示体', style_font_polite:'丁寧体',
+    // ── 스킨 이름 ──
+    skin_dark_blue:'ダークブルー', skin_deep_navy:'ディープネイビー', skin_midnight:'ミッドナイト',
+    skin_dark_purple:'ダークパープル', skin_dark_teal:'ダークティール', skin_dark_slate:'スレート',
+    skin_dark_emerald:'エメラルド', skin_dark_rose:'ダークローズ', skin_dark_amber:'アンバー', skin_charcoal:'チャコール',
+    skin_light_white:'ピュアホワイト', skin_light_blue:'アイスブルー', skin_light_sage:'セージグリーン',
+    skin_light_lavend:'ラベンダー', skin_light_rose:'ローズピンク', skin_light_amber:'クリームアンバー',
+    skin_light_teal:'ミントティール', skin_light_slate:'ウォームスレート', skin_light_peach:'ピーチオレンジ', skin_light_gray:'モダングレー',
+    // ── 기타 공통 키 ──
+    ppt_settings_modal_title:'⚙️ PPT出力設定', ppt_output_fmt_label:'出力形式',
+    ppt_fmt_pptx:'📊 PPTX (PowerPoint)', ppt_fmt_docx:'📄 DOCX (Wordドキュメント)',
+    ppt_fmt_desc_pptx:'ビジネスプレゼンテーション用.pptxファイルで保存。',
+    ppt_fmt_desc_docx:'編集可能なWord.docxドキュメントで保存。(レポート/文書形式)',
+    ppt_slide_tmpl_label:'🎨 スライドテンプレート',
+    ppt_tmpl_dark:'ダークネイビー', ppt_tmpl_navy:'コバルトブルー', ppt_tmpl_clean:'クリーンホワイト',
+    ppt_tmpl_gray:'モダングレー', ppt_tmpl_green:'エメラルド', ppt_tmpl_purple:'ディープパープル',
+    ppt_font_settings_label:'🔤 フォント設定',
+    ppt_title_font_label:'タイトルフォント', ppt_body_font_label:'本文フォント',
+    ppt_title_size_label:'タイトルサイズ', ppt_body_size_label:'本文サイズ',
+    ppt_accent_color_label:'🎨 アクセントカラー', ppt_layout_label:'レイアウトスタイル',
+    ppt_layout_bullets:'タイトル+箇条書き(デフォルト)', ppt_layout_twocol:'タイトル+2列',
+    ppt_layout_textonly:'タイトル+本文', ppt_layout_section:'セクション区切り含む',
+    ppt_body_tmpl_label:'📄 本文スライドテンプレート',
+    ppt_btmpl_minimal:'ミニマルライト', ppt_btmpl_tech:'テクニカルダーク',
+    ppt_btmpl_formal:'企業格式', ppt_btmpl_warm:'ウォームスタイル',
+    ppt_btmpl_data:'データ分析', ppt_btmpl_custom:'表紙と同じ',
+    ppt_arrange_label:'📐 レイアウト配置', ppt_arrange_split:'↔ 左右均等 (50:50)',
+    ppt_arrange_full:'⬜ 全ページ幅 (Full)', ppt_arrange_topdown:'⬇ 上要約+下箇条書き',
+    settings_save_btn:'✅ 設定保存',
+    ppt_slide_label:'スライド', ppt_section_badge:'セクション',
+    ppt_slide_title_ph:'スライドタイトル', ppt_slide_sub_ph:'サブタイトル(任意)',
+    ppt_slide_bullets_ph:'箇条書き(改行区切り)', ppt_no_title:'(タイトルなし)',
+    cal_type_etc_ph:'例：チームビルディング、外部セミナー、個人日程など',
+    cal_detail_date:'日付', cal_detail_time:'時間', cal_detail_place:'場所',
+    cal_detail_worker:'担当者', cal_detail_no_info:'詳細情報なし',
+    cal_detail_deadline:'納期日', cal_detail_desc:'説明', cal_detail_sender:'送信者',
+    cal_detail_dept:'部署', cal_detail_directive_day:'指示日', cal_detail_due:'納期日',
+    cal_detail_reg_day:'登録日', cal_detail_no_title:'(タイトルなし)',
+    cal_detail_mail_deadline:'📩 メール期限',
+    cal_detail_done:'✅ 処理完了状態です。', cal_detail_pending:'⏳ 未処理です。完了したらボタンを押してください。',
+    cal_detail_change_pend:'↩️ 未処理に変更', cal_detail_mark_done:'✅ 処理完了',
+    cal_detail_edit:'✏️ 修正', cal_detail_delete:'🗑️ 削除', cal_detail_close:'✕ 閉じる',
+    confirm_del_mail:'この分析メールを削除しますか？', confirm_del_track:'このタスクを削除しますか？',
+    confirm_del_style:'この文体データを削除しますか？', confirm_del_calev:'この日程を削除しますか？',
+    confirm_del_fallback:'削除？', confirm_no_recovery:'復元不可',
+    model_default_hint:'デフォルト：分析=Gemini Pro / 作成=Claude / 翻訳=GPT-4o',
+    api_key_btn_locked:'APIキー登録後に使用可能です',
+    status_proc_done:'処理済', status_proc_pend:'未処理',
+    weekly_mail_label:'メール', weekly_empty:'なし',
+    cal_done_tip:'処理完了', cal_pend_tip:'未処理', cal_directive_day_short:'指示日',
+    learn_verify_done:'学習検証完了',
+    learn_verify_count:'現在の学習データ：<b style="color:#60a5fa;">${n}件</b>',
+    learn_verify_dist:'スタイル分布', learn_verify_avg:'平均本文長：${n}字 / AI注入：最新50件',
+    learn_verify_state:'学習適用状態', learn_active:'有効', learn_inactive:'無効',
+    btn_edit_short:'✏️ 修正', btn_del_short:'🗑', learn_row_click_tip:'クリックして全文を表示',
+    mail_acc_summary:'💡 Timothy AI要旨', mail_acc_guide:'📋 指示ガイド',
+    mail_acc_tracker_btn:'トラッカー連動', mail_acc_dept:'🏢 関連部署',
+    mail_acc_reply:'✉️ 推奨返信草稿', mail_reply_none:'(なし)',
+    stt_acc_conclusion:'🎙️ 会議核心結論', stt_acc_no_conclusion:'結論なし',
+    stt_tracker_reg:'トラッカー登録 (${n}件)', stt_no_actions:'登録できるAction Itemがありません。',
+    stt_acc_dept:'🏢 関連部署別対応方案', stt_acc_reply:'✉️ 推奨返信/後続案内草稿',
+    feedback_ph:'修正依頼・論理補強・検索など自由入力。(Shift+Enter: 改行)',
+    feedback_fix_btn:'🔄 修正依頼', feedback_logic_btn:'🧠 論理補強',
+    sag_step1:'🔍 分析中', sag_step2:'🌐 資料検索中', sag_step3:'✍️ 本文反映中',
+    sag_searching:'検索中...', sag_search_done:'✅ 検索結果反映完了',
+    sag_logic_done:'✅ 論理補強完了', sag_fix_done:'✅ 修正完了',
+    file_reading:'読込中...', file_loading:'ロード中...',
+    file_excel_converted:'(Excel変換済)', file_excel_toast:'→ テキスト変換完了。分析を開始してください。',
+    file_docx_converted:'(DOCX変換済)', file_docx_toast:'→ テキスト抽出完了。分析を開始してください。',
+    paste_image_name:'貼り付け画像', img_placeholder:'画像', img_attached_msg:'画像添付済',
+    stt_no_result:'分析結果なし', stt_default_title:'会議分析結果',
+    stt_meeting_prefix:'会議', stt_task_type:'議事録', stt_task_prefix:'会議',
+    pptx_making:'PPTX生成中...',
+    pptlib_error:'PptxGenJSライブラリが読み込まれていません。インターネット接続を確認してください。',
+    char_unit:'文字',
+    toast_proc_done_changed:'✅ 処理完了に変更しました。',
+    toast_proc_pend_changed:'↩️ 未処理に変更しました。',
+    // ── 캘린더/트래킹 동적 텍스트 ──
+    cal_due_label:'納期',
+    stt_badge_label:'🎙️ STT',
+    work_type_label_지시:'指示', work_type_label_요청:'依頼',
+    // ── 태스크 레이블 ──
+    lbl_task_analyze:'📊 AI分析',
+    lbl_task_write:'✉️ 文書作成',
+    lbl_task_translate:'🌐 翻訳/通訳',
+    lbl_task_voice:'🎙️ 音声通訳',
+    lbl_task_conf:'🏢 会議モード',
+    lbl_reset_default:'デフォルトに戻す',
+    // ── API 키 라벨 ──
+    api_lbl_gemini:'🟦 Google Gemini (必須)',
+    api_lbl_openai:'🟩 OpenAI (GPT-4o, 翻訳デフォルト)',
+    api_lbl_anthropic:'🟧 Anthropic (Claude, 文書デフォルト)',
+    api_lbl_deepl:'🌿 DeepL (高品質翻訳, 任意)',
+    api_key_note:'* Geminiキーがないと分析・翻訳機能が無効になります。<br>* OpenAI・Claudeキーがない場合はGeminiで自動代替されます。<br>* DeepL Freeキーは末尾に <code style="color:#34d399;">:fx</code> が付きます（例：<code style="color:#34d399;">abc123:fx</code>）。<br>* DeepL登録後、翻訳/通訳モデル選択で 🌿 DeepL を選んでください。',
+    // ── collab 스타일 ──
+    collab_formal:'📋 格式体',
+    collab_direct:'⚡ 直接指示体',
+    collab_concise:'📌 簡潔体',
+    collab_official:'📜 公式書簡体',
+    collab_data:'📊 データ中心体',
+    collab_polite:'🤝 丁寧体',
+    ph_collab_content:'例：5月20日までに設備点検結果の報告を依頼する等',
   }
 };
 
@@ -3998,13 +4685,13 @@ function closeModal(id){document.getElementById(id).classList.remove('open');}
 // ══════════════════════════════
 function confirmDelete(type, idx, id){
   const msgs={
-    mail:  '이 분석 메일을 삭제하시겠습니까?',
-    track: '이 업무를 삭제하시겠습니까?',
-    style: '이 문체 데이터를 삭제하시겠습니까?',
-    calev: '이 일정을 삭제하시겠습니까?'
+    mail:  t('confirm_del_mail'),
+    track: t('confirm_del_track'),
+    style: t('confirm_del_style'),
+    calev: t('confirm_del_calev')
   };
   document.getElementById('confirmMsg').innerHTML =
-    (msgs[type]||'삭제?') + '<br><span style="font-size:10px;color:#f43f5e;">복구 불가</span>';
+    (msgs[type]||t('confirm_del_fallback')) + '<br><span style="font-size:10px;color:#f43f5e;">' + t('confirm_no_recovery') + '</span>';
 
   document.getElementById('confirmYesBtn').onclick = ()=>{
     if(type==='mail'){
@@ -4057,7 +4744,7 @@ function handleFileSelection(e){
   const f = e.target.files[0];
   if(!f) return;
   const badge = document.getElementById('fileNameBadge');
-  badge.innerText = f.name + ' 읽는 중...';
+  badge.innerText = f.name + ' ' + t('file_reading');
   fileAttachmentData = null;
 
   const ext  = f.name.split('.').pop().toLowerCase();
@@ -4106,7 +4793,7 @@ function handleFileSelection(e){
       r.readAsArrayBuffer(f);
     };
     if(typeof XLSX === 'undefined'){
-      badge.innerText = f.name + ' 로딩...';
+      badge.innerText = f.name + ' ' + t('file_loading');
       const scr = document.createElement('script');
       scr.src = 'https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js';
       scr.onload  = loadAndRead;
@@ -4197,8 +4884,8 @@ function readExcel(file, badge){
       if(allText.length > 12000) allText = allText.slice(0, 12000) + '\n...(이하 생략)';
       document.getElementById('emailPasteInput').value = allText;
       fileAttachmentData = null;
-      badge.innerText = file.name + ' ✅ (Excel 변환됨)';
-      showToast(`📊 Excel "${file.name}" → 텍스트 변환 완료. 분석 시작하세요.`);
+      badge.innerText = file.name + ' ✅ ' + t('file_excel_converted');
+      showToast(`📊 Excel "${file.name}" ${t('file_excel_toast')}`);
     }catch(err){
       badge.innerText = file.name + ' ❌';
       showToast('⚠️ Excel: ' + err.message);
@@ -4217,8 +4904,8 @@ function readDocx(file, badge){
         document.getElementById('emailPasteInput').value =
           `【Word 문서: ${file.name}】\n${text}`;
         fileAttachmentData = null;
-        badge.innerText = file.name + ' ✅ (DOCX 변환됨)';
-        showToast(`📄 Word "${file.name}" → 텍스트 추출 완료. 분석 시작하세요.`);
+        badge.innerText = file.name + ' ✅ ' + t('file_docx_converted');
+        showToast(`📄 Word "${file.name}" ${t('file_docx_toast')}`);
       })
       .catch(err => {
         badge.innerText = file.name + ' ❌';
@@ -4346,18 +5033,18 @@ ${langOut}
     currentPage=1; openMailIdx=0;
     renderAll();
     area.value=''; fileAttachmentData=null;
-    document.getElementById('fileNameBadge').innerText='선택된 파일 없음';
+    document.getElementById('fileNameBadge').innerText=t('no_file');
     showToast(`✅ [${result.category}] ${t('toast_analyze_ok')}`);
 
   } catch(err){
     console.error('[메일 분석 오류]', err);
     // 사용자에게 구체적인 원인 표시
     let msg = err.message||'알 수 없는 오류';
-    if(msg.includes('400')) msg='API Key가 잘못됐거나 요청 형식 오류입니다.';
-    else if(msg.includes('401')||msg.includes('403')) msg='API Key 권한 오류입니다. Key를 확인해 주세요.';
-    else if(msg.includes('429')) msg='API 호출 한도 초과입니다. 잠시 후 다시 시도해 주세요.';
-    else if(msg.includes('500')||msg.includes('503')) msg='Gemini 서버 오류입니다. 잠시 후 다시 시도해 주세요.';
-    else if(msg.includes('Failed to fetch')||msg.includes('network')) msg='네트워크 연결을 확인해 주세요.';
+    if(msg.includes('400')) msg=t('err_api_400');
+    else if(msg.includes('401')||msg.includes('403')) msg=t('err_api_401');
+    else if(msg.includes('429')) msg=t('err_api_429');
+    else if(msg.includes('500')||msg.includes('503')) msg=t('err_api_500');
+    else if(msg.includes('Failed to fetch')||msg.includes('network')) msg=t('err_network');
     showToast(t('toast_analyze_fail')+msg);
   } finally{
     btn.disabled=false;
@@ -4495,7 +5182,7 @@ function insertSttResultCard(result){
   // summary_bullets 배열 or 구형 summary 문자열 통합 처리
   const summaryBullets = Array.isArray(result.summary_bullets) && result.summary_bullets.length > 0
     ? result.summary_bullets
-    : (result.summary ? [result.summary] : ['분석 결과 없음']);
+    : (result.summary ? [result.summary] : [t('stt_no_result')]);
 
   const actionItems = result.action_items || [];
   const deptReqs    = result.dept_requests || [];
@@ -4503,8 +5190,8 @@ function insertSttResultCard(result){
 
   const sttCard = {
     _type:        'stt',
-    subject:      `🎙️ [STT] ${result.title || '회의 분석 결과'}`,
-    sender:       `${result.participants ? result.participants + ' · ' : ''}회의 ${result.date || new Date().toLocaleDateString()}`,
+    subject:      `🎙️ [STT] ${result.title || t('stt_default_title')}`,
+    sender:       `${result.participants ? result.participants + ' · ' : ''}${t('stt_meeting_prefix')} ${result.date || new Date().toLocaleDateString()}`,
     category:     'GOC',
     deadlineDate: null,
     deadlineText: guide.due || '',
@@ -4540,8 +5227,8 @@ function registerMeetingActions(result){
   items.forEach(a => {
     tasks.unshift({
       id:        Date.now() + Math.random(),
-      type:      '회의록',
-      title:     `[회의] ${a.task}`,
+      type:      t('stt_task_type'),
+      title:     `[${t('stt_task_prefix')}] ${a.task}`,
       worker:    a.worker || '',
       dueDate:   a.due    || '',
       source:    'meeting',
@@ -4597,24 +5284,24 @@ function buildSttAccordion(m, gi){
   // ── ④ 추천 회신 초안 (reply_draft)
   const replyHtml = m.reply_draft
     ? `<div class="acc-sec" style="border-color:rgba(16,185,129,.25);background:rgba(16,185,129,.03);">
-         <div class="acc-lbl green">✉️ 추천 회신 / 후속 안내 초안
-           <button class="small-copy-btn" onclick="event.stopPropagation();cpSttReply(${gi})">📄 복사</button>
+         <div class="acc-lbl green">${t('stt_acc_reply')}
+           <button class="small-copy-btn" onclick="event.stopPropagation();cpSttReply(${gi})">${t('conf_copy_btn')}</button>
          </div>
          <p id="stt-reply-text-${gi}" style="white-space:pre-wrap;font-size:10px;color:#a7f3d0;line-height:1.75;">${m.reply_draft}</p>
          <!-- 피드백 루프 -->
          <div class="reply-feedback" style="margin-top:8px;">
            <textarea class="reply-feedback-input" id="stt-fb-input-${gi}" rows="2"
-             placeholder="수정 요청, 논리 보강, 검색 등을 자유롭게 입력하세요. (Shift+Enter: 줄바꿈)"
+             placeholder="${t('feedback_ph')}"
              onclick="event.stopPropagation()"
              onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();event.stopPropagation();handleAnalysisFeedback('auto','stt',${gi});}"></textarea>
            <div class="feedback-btn-row">
-             <button class="reply-feedback-btn" onclick="event.stopPropagation();handleAnalysisFeedback('auto','stt',${gi})">🔄 수정 요청</button>
-             <button class="logic-boost-btn" onclick="event.stopPropagation();handleAnalysisFeedback('logic','stt',${gi})">🧠 논리 보강</button>
+             <button class="reply-feedback-btn" onclick="event.stopPropagation();handleAnalysisFeedback('auto','stt',${gi})">${t('feedback_fix_btn')}</button>
+             <button class="logic-boost-btn" onclick="event.stopPropagation();handleAnalysisFeedback('logic','stt',${gi})">${t('feedback_logic_btn')}</button>
            </div>
            <div class="sag-steps" id="stt-sag-steps-${gi}">
-             <span class="sag-step" id="stt-sag-step1-${gi}">🔍 분석 중</span>
-             <span class="sag-step" id="stt-sag-step2-${gi}">🌐 자료 검색 중</span>
-             <span class="sag-step" id="stt-sag-step3-${gi}">✍️ 본문 반영 중</span>
+             <span class="sag-step" id="stt-sag-step1-${gi}">${t('sag_step1')}</span>
+             <span class="sag-step" id="stt-sag-step2-${gi}">${t('sag_step2')}</span>
+             <span class="sag-step" id="stt-sag-step3-${gi}">${t('sag_step3')}</span>
            </div>
          </div>
        </div>`
@@ -4624,28 +5311,28 @@ function buildSttAccordion(m, gi){
 
     <!-- ① 핵심 결론 상세 -->
     <div class="acc-sec" style="border-color:rgba(168,85,247,.25);">
-      <div class="acc-lbl" style="color:#a855f7;">🎙️ 회의 핵심 결론 및 결정사항</div>
-      ${summaryHtml || '<p style="color:#64748b;font-size:11px;">결론 없음</p>'}
+      <div class="acc-lbl" style="color:#a855f7;">${t('stt_acc_conclusion')}</div>
+      ${summaryHtml || `<p style="color:#64748b;font-size:11px;">${t('stt_acc_no_conclusion')}</p>`}
     </div>
 
     <!-- ② 지시 가이드 + Action Items -->
     <div class="acc-sec" style="border-color:rgba(168,85,247,.3);background:rgba(168,85,247,.02);">
-      <div class="acc-lbl" style="color:#a855f7;">📋 지시 가이드
+      <div class="acc-lbl" style="color:#a855f7;">${t('mail_acc_guide')}
         ${items.length ? `<button class="sync-btn" style="background:rgba(168,85,247,.15);color:#a855f7;border-color:rgba(168,85,247,.35);"
-          onclick="event.stopPropagation();registerMeetingActions(JSON.parse(decodeURIComponent('${encodedItems}')))">트래커 등록 (${items.length}건)</button>` : ''}
+          onclick="event.stopPropagation();registerMeetingActions(JSON.parse(decodeURIComponent('${encodedItems}'))">${t('stt_tracker_reg').replace('${n}', items.length)}</button>` : ''}
       </div>
       ${guide.worker || guide.due ? `<p style="font-weight:700;color:#a855f7;font-size:10px;margin-bottom:5px;">[${guide.worker||'-'} / ${guide.due||'-'}]</p>` : ''}
       ${guide.instruction ? `<p style="color:#e2e8f0;font-style:italic;font-size:11px;margin-bottom:8px;line-height:1.6;">"${guide.instruction}"</p>` : ''}
       ${items.length ? `
         <div style="font-size:10px;font-weight:bold;color:#94a3b8;margin-bottom:3px;">✅ Action Items</div>
         ${actionRows}
-      ` : '<p style="color:#64748b;font-size:11px;">등록된 Action Item이 없습니다.</p>'}
+      ` : `<p style="color:#64748b;font-size:11px;">${t('stt_no_actions')}</p>`}
     </div>
 
     <!-- ③ 유관부서 협조 -->
     ${deptReqs.length ? `
     <div class="acc-sec" style="border-color:rgba(168,85,247,.2);">
-      <div class="acc-lbl" style="color:#a855f7;">🏢 유관부서별 대응방안</div>
+      <div class="acc-lbl" style="color:#a855f7;">${t('stt_acc_dept')}</div>
       ${deptHtml}
     </div>` : ''}
 
@@ -4709,15 +5396,30 @@ function updateUI(){
     const val = pack[key];
     if(!val || val === key) return;
     // confirm_msg 처럼 HTML 태그 포함 키는 innerHTML 사용
-    if(key === 'confirm_msg') { el.innerHTML = val; }
-    else { el.innerText = val; }
+    if(key === 'confirm_msg' || key === 'api_key_note' || key === 'backup_desc' || key === 'pwa_hint') {
+      el.innerHTML = val;
+    } else { el.innerText = val; }
   });
 
   // 2. data-i18n-placeholder 순회 갱신
   document.querySelectorAll('[data-i18n-placeholder]').forEach(el=>{
     const key = el.getAttribute('data-i18n-placeholder');
     const val = pack[key];
-    if(val && val !== key) el.placeholder = val;
+    if(val && val !== key){
+      if(el.getAttribute('data-placeholder') !== undefined && el.contentEditable === 'true'){
+        // contenteditable div — data-placeholder 속성 갱신
+        el.setAttribute('data-placeholder', val);
+      } else {
+        el.placeholder = val;
+      }
+    }
+  });
+
+  // 2-b. data-i18n-title 순회 갱신 (tooltip 텍스트)
+  document.querySelectorAll('[data-i18n-title]').forEach(el=>{
+    const key = el.getAttribute('data-i18n-title');
+    const val = pack[key];
+    if(val && val !== key) el.title = val;
   });
 
   // 3. 동적 요소 — JS로 생성되는 텍스트 즉시 갱신
@@ -4769,6 +5471,19 @@ function updateUI(){
   else if(lang==='ZH'){ root.style.fontSize='100%'; root.style.lineHeight='1.45'; }
   else if(lang==='JA'){ root.style.fontSize='97%'; root.style.lineHeight='1.65'; }
   else { root.style.fontSize='100%'; root.style.lineHeight='1.6'; }
+
+  // 스킨 그리드 재렌더 (언어 변경 시 스킨 이름 즉시 갱신)
+  const skinGridEl = document.getElementById('skinGrid');
+  if(skinGridEl && skinGridEl.children.length > 0) renderSkinGrid();
+
+  // ★ TASK_LABELS 동적 갱신 (JS 상수이므로 updateUI에서 재할당)
+  if(typeof TASK_LABELS !== 'undefined'){
+    TASK_LABELS.analyze   = pack.lbl_task_analyze   || TASK_LABELS.analyze;
+    TASK_LABELS.write     = pack.lbl_task_write     || TASK_LABELS.write;
+    TASK_LABELS.translate = pack.lbl_task_translate || TASK_LABELS.translate;
+    TASK_LABELS.voice     = pack.lbl_task_voice     || TASK_LABELS.voice;
+    TASK_LABELS.conf      = pack.lbl_task_conf      || TASK_LABELS.conf;
+  }
 
   console.log(`[Timothy] updateUI 완료 — 언어: ${lang}`);
 }
@@ -5301,8 +6016,8 @@ function handlePasteImage(e){
       if(!file) continue;
       const reader = new FileReader();
       reader.onloadend = () => {
-        fileAttachmentData = { mime: item.type, base64: reader.result.split(',')[1], name: '붙여넣기 이미지' };
-        document.getElementById('fileNameBadge').innerText = '🖼️ 클립보드 이미지';
+        fileAttachmentData = { mime: item.type, base64: reader.result.split(',')[1], name: t('paste_image_name') };
+        document.getElementById('fileNameBadge').innerText = t('clipboard_image');
         showToast('🖼️ '+t('toast_analyze_ok'));
       };
       reader.readAsDataURL(file);
@@ -5359,9 +6074,9 @@ function handleTransInputPaste(e){
         if(!file) continue;
         const reader = new FileReader();
         reader.onloadend = () => {
-          transFileData = { mime: item.type, base64: reader.result.split(',')[1], name:'붙여넣기 이미지' };
+          transFileData = { mime: item.type, base64: reader.result.split(',')[1], name: t('paste_image_name') };
           const ti = document.getElementById('transInput');
-          if(ti){ ti.setAttribute('data-placeholder','🖼️ 이미지 첨부됨 — 번역하기를 누르세요.'); ti.innerHTML=''; }
+          if(ti){ ti.setAttribute('data-placeholder', t('trans_img_attached_hint')); ti.innerHTML=''; }
           showToast('🖼️ '+t('toast_translate_ok'));
         };
         reader.readAsDataURL(file);
@@ -5408,13 +6123,13 @@ function handleTransInputPaste(e){
       } else if(src.startsWith('data:')){
         const mimeMatch = src.match(/^data:([^;]+);/);
         if(mimeMatch && !transFileData){
-          transFileData = { mime: mimeMatch[1], base64: src.split(',')[1], name:'붙여넣기 이미지' };
+          transFileData = { mime: mimeMatch[1], base64: src.split(',')[1], name: t('paste_image_name') };
           showToast('🖼️ '+t('toast_copy_ok'));
         }
-        img.replaceWith(document.createTextNode('\n[이미지 첨부됨]\n'));
+        img.replaceWith(document.createTextNode('\n[' + t('img_attached_msg') + ']\n'));
       } else {
         // blob: URL 등 — 텍스트로 대체
-        img.replaceWith(document.createTextNode('\n[이미지]\n'));
+        img.replaceWith(document.createTextNode('\n[' + t('img_placeholder') + ']\n'));
       }
     });
 
@@ -5728,7 +6443,7 @@ async function sagReplyFix({ mailData, feedback, apiKey, replyTextEl, fbInputEl,
 
   // 버튼 잠금 — 원래 텍스트 저장
   const originalBtnText = btnEl ? btnEl.innerText : '';
-  if(btnEl){ btnEl.disabled=true; btnEl.innerText='처리 중...'; }
+  if(btnEl){ btnEl.disabled=true; btnEl.innerText=t('status_processing_btn'); }
   sagSetStep(sagPrefix, sagIdx, 1);
 
   let searchContext = '';
@@ -5739,7 +6454,7 @@ async function sagReplyFix({ mailData, feedback, apiKey, replyTextEl, fbInputEl,
       .replace(/관련|관한|대한|에 대해|를|을|이|가/g,' ')
       .trim() || feedback;
 
-    showToast(`🌐 "${searchQuery}" 검색 중...`);
+    showToast(`🌐 "${searchQuery}" ${t('sag_searching')}`);
     const searchResult = await sagSearch(searchQuery, apiKey);
     if(!searchResult.success){
       sagSetStep(sagPrefix, sagIdx, 0);
@@ -5813,8 +6528,8 @@ async function sagReplyFix({ mailData, feedback, apiKey, replyTextEl, fbInputEl,
 
     sagSetStep(sagPrefix, sagIdx, 0);
     const successMsg = needSearch
-      ? '✅ 검색 자료 반영 완료'
-      : (resolvedMode==='logic' ? '✅ 논리 보강 완료' : '✅ 수정 완료');
+      ? t('sag_search_done')
+      : (resolvedMode==='logic' ? t('sag_logic_done') : t('sag_fix_done'));
     showToast(successMsg);
 
   }catch(err){
@@ -5825,7 +6540,7 @@ async function sagReplyFix({ mailData, feedback, apiKey, replyTextEl, fbInputEl,
     // ★ 원래 버튼 레이블로 정확히 복원
     if(btnEl){
       btnEl.disabled = false;
-      btnEl.innerText = originalBtnText || (resolvedMode==='logic' ? '🧠 논리 보강' : '🔄 수정 요청');
+      btnEl.innerText = originalBtnText || (resolvedMode==='logic' ? t('feedback_logic_btn') : t('feedback_fix_btn'));
     }
   }
 }
@@ -5889,35 +6604,35 @@ function renderEmails(){
     const feedbackHtml=`
       <div class="reply-feedback">
         <textarea class="reply-feedback-input" id="fb-input-${i}" rows="2"
-          placeholder="수정 요청, 논리 보강, 검색 등을 자유롭게 입력하세요. (Shift+Enter: 줄바꿈)"
+          placeholder="${t('feedback_ph')}"
           onclick="event.stopPropagation()"
           onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();event.stopPropagation();handleAnalysisFeedback('auto','mail',${i});}"></textarea>
         <div class="feedback-btn-row">
-          <button class="reply-feedback-btn" onclick="event.stopPropagation();handleAnalysisFeedback('auto','mail',${i})">🔄 수정 요청</button>
-          <button class="logic-boost-btn" onclick="event.stopPropagation();handleAnalysisFeedback('logic','mail',${i})">🧠 논리 보강</button>
+          <button class="reply-feedback-btn" onclick="event.stopPropagation();handleAnalysisFeedback('auto','mail',${i})">${t('feedback_fix_btn')}</button>
+          <button class="logic-boost-btn" onclick="event.stopPropagation();handleAnalysisFeedback('logic','mail',${i})">${t('feedback_logic_btn')}</button>
         </div>
         <div class="sag-steps" id="sag-steps-${i}">
-          <span class="sag-step" id="sag-step1-${i}">🔍 분석 중</span>
-          <span class="sag-step" id="sag-step2-${i}">🌐 자료 검색 중</span>
-          <span class="sag-step" id="sag-step3-${i}">✍️ 본문 반영 중</span>
+          <span class="sag-step" id="sag-step1-${i}">${t('sag_step1')}</span>
+          <span class="sag-step" id="sag-step2-${i}">${t('sag_step2')}</span>
+          <span class="sag-step" id="sag-step3-${i}">${t('sag_step3')}</span>
         </div>
       </div>`;
     // ★ STT 카드이면 전용 아코디언 사용, 일반 메일이면 기존 아코디언
     const sttAcc = buildSttAccordion(m, i);
     const acc = sttAcc || `<div class="mail-accordion">
-      <div class="acc-sec"><div class="acc-lbl">💡 Timothy AI 핵심 요약</div>${bullets}</div>
+      <div class="acc-sec"><div class="acc-lbl">${t('mail_acc_summary')}</div>${bullets}</div>
       <div class="acc-sec" style="border-color:rgba(245,158,11,.3);background:rgba(245,158,11,.02);">
-        <div class="acc-lbl orange">📋 지시 가이드
-          <button class="sync-btn" onclick="event.stopPropagation();syncTracker('${b64}','${(m.category||'').replace(/'/g,"\\'")}','${(m.subject||'').replace(/'/g,"\\'")}')">트래커 연동</button>
+        <div class="acc-lbl orange">${t('mail_acc_guide')}
+          <button class="sync-btn" onclick="event.stopPropagation();syncTracker('${b64}','${(m.category||'').replace(/'/g,"\\'")}','${(m.subject||'').replace(/'/g,"\\'")}'")}">${t('mail_acc_tracker_btn')}</button>
         </div>
         <p style="font-weight:600;color:#f59e0b;font-size:10px;margin-bottom:2px;">[${(m.guide||{}).worker||'-'} / ${(m.guide||{}).due||'-'}]</p>
         <p style="color:#e2e8f0;font-style:italic;font-size:10px;">"${(m.guide||{}).instruction||''}"</p>
       </div>
-      ${deptR?`<div class="acc-sec"><div class="acc-lbl">🏢 유관 부서</div>${deptR}</div>`:''}
+      ${deptR?`<div class="acc-sec"><div class="acc-lbl">${t('mail_acc_dept')}</div>${deptR}</div>`:''}
       <div class="acc-sec" style="border-color:rgba(16,185,129,.25);background:rgba(16,185,129,.03);">
-        <div class="acc-lbl green">✉️ 추천 회신 초안</div>
-        <p id="reply-text-${i}" style="white-space:pre-wrap;font-size:10px;color:#a7f3d0;">${m.reply_draft||'(없음)'}</p>
-        <button class="small-copy-btn" onclick="event.stopPropagation();cpReply(${i})">📄 복사</button>
+        <div class="acc-lbl green">${t('mail_acc_reply')}</div>
+        <p id="reply-text-${i}" style="white-space:pre-wrap;font-size:10px;color:#a7f3d0;">${m.reply_draft||t('mail_reply_none')}</p>
+        <button class="small-copy-btn" onclick="event.stopPropagation();cpReply(${i})">${t('conf_copy_btn')}</button>
         ${feedbackHtml}
       </div>
     </div>`;
@@ -5927,8 +6642,8 @@ function renderEmails(){
     c.insertAdjacentHTML('beforeend',`
       <div class="mail-row ${urgent?'urgent-row':''} ${isOpen?'open':''}" data-idx="${i}" style="${sttRowStyle}">
         <div class="mail-row-hdr" onclick="toggleMail(${i})">
-          <span class="mail-badge" style="${sttBadgeColor}">${isStt?'🎙️ STT':(m.category||'-')}</span>
-          <span class="mail-subj">${m.subject||'(제목없음)'}</span>
+          <span class="mail-badge" style="${sttBadgeColor}">${isStt?t('stt_badge_label'):(m.category||'-')}</span>
+          <span class="mail-subj">${m.subject||t('cal_detail_no_title')}</span>
           <span class="mail-sender-sm">${m.sender||'-'}</span>
           <span class="mail-date-sm">${date}</span>
           <span class="mail-chevron">▼</span>
@@ -5954,7 +6669,7 @@ function cpReply(i){
     const clone = domEl.cloneNode(true);
     // 이미지 → URL 텍스트
     clone.querySelectorAll('img').forEach(img =>
-      img.replaceWith(img.src ? '[이미지: ' + img.src + ']\n' : '')
+      img.replaceWith(img.src ? '[' + t('img_placeholder') + ': ' + img.src + ']\n' : '')
     );
     // 표 셀 탭 구분
     clone.querySelectorAll('td,th').forEach(el => el.append('\t'));
@@ -5978,7 +6693,7 @@ function cpReply(i){
       const tmp = document.createElement('div');
       tmp.innerHTML = draft;
       tmp.querySelectorAll('img').forEach(img =>
-        img.replaceWith(img.src ? '[이미지: ' + img.src + ']\n' : '')
+        img.replaceWith(img.src ? '[' + t('img_placeholder') + ': ' + img.src + ']\n' : '')
       );
       tmp.querySelectorAll('td,th').forEach(el => el.append('\t'));
       tmp.querySelectorAll('br').forEach(el => el.replaceWith('\n'));
@@ -6041,8 +6756,8 @@ function renderStatusPanel(){
         <span class="status-item-title" title="${m.subject}">[${m.category}] ${m.subject}</span>
         <span style="font-size:9px;color:#475569;margin-right:4px;">${m.deadlineDate}</span>
         <div class="status-toggle">
-          <button class="stog-btn stog-done ${isDone?'active':''}" onclick="event.stopPropagation();setProc(${i},true)">처리</button>
-          <button class="stog-btn stog-pend ${!isDone?'active':''}" onclick="event.stopPropagation();setProc(${i},false)">미처리</button>
+          <button class="stog-btn stog-done ${isDone?'active':''}" onclick="event.stopPropagation();setProc(${i},true)">${t('status_proc_done')}</button>
+          <button class="stog-btn stog-pend ${!isDone?'active':''}" onclick="event.stopPropagation();setProc(${i},false)">${t('status_proc_pend')}</button>
         </div>
       </div>`);
   });
@@ -6081,7 +6796,7 @@ function saveWork(){
   const tasks=lsArr('tasks'); tasks.unshift(task); lsSet('tasks',tasks);
   closeModal('workModal');
   ['workTitle','workDueDate','workWorker','workMemo'].forEach(id=>{document.getElementById(id).value='';});
-  document.getElementById('workDueDateDisplay').innerText='날짜 선택';
+  document.getElementById('workDueDateDisplay').innerText=t('lbl_date_pick');
   renderTracking(); renderCalendar(); renderWeekly();
   showToast(`✅ ${selectedWorkType} ${t('toast_task_reg_ok')}`);
 }
@@ -6094,7 +6809,7 @@ function syncTracker(b64,cat,subj){
   const tasks=lsArr('tasks');
   tasks.unshift({
     id:Date.now(),
-    type:'메일',
+    type:t('weekly_mail_label'),
     title:`[${cat}] ${g.instruction||subj}`,
     worker:g.worker||'-',
     dueDate:g.due||'',
@@ -6116,16 +6831,16 @@ function renderTracking(){
   mails.forEach((m,i)=>{
     if(m.deadlineDate&&m.deadlineDate!=='null'&&m.deadlineDate!==null){
       combined.push({
-        id:'mail_'+i, type:'메일',
+        id:'mail_'+i, type:t('weekly_mail_label'),
         title:`[${m.category}] ${m.subject}`,
         worker:m.sender||'-', dueDate:m.deadlineDate,
         source:'mail_auto', _src:'mail', _idx:i, isDone:!!pmap[i]
       });
     }
   });
-  document.getElementById('trackCount').innerText=`총 ${combined.length}건`;
+  document.getElementById('trackCount').innerText=t('track_total_count').replace('${n}',combined.length);
   if(!combined.length){
-    c.innerHTML=`<div style="color:#64748b;text-align:center;padding:20px 0;font-size:11px;">등록된 업무가 없습니다.</div>`;
+    c.innerHTML=`<div style="color:#64748b;text-align:center;padding:20px 0;font-size:11px;">${t('no_tracking')}</div>`;
     return;
   }
   combined.forEach((t,i)=>{
@@ -6155,11 +6870,11 @@ function renderWeekly(){
   const tasks=lsArr('tasks'), mails=lsArr('emails'), calEvs=lsArr('cal_events');
   const items=[
     ...tasks.map(t=>({label:`[${t.type}] ${t.title}`, date:t.dueDate||t.startDate||''})),
-    ...mails.filter(m=>m.deadlineDate&&m.deadlineDate!=='null'&&m.deadlineDate!==null).map(m=>({label:`[메일] ${m.subject}`, date:m.deadlineDate})),
+    ...mails.filter(m=>m.deadlineDate&&m.deadlineDate!=='null'&&m.deadlineDate!==null).map(m=>({label:`[${t('weekly_mail_label')}] ${m.subject}`, date:m.deadlineDate})),
     ...calEvs.map(e=>({label:`[${e.type}] ${e.title}`, date:e.startDate||''}))
   ];
   const inR=(d,f,t)=>{if(!d) return false; const x=new Date(d); x.setHours(0,0,0,0); return x>=f&&x<=t;};
-  const mk=arr=>arr.length?arr.slice(0,5).map(x=>`<div class="weekly-item" title="${x.label}">${x.label}</div>`).join(''):`<div class="weekly-empty">없음</div>`;
+  const mk=arr=>arr.length?arr.slice(0,5).map(x=>`<div class="weekly-item" title="${x.label}">${x.label}</div>`).join(''):`<div class="weekly-empty">${t('weekly_empty')}</div>`;
   document.getElementById('weeklyThis').innerHTML=mk(items.filter(x=>inR(x.date,mon,sun)));
   document.getElementById('weeklyNext').innerHTML=mk(items.filter(x=>inR(x.date,nmon,nsun)));
 }
@@ -6190,7 +6905,7 @@ async function genWeeklyReport(){
   const modal=document.getElementById('reportModal');
   const oldBtns=modal.querySelectorAll('.modal-save-btn,.modal-btn-row');
   oldBtns.forEach(b=>b.remove());
-  modal.querySelector('.modal-box').insertAdjacentHTML('beforeend',`<button class="modal-save-btn" onclick="event.stopPropagation();copyReport()">📄 전체 복사</button>`);
+  modal.querySelector('.modal-box').insertAdjacentHTML('beforeend',`<button class="modal-save-btn" onclick="event.stopPropagation();copyReport()" data-i18n="btn_copy_all">${t('btn_copy_all')}</button>`);
   const url=`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
   const reportRole = t('report_role');
   const langOut = t('ai_lang_out');
@@ -6230,7 +6945,11 @@ function renderCalendar(){
   let twd=0, done=0;
   mails.forEach((m,mi)=>{if(m.deadlineDate&&m.deadlineDate!=='null'&&m.deadlineDate!==null){twd++;if(pmap[mi])done++;}});
   const banner=document.getElementById('replyBanner');
-  if(banner) banner.innerHTML=`<div class="banner-chip chip-total">📬 메일 일정 ${twd}건</div><div class="banner-chip chip-done">✅ 처리완료 ${done}건</div><div class="banner-chip chip-pend">⏳ 미처리 ${twd-done}건</div>`;
+  if(banner){
+    const _unit = t('ppt_unit_page')==='장'?'건':''; // KO fallback
+    const _trackUnit = (LANG_PACKS[currentLang]||LANG_PACKS.KO).track_total_count?.replace('${n}','').replace('총','').replace('共','').replace('total','').trim()||'건';
+    banner.innerHTML=`<div class="banner-chip chip-total">${t('mail_banner_count').replace('\${n}',twd)}</div><div class="banner-chip chip-done">✅ ${done}${_trackUnit}</div><div class="banner-chip chip-pend">⏳ ${twd-done}${_trackUnit}</div>`;
+  }
   if(!g) return; // 다른 뷰면 배너만
 
   g.innerHTML='';
@@ -6238,7 +6957,7 @@ function renderCalendar(){
   const labelCls=['sun','','','','','','sat'];
   labels.forEach((w,i)=>g.insertAdjacentHTML('beforeend',`<div class="cal-day-label ${labelCls[i]}">${w}</div>`));
   const ml=document.getElementById('calMonthLabel');
-  if(ml) ml.innerText=`${calYear}년 ${calMonth+1}월`;
+  if(ml) ml.innerText=t('cal_month_label').replace('\${year}',calYear).replace('\${month}',calMonth+1);
 
   const first=new Date(calYear,calMonth,1).getDay();
   const total=new Date(calYear,calMonth+1,0).getDate();
@@ -6262,15 +6981,15 @@ function renderCalendar(){
         const isDone=!!pmap[mi];
         ev+=`<div class="cal-event ev-메일 ${isDone?'ev-processed':''}"
           onclick="event.stopPropagation();openMailEventPopup(${mi})"
-          title="${m.subject}${isDone?' ✅처리완료':' ⏳미처리'}">[메일] ${m.subject}</div>`;
+          title="${m.subject}${isDone?' ✅'+t('cal_done_tip'):' ⏳'+t('cal_pend_tip')}">[${t('weekly_mail_label')}] ${m.subject}</div>`;
       }
     });
     // 수동 업무
     tasks.forEach(t=>{
       if(t.dueDate&&t.dueDate===ds)
-        ev+=`<div class="cal-event ev-업무-${t.type}" title="${t.title}(납기)">[${t.type}] ${t.title}</div>`;
+        ev+=`<div class="cal-event ev-업무-${t.type}" title="${t.title}(${t('cal_due_label')})">[${t.type}] ${t.title}</div>`;
       if(t.startDate&&t.startDate===ds&&t.startDate!==t.dueDate)
-        ev+=`<div class="cal-event ev-업무-${t.type}" style="opacity:.65;" title="${t.title}(지시일)">[지시일]${t.title}</div>`;
+        ev+=`<div class="cal-event ev-업무-${t.type}" style="opacity:.65;" title="${t.title}(${t('cal_directive_day_short')})">[${t('cal_directive_day_short')}]${t.title}</div>`;
     });
     // 등록 일정 (★신규 유형 포함 + 팝업 연동)
     calEvs.forEach((e,ei)=>{
@@ -6314,7 +7033,7 @@ function selectCalType(t){
     if(titleInput){
       titleInput.style.borderColor='#f59e0b';
       titleInput.style.boxShadow='0 0 0 2px rgba(245,158,11,.25)';
-      titleInput.placeholder='예: 팀빌딩, 외부 세미나, 개인 일정 등 자유 입력';
+      titleInput.placeholder=t('cal_type_etc_ph');
       // 살짝 딜레이 후 포커스 (모달 애니메이션 완료 후)
       setTimeout(()=>titleInput.focus(), 120);
     }
@@ -6332,7 +7051,7 @@ function openNewCal(ds){
   document.getElementById('calEditId').value='';
   // 제목 초기화 (기타 스타일 리셋)
   const ti=document.getElementById('calTitle');
-  ti.value=''; ti.style.borderColor=''; ti.style.boxShadow=''; ti.placeholder='일정 제목';
+  ti.value=''; ti.style.borderColor=''; ti.style.boxShadow=''; ti.placeholder=t('ph_event_title');
   document.getElementById('calWorker').value='';
   document.getElementById('calMemo').value='';
   document.getElementById('calMeetTime').value='';
@@ -6341,7 +7060,7 @@ function openNewCal(ds){
   document.getElementById('calStartDateDisplay').innerText=ds;
   document.getElementById('calEndDate').value=ds;
   document.getElementById('calEndDateDisplay').innerText=ds;
-  document.getElementById('calMeetTimeDisplay').innerText='시간 선택';
+  document.getElementById('calMeetTimeDisplay').innerText=t('lbl_time_pick');
   const hint=document.getElementById('calTitleHint');
   if(hint){hint.innerText=''; hint.style.color='';}
   selectedCalType='보고';
@@ -6357,13 +7076,13 @@ function openEditCal(ei){
   document.getElementById('calEditId').value=ei;
   document.getElementById('calTitle').value=e.title||'';
   document.getElementById('calStartDate').value=e.startDate||'';
-  document.getElementById('calStartDateDisplay').innerText=e.startDate||'날짜 선택';
+  document.getElementById('calStartDateDisplay').innerText=e.startDate||t('lbl_date_pick');
   document.getElementById('calEndDate').value=e.endDate||'';
-  document.getElementById('calEndDateDisplay').innerText=e.endDate||'날짜 선택';
+  document.getElementById('calEndDateDisplay').innerText=e.endDate||t('lbl_date_pick');
   document.getElementById('calWorker').value=e.worker||'';
   document.getElementById('calMemo').value=e.memo||'';
   document.getElementById('calMeetTime').value=e.meetTime||'';
-  document.getElementById('calMeetTimeDisplay').innerText=e.meetTime||'시간 선택';
+  document.getElementById('calMeetTimeDisplay').innerText=e.meetTime||t('lbl_time_pick');
   document.getElementById('calMeetPlace').value=e.meetPlace||'';
   selectedCalType=e.type||'보고';
   const allTypes=['보고','회의','문서작성','평가','공사','회식','조직강화','월례조회','기타'];
@@ -6525,11 +7244,11 @@ async function verifyLearning(){
   const avgChars   = items.length ? Math.round(totalChars/items.length) : 0;
   resultEl.style.display='block';
   resultEl.innerHTML=`
-    ✅ <b style="color:#10b981;">학습 검증 완료</b><br>
-    📊 현재 학습된 데이터: <b style="color:#60a5fa;">${items.length}개</b><br>
-    🏷️ 스타일 분포: ${typeStr}<br>
-    📝 평균 본문 길이: ${avgChars}자 / AI 컨텍스트 주입: 최신 50개<br>
-    🔄 학습 적용 상태: <b style="color:${learnApplied?'#10b981':'#f43f5e'};">${learnApplied?'활성화':'비활성화'}</b>
+    ✅ <b style="color:#10b981;">${t('learn_verify_done')}</b><br>
+    📊 ${t('learn_verify_count').replace('${n}', items.length)}<br>
+    🏷️ ${t('learn_verify_dist')}: ${typeStr}<br>
+    📝 ${t('learn_verify_avg').replace('${n}', avgChars)}<br>
+    🔄 ${t('learn_verify_state')}: <b style="color:${learnApplied?'#10b981':'#f43f5e'};">${learnApplied?t('learn_active'):t('learn_inactive')}</b>
   `;
 }
 
@@ -6580,7 +7299,7 @@ async function renderLearning(){
     const row = document.createElement('div');
     row.className = 'learning-row';
     row.innerHTML = `
-      <div class="learning-row-title" onclick="event.stopPropagation();openStyleDetail(${x.id})" title="클릭하여 전체 내용 보기">
+      <div class="learning-row-title" onclick="event.stopPropagation();openStyleDetail(${x.id})" title="${t('learn_row_click_tip')}">
         <span class="l-tag tag-${type}" style="margin-right:5px;">${type}</span>
         <span class="l-tag tag-font" style="margin-right:5px;">${font}</span>
         <span style="color:#94a3b8;">${preview}</span>
@@ -6590,8 +7309,8 @@ async function renderLearning(){
         <span class="learning-row-date">${savedAt}</span>
       </div>
       <div class="learning-row-actions">
-        <button class="lr-edit-btn" onclick="event.stopPropagation();openStyleEdit(${x.id})">✏️ 수정</button>
-        <button class="lr-del-btn"  onclick="event.stopPropagation();deleteStyleItem(${x.id})">🗑</button>
+        <button class="lr-edit-btn" onclick="event.stopPropagation();openStyleEdit(${x.id})">${t('btn_edit_short')}</button>
+        <button class="lr-del-btn"  onclick="event.stopPropagation();deleteStyleItem(${x.id})">${t('btn_del_short')}</button>
       </div>`;
     c.appendChild(row);
   });
@@ -6667,13 +7386,13 @@ async function saveStyleData(){
 
 /** 개별 삭제 */
 async function deleteStyleItem(id){
-  document.getElementById('confirmMsg').innerHTML='이 학습 데이터를 <b style="color:#f43f5e;">영구 삭제</b>하시겠습니까?';
+  document.getElementById('confirmMsg').innerHTML=t('msg_del_style');
   document.getElementById('confirmYesBtn').style.display='';
   document.getElementById('confirmYesBtn').onclick=async()=>{
     await deleteStyleFromDB(id);
     closeModal('confirmModal');
     await renderLearning();
-    showToast('🗑 학습 데이터 삭제됨');
+    showToast(t('toast_style_deleted'));
   };
   openModal('confirmModal');
 }
@@ -6682,7 +7401,7 @@ async function deleteStyleItem(id){
 async function clearAllStyles(){
   const items = await getAllStyles();
   if(!items.length){ showToast(t('toast_no_style_del')); return; }
-  document.getElementById('confirmMsg').innerHTML='저장된 <b style="color:#f43f5e;">모든 스타일 학습 데이터</b>를 삭제하시겠습니까?<br><span style="font-size:10px;color:#64748b;">복구할 수 없습니다.</span>';
+  document.getElementById('confirmMsg').innerHTML=t('del_all_styles_msg');
   document.getElementById('confirmYesBtn').style.display='';
   document.getElementById('confirmYesBtn').onclick=async()=>{
     await clearAllStylesFromDB();
@@ -6734,7 +7453,7 @@ function handleTransFile(e){
     const reader = new FileReader();
     reader.onload = ev => {
       document.getElementById('transInput').value = ev.target.result;
-      badge.innerText = `📄 ${f.name} — 텍스트 로드 완료`;
+      badge.innerText = t('trans_file_loaded').replace('${name}',f.name);
       badge.classList.add('loaded');
       clearBtn.style.display = 'block';
       transFileData = null; // 텍스트로 처리하므로 파일 첨부 불필요
@@ -6750,23 +7469,23 @@ function handleTransFile(e){
         base64: ev.target.result.split(',')[1],
         name: f.name
       };
-      badge.innerText = `📎 ${f.name} (${(f.size/1024).toFixed(1)}KB) — 번역 시 자동 첨부`;
+      badge.innerText = t('trans_file_attached').replace('${name}',f.name).replace('${size}',(f.size/1024).toFixed(1));
       badge.classList.add('loaded');
       clearBtn.style.display = 'block';
       // 입력란 안내 텍스트
       if(!document.getElementById('transInput').value.trim()){
         document.getElementById('transInput').placeholder =
-          `${f.name} 파일을 첨부했습니다.\n아래 번역하기를 누르면 파일 내용을 분석·번역합니다.\n추가 지시사항이 있으면 여기에 입력하세요.`;
+          t('trans_file_attached_hint').replace('${name}', f.name);
       }
       showToast(`✅ ${f.name} ${t('toast_copy_ok')}`);
     };
     reader.readAsDataURL(f);
   } else if(ext === 'docx'){
     // docx → 현재는 파일명만 안내 (실제 파싱은 서버 없이 불가)
-    badge.innerText = `⚠️ ${f.name} — docx는 텍스트를 복사해 붙여넣기 권장`;
+    badge.innerText = t('trans_file_docx_warn').replace('${name}',f.name);
     badge.classList.remove('loaded');
     clearBtn.style.display = 'block';
-    showToast('docx 파일은 내용을 직접 복사해 붙여넣어 주세요.');
+    showToast(t('trans_docx_copy_hint'));
   } else {
     showToast('Unsupported format');
   }
@@ -6777,10 +7496,10 @@ function clearTransFile(){
   transFileData = null;
   document.getElementById('transFileInput').value = '';
   const badge = document.getElementById('transFileBadge');
-  badge.innerText = '이미지·PDF·txt·md 업로드 가능';
+  badge.innerText = t('trans_file_hint_short');
   badge.classList.remove('loaded');
   document.getElementById('transFileClearBtn').style.display = 'none';
-  document.getElementById('transInput').placeholder = '번역할 텍스트를 입력하거나\n위에서 파일을 첨부하세요.';
+  document.getElementById('transInput').placeholder = t('trans_input_ph');
 }
 
 /** ★ 초기화 — 원문·결과 모두 클리어 */
@@ -6963,7 +7682,7 @@ let interpMode         = 'one';  // 'one' | 'both'
 // ══════════════════════════════
 // ★ 번역 뷰 트리 구조 제어 함수
 // ══════════════════════════════
-let ttsGender = 'male'; // 'male' | 'female'
+let ttsGender = localStorage.getItem('tts_gender') || 'male'; // localStorage 복원
 
 // ══════════════════════════════
 // ★ 번역 뷰 3탭 제어 + 모드별 언어 설정
@@ -6987,8 +7706,8 @@ function onDocLangChange(){
   localStorage.setItem('doc_peer_lang', peer);
   const srcTitle = document.getElementById('docSrcTitle');
   const dstTitle = document.getElementById('docDstTitle');
-  if(srcTitle) srcTitle.innerText = `📝 원문 (${LANG_NAMES[my]||my})`;
-  if(dstTitle) dstTitle.innerText = `🌐 번역 결과 (${LANG_NAMES[peer]||peer})`;
+  if(srcTitle) srcTitle.innerText = (t('trans_src_title_tpl')||'📝 원문 ({lang})').replace('{lang}', LANG_NAMES[my]||my);
+  if(dstTitle) dstTitle.innerText = (t('trans_dst_title_tpl')||'🌐 번역 결과 ({lang})').replace('{lang}', LANG_NAMES[peer]||peer);
   // 기존 transTargetLang 변수도 동기화 (runTranslate 호환)
   transTargetLang = peer;
   transTargetName = LANG_NAMES[peer] || peer;
@@ -7020,13 +7739,19 @@ function onConfLangChange(){
   const peerName = LANG_NAMES[peer] || peer;
   const isBilingual = my !== peer;
 
-  // ★ 모드 안내 — 언어 방향 명시
+  // ★ 모드 안내 — 완전 i18n (conf_mode_interp / conf_mode_minutes 키 사용)
   const modeNote = document.getElementById('confModeNote');
   if(modeNote){
     if(isBilingual){
-      modeNote.innerHTML = `💡 <b style="color:#60a5fa;">${t('conf_mode_label')||'통역 모드'}</b>: <b style="color:#f59e0b;">${peerName}</b> 발화 → <b style="color:#10b981;">${myName}</b> 번역. 이어폰 착용을 권장합니다.`;
+      // conf_mode_interp에 {peer}/{my} 플레이스홀더 치환
+      const interp = t('conf_mode_interp')
+        .replace('{peer}', `<b style="color:#f59e0b;">${peerName}</b>`)
+        .replace('{my}',   `<b style="color:#10b981;">${myName}</b>`);
+      modeNote.innerHTML = interp;
     } else {
-      modeNote.innerHTML = `📋 <b style="color:#34d399;">${t('conf_mode_label')||'회의록 모드'}</b>: <b style="color:#60a5fa;">${myName}</b> 발화를 회의록으로 정리합니다.`;
+      const minutes = t('conf_mode_minutes')
+        .replace('{my}', `<b style="color:#60a5fa;">${myName}</b>`);
+      modeNote.innerHTML = minutes;
     }
   }
 
@@ -7441,7 +8166,7 @@ function clearConfLog(){
     if(sw) sw.style.display = 'none';
   };
   if(meetingScript.length > 0){
-    document.getElementById('confirmMsg').innerHTML = `회의 기록 <b style="color:#f43f5e;">${meetingScript.length}건</b>을 모두 삭제하시겠습니까?`;
+    document.getElementById('confirmMsg').innerHTML = t('conf_clear_confirm').replace('${n}',meetingScript.length);
     document.getElementById('confirmYesBtn').style.display = '';
     document.getElementById('confirmYesBtn').onclick = ()=>{ doReset(); closeModal('confirmModal'); showToast(t('toast_meeting_cleared')); };
     openModal('confirmModal');
@@ -7547,47 +8272,82 @@ function switchVoiceSubMode(sub){
   interpMode = sub;
 }
 
-/** 4 Depth: TTS 성별 선택 + 휴리스틱 보이스 필터링 */
+/** TTS 성별 선택 — localStorage 저장으로 새로고침 후에도 유지 */
 function setTtsGender(gender){
   ttsGender = gender;
-  const btnM = document.getElementById('genderMale');
-  const btnF = document.getElementById('genderFemale');
-  if(btnM) btnM.classList.toggle('active', gender==='male');
-  if(btnF) btnF.classList.toggle('active', gender==='female');
+  localStorage.setItem('tts_gender', gender);
+  // 단방향/회의 모드 버튼 동기화
+  ['genderMale','confGenderMale'].forEach(id=>{
+    const b = document.getElementById(id);
+    if(b) b.classList.toggle('active', gender==='male');
+  });
+  ['genderFemale','confGenderFemale'].forEach(id=>{
+    const b = document.getElementById(id);
+    if(b) b.classList.toggle('active', gender==='female');
+  });
   showToast(gender==='male' ? t('toast_voice_male') : t('toast_voice_female'));
 }
 
 /**
- * TTS 성별 휴리스틱 보이스 선택
- * - 브라우저 Voice.name에 Male/Female/남성/여성 포함 여부로 필터
- * - 없으면 타겟 언어에 맞는 첫 번째 보이스 사용
+ * TTS 성별 휴리스틱 보이스 선택 (강화판)
+ * - _cachedVoices 캐시 우선 사용 → Chrome 비동기 빈 배열 문제 해결
+ * - 언어별 남성 보이스 이름 힌트 확장
+ * - fallback 단계별 안전 처리
  */
 function getVoiceForGender(lang){
-  const voices = window.speechSynthesis.getVoices();
+  // _voicesReady 상태 우선 — 캐시 또는 즉시 재조회
+  const voices = (_voicesReady && _cachedVoices.length > 0)
+    ? _cachedVoices
+    : window.speechSynthesis.getVoices();
   if(!voices || voices.length === 0) return null;
+  // 캐시 동기화 (즉시 재조회로 얻은 경우)
+  if(voices.length > 0 && _cachedVoices.length === 0){
+    _cachedVoices = voices;
+    _voicesReady  = true;
+  }
 
-  // 타겟 언어 코드 매핑
+  // 타겟 언어 BCP-47 결정
   const ttsLang = TTS_LANG_MAP[lang] || 'en-US';
   const baseLang = ttsLang.split('-')[0].toLowerCase();
 
-  // 성별 키워드 패턴
-  const maleKw   = /male|man|남성|남자|guy|eric|david|george|daniel|fred/i;
-  const femaleKw = /female|woman|여성|여자|zira|samantha|victoria|kate|alice|karen/i;
+  // ── 성별 키워드 패턴 (언어별 실제 보이스명 확장) ──
+  const maleKw = /\b(male|man|guy|남성|남자|하준|민준|도현|dong-?hyun|jun|hyun)\b|\b(david|mark|guy|eric|george|daniel|fred|alex|tom|james|rishi|google\s*uk\s*english\s*male)\b/i;
+  const femaleKw = /\b(female|woman|여성|여자|서연|지우|민지|ji|seo|yeon)\b|\b(zira|samantha|victoria|kate|alice|karen|lisa|google\s*uk\s*english\s*female|ava|susan|fiona)\b/i;
   const kw = ttsGender === 'male' ? maleKw : femaleKw;
 
-  // 1차: 타겟 언어 + 성별 키워드 매칭
-  let v = voices.find(v => v.lang.toLowerCase().startsWith(baseLang) && kw.test(v.name));
-  // 2차: 전체 언어 중 성별 키워드만 매칭
-  if(!v) v = voices.find(v => kw.test(v.name));
-  // 3차: 타겟 언어 첫 번째
-  if(!v) v = voices.find(v => v.lang.toLowerCase().startsWith(baseLang));
-  // 4차: 기본값
+  // 1차: 타겟 언어 + 성별 키워드 (가장 이상적)
+  let v = voices.find(x => x.lang.toLowerCase().startsWith(baseLang) && kw.test(x.name));
+
+  // 2차: 타겟 언어 + 반대 성별 키워드 제외 (= 중립 보이스 선택)
+  if(!v){
+    const oppKw = ttsGender === 'male' ? femaleKw : maleKw;
+    v = voices.find(x => x.lang.toLowerCase().startsWith(baseLang) && !oppKw.test(x.name));
+  }
+
+  // 3차: 성별 키워드만 매칭 (언어 무관)
+  if(!v) v = voices.find(x => kw.test(x.name));
+
+  // 4차: 타겟 언어 첫 번째 (성별 무관)
+  if(!v) v = voices.find(x => x.lang.toLowerCase().startsWith(baseLang));
+
+  // 5차: 전체 첫 번째 (최후 fallback)
   return v || voices[0];
 }
 
-/** speakBidir 오버라이드 — 성별 선택 반영 */
+/** speakBidir — cancel() 선행 + 성별 보이스 + 미로드 시 큐잉 안전장치 */
 function speakBidir(text, lang){
   if(!text || !window.speechSynthesis) return;
+
+  // ★ 보이스가 아직 로드되지 않은 경우: 큐에 저장하고 onvoiceschanged 후 자동 실행
+  if(!_voicesReady){
+    _pendingSpeak = { text, lang };
+    // 강제 트리거 시도 (일부 브라우저에서 onvoiceschanged가 늦게 발화됨)
+    window.speechSynthesis.getVoices();
+    return;
+  }
+
+  // ① 이전 대기열 즉시 완전 청소 → 딜레이/버퍼링 제거
+  window.speechSynthesis.cancel();
   const utter = new SpeechSynthesisUtterance(text);
   const voice = getVoiceForGender(lang.replace(/-.*/,'')); // 'en-US' → 'en'
   if(voice) utter.voice = voice;
@@ -7595,7 +8355,8 @@ function speakBidir(text, lang){
   utter.rate   = 1.0;
   utter.pitch  = 1.0;
   utter.volume = 1.0;
-  window.speechSynthesis.speak(utter);
+  // ② cancel() 직후 동기 speak()는 일부 브라우저에서 씹힘 — 마이크로태스크로 안전하게 발화
+  queueMicrotask(() => window.speechSynthesis.speak(utter));
 }
 
 /** 통역 로그 초기화 */
@@ -7644,9 +8405,30 @@ function appendToTextarea(id, text){
   el.scrollTop = el.scrollHeight;
 }
 
-// 보이스 목록 비동기 로딩 (Chrome은 onvoiceschanged 필요)
+// ── 보이스 목록 캐시 + 초기 로드 안전장치 (Chrome 비동기 이슈 완전 해결)
+let _cachedVoices = [];
+let _voicesReady  = false;          // 보이스 로드 완료 플래그
+let _pendingSpeak = null;           // 로드 전 발화 요청 큐 (최신 1건만 유지)
+
+function _initVoices(){
+  const vs = window.speechSynthesis.getVoices();
+  if(vs && vs.length > 0){
+    _cachedVoices = vs;
+    _voicesReady  = true;
+    // 대기 중인 발화 요청이 있으면 즉시 실행
+    if(_pendingSpeak){
+      const { text, lang } = _pendingSpeak;
+      _pendingSpeak = null;
+      speakBidir(text, lang);
+    }
+  }
+}
+
 if(window.speechSynthesis){
-  window.speechSynthesis.onvoiceschanged = ()=>{ window.speechSynthesis.getVoices(); };
+  // ① 최초 즉시 시도 (Firefox/Safari/일부 Chrome)
+  _initVoices();
+  // ② onvoiceschanged 바인딩 (Chrome은 이 이벤트 후에야 목록 완성)
+  window.speechSynthesis.onvoiceschanged = _initVoices;
 }
 
 // ── 기존 setInterpMode 호환 유지 ──
@@ -7968,8 +8750,8 @@ function updateMicBtn(side, on){
   textIds.forEach(id => {
     const el = document.getElementById(id);
     if(!el) return;
-    if(side === 'my')   el.innerText = on ? '🇰🇷 인식 중지' : (interpMode==='one' ? '🇰🇷 내 음성 통역 시작' : '🇰🇷 내 음성 인식');
-    if(side === 'peer') el.innerText = on ? '🌐 인식 중지' : '🌐 상대방 음성 인식';
+    if(side === 'my')   el.innerText = on ? t('voice_my_stop') : (interpMode==='one' ? t('voice_my_start_one') : t('voice_my_start_both'));
+    if(side === 'peer') el.innerText = on ? t('voice_peer_stop') : t('voice_peer_start');
   });
 
   // LIVE 배지
@@ -7986,11 +8768,13 @@ function updateBidirStatusBar(side){
   if(!bar) return;
   bar.classList.add('show');
   if(side==='my'){
-    if(status) status.innerText = '🇰🇷 내 음성 인식 중 (한국어 → '+transTargetName+')';
-    if(badge)  badge.innerText  = `한국어 → ${transTargetName}`;
+    const myName = LANG_NAMES[document.getElementById('voiceMyLang')?.value||'ko'] || t('lang_ko')||'한국어';
+    if(status) status.innerText = t('voice_status_my') + ' (' + myName + ' → ' + transTargetName + ')';
+    if(badge)  badge.innerText  = myName + ' → ' + transTargetName;
   } else {
-    if(status) status.innerText = '🌐 상대방 음성 인식 중 ('+transTargetName+' → 한국어)';
-    if(badge)  badge.innerText  = `${transTargetName} → 한국어`;
+    const myName = LANG_NAMES[document.getElementById('voiceMyLang')?.value||'ko'] || t('lang_ko')||'한국어';
+    if(status) status.innerText = t('voice_status_peer') + ' (' + transTargetName + ' → ' + myName + ')';
+    if(badge)  badge.innerText  = transTargetName + ' → ' + myName;
   }
 }
 
@@ -8168,7 +8952,7 @@ async function genCollabMail(){
       console.warn(`[genCollabMail] ${model} 실패:`, err.message);
     }
   }
-  resultEl.innerText = '⚠️ 생성 실패: ' + lastErr;
+  resultEl.innerText = t('collab_gen_fail') + lastErr;
 }
 
 /** 유관부서 메일 초안 수정 요청 */
@@ -8186,7 +8970,7 @@ async function applyCollabFix(){
 
   const fixBtn = document.querySelector('#collabFixRow button:last-child');
   const origBtnText = fixBtn?.innerText || '🔄 수정 적용';
-  if(fixBtn){ fixBtn.disabled = true; fixBtn.innerText = '⏳ 수정 중...'; }
+  if(fixBtn){ fixBtn.disabled = true; fixBtn.innerText = t('collab_fixing_btn'); }
 
   const prompt = `아래는 현재 작성된 협조 요청 메일 초안입니다.
 
@@ -8333,8 +9117,8 @@ function selPptFmt(f){
   document.getElementById('pptFmt-pptx').className = 'ppt-fmt-btn' + (f==='pptx'?' active':'');
   document.getElementById('pptFmt-docx').className = 'ppt-fmt-btn' + (f==='docx'?' active-docx':'');
   document.getElementById('pptFmtDesc').innerText = f==='pptx'
-    ? '비즈니스 프레젠테이션용 .pptx 파일로 저장됩니다.'
-    : '편집 가능한 Word .docx 문서로 저장됩니다. (보고서/문서 형태)';
+    ? t('ppt_fmt_desc_pptx')
+    : t('ppt_fmt_desc_docx');
 }
 function selTmpl(t){
   pptSettings.template = t;
@@ -8487,7 +9271,7 @@ ${inputText}`;
 /** 슬라이드 카드 렌더 (편집 가능 + 삭제 + 섹션 구분) */
 function renderPptSlides(slides){
   const c = document.getElementById('pptSlidesContainer'); c.innerHTML = '';
-  document.getElementById('pptSlideCount').innerText = `(${slides.length}장)`;
+  document.getElementById('pptSlideCount').innerText = t('ppt_slide_count').replace('${n}',slides.length).replace('${unit}',t('ppt_unit_page'));
   const tmpl = PPT_TEMPLATES[pptSettings.template] || PPT_TEMPLATES.dark;
 
   slides.forEach((s, i) => {
@@ -8499,8 +9283,8 @@ function renderPptSlides(slides){
       <div class="ppt-slide-card" style="${sectionStyle}">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;">
           <div class="ppt-slide-num">
-            슬라이드 ${i+1}
-            ${isSection ? `<span style="margin-left:6px;background:rgba(${hexToRgb(pptSettings.accentColor)},.2);color:#${pptSettings.accentColor};font-size:9px;padding:1px 6px;border-radius:3px;font-weight:bold;">섹션</span>` : ''}
+            ${t('ppt_slide_label')} ${i+1}
+            ${isSection ? `<span style="margin-left:6px;background:rgba(${hexToRgb(pptSettings.accentColor)},.2);color:#${pptSettings.accentColor};font-size:9px;padding:1px 6px;border-radius:3px;font-weight:bold;">${t('ppt_section_badge')}</span>` : ''}
           </div>
           <button class="ppt-slide-del" onclick="event.stopPropagation();delPptSlide(${i})" title="이 슬라이드 삭제">×</button>
         </div>
@@ -8513,7 +9297,7 @@ function renderPptSlides(slides){
         <!-- 편집 필드 -->
         <input class="ppt-slide-title-input" id="ppt-title-${i}" value="${esc(s.title||'')}" placeholder="슬라이드 제목" oninput="livePreviewUpdate(${i})">
         <input class="ppt-slide-sub-input" id="ppt-sub-${i}" value="${esc(s.subtitle||'')}" placeholder="부제목 (선택)">
-        <textarea class="ppt-slide-bullets-input" id="ppt-bullets-${i}" placeholder="불릿포인트 (줄바꿈으로 구분)">${(s.bullets||[]).join('\n')}</textarea>
+        <textarea class="ppt-slide-bullets-input" id="ppt-bullets-${i}" placeholder="${t('ppt_slide_bullets_ph')}">${(s.bullets||[]).join('\n')}</textarea>
       </div>`);
   });
 }
@@ -8544,7 +9328,7 @@ function collectPptSlides(){
     const titleEl    = document.getElementById('ppt-title-'+i);
     const subtitleEl = document.getElementById('ppt-sub-'+i);
     const bulletsEl  = document.getElementById('ppt-bullets-'+i);
-    const title    = (titleEl?.value    || '').trim() || '(제목 없음)';
+    const title    = (titleEl?.value    || '').trim() || t('ppt_no_title');
     const subtitle = (subtitleEl?.value || '').trim();
     const raw      = (bulletsEl?.value  || '').trim();
     // ★ null/빈값 안전 처리
@@ -8574,10 +9358,10 @@ async function downloadPpt(fmt){
     return;
   }
 
-  showToast('PPTX 생성 중...');
+  showToast(t('pptx_making'));
   try{
     if(typeof PptxGenJS === 'undefined'){
-      throw new Error('PptxGenJS 라이브러리가 로드되지 않았습니다. 인터넷 연결을 확인하세요.');
+      throw new Error(t('pptlib_error'));
     }
     const pptx = new PptxGenJS();
     pptx.layout = 'LAYOUT_16x9';
@@ -8628,7 +9412,7 @@ async function downloadPpt(fmt){
     slides.forEach((s, idx) => {
       // ★ null 방어 — 슬라이드 데이터 안전 처리
       if(!s) return;
-      s.title    = (s.title    || '').trim() || '(제목 없음)';
+      s.title    = (s.title    || '').trim() || t('ppt_no_title');
       s.subtitle = (s.subtitle || '').trim();
       s.bullets  = Array.isArray(s.bullets) ? s.bullets.filter(b => b && String(b).trim()) : [];
       s.summary  = (s.summary  || '').trim();
@@ -8900,20 +9684,20 @@ function openCalEventPopup(ei, px, py){
     `<span style="${typeStyle};padding:3px 10px;border-radius:5px;">${e.type||'일정'}</span>`;
 
   // 제목
-  document.getElementById('cdTitle').innerText = e.title || '(제목없음)';
+  document.getElementById('cdTitle').innerText = e.title || t('cal_detail_no_title');
 
   // 상세 정보 행 구성
   let rows = '';
   if(e.startDate){
     const dateStr = e.endDate && e.endDate!==e.startDate
       ? `${e.startDate} ~ ${e.endDate}` : e.startDate;
-    rows += row('📅','날짜',dateStr);
+    rows += row('📅', t('cal_detail_date'), dateStr);
   }
-  if(e.type==='회의' && e.meetTime) rows += row('⏰','시간',e.meetTime);
-  if(e.type==='회의' && e.meetPlace) rows += row('📍','장소',e.meetPlace);
-  if(e.worker) rows += row('👤','담당자',e.worker);
+  if(e.type==='회의' && e.meetTime) rows += row('⏰', t('cal_detail_time'), e.meetTime);
+  if(e.type==='회의' && e.meetPlace) rows += row('📍', t('cal_detail_place'), e.meetPlace);
+  if(e.worker) rows += row('👤', t('cal_detail_worker'), e.worker);
   document.getElementById('cdRows').innerHTML = rows ||
-    '<div style="color:#475569;font-size:12px;">세부 정보 없음</div>';
+    `<div style="color:#475569;font-size:12px;">${t('cal_detail_no_info')}</div>`;
 
   // 메모
   const memoEl = document.getElementById('cdMemo');
@@ -8930,9 +9714,9 @@ function openCalEventPopup(ei, px, py){
   // 하단 버튼: 수정 / 삭제 / 닫기
   document.getElementById('cdActions').className = 'cal-detail-actions';
   document.getElementById('cdActions').innerHTML = `
-    <button class="cda-btn cda-edit" onclick="calDetailEdit()">✏️ 수정</button>
-    <button class="cda-btn cda-del"  onclick="calDetailDelete()">🗑️ 삭제</button>
-    <button class="cda-btn cda-close" onclick="closeCalDetail()" style="grid-column:1/-1;">✕ 닫기</button>
+    <button class="cda-btn cda-edit" onclick="calDetailEdit()">${t('cal_detail_edit')}</button>
+    <button class="cda-btn cda-del"  onclick="calDetailDelete()">${t('cal_detail_delete')}</button>
+    <button class="cda-btn cda-close" onclick="closeCalDetail()" style="grid-column:1/-1;">${t('cal_detail_close')}</button>
   `;
   document.getElementById('cdActions').style.gridTemplateColumns = '1fr 1fr';
 
@@ -8950,17 +9734,17 @@ function openMailEventPopup(mailIdx){
 
   // 유형 배지
   document.getElementById('cdType').innerHTML =
-    `<span style="${CAL_TYPE_STYLE['메일']};padding:3px 10px;border-radius:5px;">📩 메일 납기</span>`;
+    `<span style="${CAL_TYPE_STYLE['메일']};padding:3px 10px;border-radius:5px;">${t('cal_detail_mail_deadline')}</span>`;
 
   // 제목
-  document.getElementById('cdTitle').innerText = m.subject || '(제목없음)';
+  document.getElementById('cdTitle').innerText = m.subject || t('cal_detail_no_title');
 
   // 상세 행
   let rows = '';
-  if(m.deadlineDate) rows += row('📅','납기일',m.deadlineDate);
-  if(m.deadlineText) rows += row('📋','설명',m.deadlineText);
-  if(m.sender)       rows += row('👤','발신자',m.sender);
-  if(m.category)     rows += row('🏢','부서',m.category);
+  if(m.deadlineDate) rows += row('📅', t('cal_detail_deadline'), m.deadlineDate);
+  if(m.deadlineText) rows += row('📋', t('cal_detail_desc'), m.deadlineText);
+  if(m.sender)       rows += row('👤', t('cal_detail_sender'), m.sender);
+  if(m.category)     rows += row('🏢', t('cal_detail_dept'), m.category);
   document.getElementById('cdRows').innerHTML = rows || '';
 
   // AI 요약 메모
@@ -8977,17 +9761,17 @@ function openMailEventPopup(mailIdx){
   statusEl.style.display = 'flex';
   statusEl.className = `cal-detail-status ${isDone?'done':'pend'}`;
   statusEl.innerHTML = isDone
-    ? '✅ 처리완료 상태입니다.'
-    : '⏳ 미처리 상태입니다. 처리 완료 시 버튼을 누르세요.';
+    ? t('cal_detail_done')
+    : t('cal_detail_pending');
 
   // 하단 버튼: 처리완료 토글 + 닫기
   const cdA = document.getElementById('cdActions');
   cdA.style.gridTemplateColumns = isDone ? '1fr 1fr' : '1fr 1fr';
   cdA.innerHTML = isDone
-    ? `<button class="cda-btn cda-pend" onclick="calDetailToggleProc()">↩️ 미처리로 변경</button>
-       <button class="cda-btn cda-close" onclick="closeCalDetail()">✕ 닫기</button>`
-    : `<button class="cda-btn cda-done" onclick="calDetailToggleProc()">✅ 처리 완료</button>
-       <button class="cda-btn cda-close" onclick="closeCalDetail()">✕ 닫기</button>`;
+    ? `<button class="cda-btn cda-pend" onclick="calDetailToggleProc()">${t('cal_detail_change_pend')}</button>
+       <button class="cda-btn cda-close" onclick="closeCalDetail()">${t('cal_detail_close')}</button>`
+    : `<button class="cda-btn cda-done" onclick="calDetailToggleProc()">${t('cal_detail_mark_done')}</button>
+       <button class="cda-btn cda-close" onclick="closeCalDetail()">${t('cal_detail_close')}</button>`;
 
   openCalDetail();
 }
@@ -9003,15 +9787,15 @@ function openTaskEventPopup(taskIdx){
     ? 'background:rgba(244,63,94,.18);color:#fca5a5'
     : 'background:rgba(59,130,246,.18);color:#93c5fd';
   document.getElementById('cdType').innerHTML =
-    `<span style="${typeStyle};padding:3px 10px;border-radius:5px;">${tk.type==='지시'?'⚡ 지시사항':'📋 요청사항'}</span>`;
+    `<span style="${typeStyle};padding:3px 10px;border-radius:5px;">${tk.type==='지시' ? t('work_type_directive') : t('work_type_request')}</span>`;
 
-  document.getElementById('cdTitle').innerText = tk.title || '(제목없음)';
+  document.getElementById('cdTitle').innerText = tk.title || t('cal_detail_no_title');
 
   let rows = '';
-  if(tk.startDate) rows += row('📅','지시일',tk.startDate);
-  if(tk.dueDate)   rows += row('⏰','납기일',tk.dueDate);
-  if(tk.worker)    rows += row('👤','담당자',tk.worker);
-  if(tk.createdAt) rows += row('🗓','등록일',tk.createdAt);
+  if(tk.startDate) rows += row('📅', t('cal_detail_directive_day'), tk.startDate);
+  if(tk.dueDate)   rows += row('⏰', t('cal_detail_due'), tk.dueDate);
+  if(tk.worker)    rows += row('👤', t('cal_detail_worker'), tk.worker);
+  if(tk.createdAt) rows += row('🗓', t('cal_detail_reg_day'), tk.createdAt);
   document.getElementById('cdRows').innerHTML = rows || '';
 
   const memoEl = document.getElementById('cdMemo');
@@ -9026,8 +9810,8 @@ function openTaskEventPopup(taskIdx){
   const cdA = document.getElementById('cdActions');
   cdA.style.gridTemplateColumns = '1fr 1fr';
   cdA.innerHTML = `
-    <button class="cda-btn cda-del"   onclick="calDetailDelete()">🗑️ 삭제</button>
-    <button class="cda-btn cda-close" onclick="closeCalDetail()">✕ 닫기</button>
+    <button class="cda-btn cda-del"   onclick="calDetailDelete()">${t('cal_detail_delete')}</button>
+    <button class="cda-btn cda-close" onclick="closeCalDetail()">${t('cal_detail_close')}</button>
   `;
   openCalDetail();
 }
@@ -9074,7 +9858,7 @@ function calDetailToggleProc(){
   lsSet('pmap', pmap);
   closeCalDetail();
   renderCalendar(); renderStatusPanel(); renderTracking();
-  showToast(pmap[idx] ? '✅ 처리 완료로 변경됐습니다.' : '↩️ 미처리로 변경됐습니다.');
+  showToast(pmap[idx] ? t('toast_proc_done_changed') : t('toast_proc_pend_changed'));
 }
 
 // 오버레이 클릭으로 닫기
@@ -9102,7 +9886,7 @@ function dpNav(d){
   dpRender();
 }
 function dpRender(){
-  document.getElementById('dpTitle').innerText=`${dpYear}년 ${dpMonth+1}월`;
+  document.getElementById('dpTitle').innerText=t('dp_title_label').replace('${year}',dpYear).replace('${month}',dpMonth+1);
   const days=document.getElementById('dpDays'); days.innerHTML='';
   const first=new Date(dpYear,dpMonth,1).getDay();
   const total=new Date(dpYear,dpMonth+1,0).getDate();
@@ -9239,27 +10023,27 @@ document.addEventListener('DOMContentLoaded', ()=>{
 /** 10종 스킨 정의 */
 const SKINS = [
   // ── 다크 테마 10종 ──
-  { id:'dark-blue',    name:'다크 블루',    bg:'#0f172a', sidebar:'#020617', accent:'#3b82f6', text:'#f1f5f9', dark:true },
-  { id:'deep-navy',    name:'딥 네이비',    bg:'#0a0f1e', sidebar:'#060c18', accent:'#60a5fa', text:'#e2e8f0', dark:true },
-  { id:'midnight',     name:'미드나잇',     bg:'#111827', sidebar:'#0d1117', accent:'#818cf8', text:'#f9fafb', dark:true },
-  { id:'dark-purple',  name:'다크 퍼플',    bg:'#1a0f2e', sidebar:'#110920', accent:'#a855f7', text:'#f5f3ff', dark:true },
-  { id:'dark-teal',    name:'다크 틸',      bg:'#042f2e', sidebar:'#021f1e', accent:'#14b8a6', text:'#f0fdfa', dark:true },
-  { id:'dark-slate',   name:'슬레이트',     bg:'#1e293b', sidebar:'#0f172a', accent:'#94a3b8', text:'#f8fafc', dark:true },
-  { id:'dark-emerald', name:'에메랄드',     bg:'#052e16', sidebar:'#021808', accent:'#10b981', text:'#ecfdf5', dark:true },
-  { id:'dark-rose',    name:'다크 로즈',    bg:'#1c0a0a', sidebar:'#110606', accent:'#f43f5e', text:'#fff1f2', dark:true },
-  { id:'dark-amber',   name:'앰버',         bg:'#1c1100', sidebar:'#110a00', accent:'#f59e0b', text:'#fffbeb', dark:true },
-  { id:'charcoal',     name:'차콜',         bg:'#18181b', sidebar:'#09090b', accent:'#71717a', text:'#fafafa', dark:true },
+  { id:'dark-blue',    name:'다크 블루',    nameKey:'skin_dark_blue',    bg:'#0f172a', sidebar:'#020617', accent:'#3b82f6', text:'#f1f5f9', dark:true },
+  { id:'deep-navy',    name:'딥 네이비',    nameKey:'skin_deep_navy',    bg:'#0a0f1e', sidebar:'#060c18', accent:'#60a5fa', text:'#e2e8f0', dark:true },
+  { id:'midnight',     name:'미드나잇',     nameKey:'skin_midnight',     bg:'#111827', sidebar:'#0d1117', accent:'#818cf8', text:'#f9fafb', dark:true },
+  { id:'dark-purple',  name:'다크 퍼플',    nameKey:'skin_dark_purple',  bg:'#1a0f2e', sidebar:'#110920', accent:'#a855f7', text:'#f5f3ff', dark:true },
+  { id:'dark-teal',    name:'다크 틸',      nameKey:'skin_dark_teal',    bg:'#042f2e', sidebar:'#021f1e', accent:'#14b8a6', text:'#f0fdfa', dark:true },
+  { id:'dark-slate',   name:'슬레이트',     nameKey:'skin_dark_slate',   bg:'#1e293b', sidebar:'#0f172a', accent:'#94a3b8', text:'#f8fafc', dark:true },
+  { id:'dark-emerald', name:'에메랄드',     nameKey:'skin_dark_emerald', bg:'#052e16', sidebar:'#021808', accent:'#10b981', text:'#ecfdf5', dark:true },
+  { id:'dark-rose',    name:'다크 로즈',    nameKey:'skin_dark_rose',    bg:'#1c0a0a', sidebar:'#110606', accent:'#f43f5e', text:'#fff1f2', dark:true },
+  { id:'dark-amber',   name:'앰버',         nameKey:'skin_dark_amber',   bg:'#1c1100', sidebar:'#110a00', accent:'#f59e0b', text:'#fffbeb', dark:true },
+  { id:'charcoal',     name:'차콜',         nameKey:'skin_charcoal',     bg:'#18181b', sidebar:'#09090b', accent:'#71717a', text:'#fafafa', dark:true },
   // ── 라이트 테마 10종 ──
-  { id:'light-white',  name:'순백 라이트',  bg:'#f8fafc', sidebar:'#e2e8f0', accent:'#2563eb', text:'#0f172a', dark:false },
-  { id:'light-blue',   name:'아이스 블루',  bg:'#eff6ff', sidebar:'#dbeafe', accent:'#1d4ed8', text:'#1e3a5f', dark:false },
-  { id:'light-sage',   name:'세이지 그린',  bg:'#f0fdf4', sidebar:'#dcfce7', accent:'#16a34a', text:'#14532d', dark:false },
-  { id:'light-lavend', name:'라벤더',       bg:'#faf5ff', sidebar:'#ede9fe', accent:'#7c3aed', text:'#3b0764', dark:false },
-  { id:'light-rose',   name:'로즈 핑크',    bg:'#fff1f2', sidebar:'#ffe4e6', accent:'#e11d48', text:'#881337', dark:false },
-  { id:'light-amber',  name:'크림 앰버',    bg:'#fffbeb', sidebar:'#fef3c7', accent:'#d97706', text:'#451a03', dark:false },
-  { id:'light-teal',   name:'민트 틸',      bg:'#f0fdfa', sidebar:'#ccfbf1', accent:'#0d9488', text:'#134e4a', dark:false },
-  { id:'light-slate',  name:'웜 슬레이트',  bg:'#f8fafc', sidebar:'#cbd5e1', accent:'#475569', text:'#0f172a', dark:false },
-  { id:'light-peach',  name:'피치 오렌지',  bg:'#fff7ed', sidebar:'#fed7aa', accent:'#ea580c', text:'#431407', dark:false },
-  { id:'light-gray',   name:'모던 그레이',  bg:'#f9fafb', sidebar:'#e5e7eb', accent:'#4b5563', text:'#111827', dark:false },
+  { id:'light-white',  name:'순백 라이트',  nameKey:'skin_light_white',  bg:'#f8fafc', sidebar:'#e2e8f0', accent:'#2563eb', text:'#0f172a', dark:false },
+  { id:'light-blue',   name:'아이스 블루',  nameKey:'skin_light_blue',   bg:'#eff6ff', sidebar:'#dbeafe', accent:'#1d4ed8', text:'#1e3a5f', dark:false },
+  { id:'light-sage',   name:'세이지 그린',  nameKey:'skin_light_sage',   bg:'#f0fdf4', sidebar:'#dcfce7', accent:'#16a34a', text:'#14532d', dark:false },
+  { id:'light-lavend', name:'라벤더',       nameKey:'skin_light_lavend', bg:'#faf5ff', sidebar:'#ede9fe', accent:'#7c3aed', text:'#3b0764', dark:false },
+  { id:'light-rose',   name:'로즈 핑크',    nameKey:'skin_light_rose',   bg:'#fff1f2', sidebar:'#ffe4e6', accent:'#e11d48', text:'#881337', dark:false },
+  { id:'light-amber',  name:'크림 앰버',    nameKey:'skin_light_amber',  bg:'#fffbeb', sidebar:'#fef3c7', accent:'#d97706', text:'#451a03', dark:false },
+  { id:'light-teal',   name:'민트 틸',      nameKey:'skin_light_teal',   bg:'#f0fdfa', sidebar:'#ccfbf1', accent:'#0d9488', text:'#134e4a', dark:false },
+  { id:'light-slate',  name:'웜 슬레이트',  nameKey:'skin_light_slate',  bg:'#f8fafc', sidebar:'#cbd5e1', accent:'#475569', text:'#0f172a', dark:false },
+  { id:'light-peach',  name:'피치 오렌지',  nameKey:'skin_light_peach',  bg:'#fff7ed', sidebar:'#fed7aa', accent:'#ea580c', text:'#431407', dark:false },
+  { id:'light-gray',   name:'모던 그레이',  nameKey:'skin_light_gray',   bg:'#f9fafb', sidebar:'#e5e7eb', accent:'#4b5563', text:'#111827', dark:false },
 ];
 let currentSkinId = localStorage.getItem('app_skin') || 'dark-blue';
 
@@ -9301,15 +10085,18 @@ function renderSkinGrid(){
   const darkSkins  = SKINS.filter(s=>s.dark);
   const lightSkins = SKINS.filter(s=>!s.dark);
 
-  const renderGroup = (arr) => arr.map(s=>`
+  const renderGroup = (arr) => arr.map(s=>{
+    const sName = (s.nameKey && t(s.nameKey)) || s.name;
+    return `
     <button class="skin-btn${s.id===currentSkinId?' active':''}" data-skin="${s.id}"
-      onclick="applySkin('${s.id}')" title="${s.name}">
+      onclick="applySkin('${s.id}')" title="${sName}">
       <div class="skin-preview" style="background:linear-gradient(135deg,${s.sidebar},${s.bg});">
-        <div style="font-size:8px;color:${s.text};font-weight:700;text-shadow:${s.dark?'none':'0 0 4px rgba(255,255,255,.7)'};">${s.name}</div>
+        <div style="font-size:8px;color:${s.text};font-weight:700;text-shadow:${s.dark?'none':'0 0 4px rgba(255,255,255,.7)'};">${sName}</div>
         <div class="skin-preview-bar" style="background:${s.accent};"></div>
       </div>
-      <div class="skin-name" style="background:${s.sidebar};color:${s.text};">${s.name}</div>
-    </button>`).join('');
+      <div class="skin-name" style="background:${s.sidebar};color:${s.text};">${sName}</div>
+    </button>`;
+  }).join('');
 
   grid.innerHTML = `
     <div style="grid-column:1/-1;font-size:10px;font-weight:700;color:#64748b;margin-bottom:2px;letter-spacing:.5px;">🌑 DARK</div>
@@ -9438,7 +10225,7 @@ function syncFunctionLockState(){
     } else {
       el.classList.add('api-locked');
       el.disabled = true;
-      el.title = 'API 키 등록 후 사용 가능합니다';
+      el.title = t('api_key_btn_locked');
     }
   });
 
@@ -9450,7 +10237,7 @@ function syncFunctionLockState(){
   const dot = document.getElementById('statusDot');
   const txt = document.getElementById('statusTxt');
   if(dot) dot.style.background = hasKey ? '#10b981' : '#f43f5e';
-  if(txt) txt.innerText = hasKey ? 'Timothy AI 가동 중' : 'API 키 미등록';
+  if(txt) txt.innerText = hasKey ? t('status_active') : t('status_api_missing');
 }
 
 /** 상태 렌더: 등록됨 ↔ 입력중 */
@@ -9542,7 +10329,7 @@ function syncModelSelectsToKeys(){
       Array.from(sel.options).forEach(o=>{ if(o.value==='deepl') o.remove(); });
       const deeplOpt = document.createElement('option');
       deeplOpt.value = 'deepl';
-      deeplOpt.textContent = hasDeepL ? '🌿 DeepL (고품질)' : '🌿 DeepL (키 미등록)';
+      deeplOpt.textContent = hasDeepL ? t('deepl_registered') : t('deepl_not_registered');
       deeplOpt.disabled = !hasDeepL;
       deeplOpt.style.color = hasDeepL ? '#34d399' : '#64748b';
       sel.appendChild(deeplOpt);
@@ -9890,7 +10677,7 @@ function betaAlert(){ alert(t('toast_beta')); }
 /** 설정 모달 열기 — 항상 account 탭으로 시작 */
 function openSettingsModal(){
   switchSettingsTab('account');
-  const curLoc=localStorage.getItem('user_location')||'청주 사업장';
+  const curLoc=localStorage.getItem('user_location')||t('loc_default').replace('📍 ','');
   const li=document.getElementById('settingsLocInput'); if(li) li.value=curLoc;
   const ld=document.getElementById('currentLocDisplay'); if(ld) ld.innerText=`📍 ${curLoc}`;
   renderAiModelSelect();
@@ -9909,7 +10696,7 @@ switchSettingsTab = function(tab){
       if(geo){
         renderWeeklyWeatherInSettings(geo.lat, geo.lon, currentTimezone);
       } else {
-        const loc = localStorage.getItem('user_location') || '청주 사업장';
+        const loc = localStorage.getItem('user_location') || t('loc_default').replace('📍 ','');
         geocode(loc).then(g=>{
           if(g){ _lastGeo=g; renderWeeklyWeatherInSettings(g.lat, g.lon, g.tz||currentTimezone); }
         });
@@ -10008,7 +10795,7 @@ document.addEventListener('DOMContentLoaded', ()=>{
   const savedSkin=localStorage.getItem('app_skin');
   if(savedSkin) applySkin(savedSkin);
   // ★ 위치 기본값: localStorage → '청주 사업장' (KO 기본값 유지, 언어 무관)
-  const savedLoc=localStorage.getItem('user_location') || '청주 사업장';
+  const savedLoc=localStorage.getItem('user_location') || t('loc_default').replace('📍 ','');
   const el=document.getElementById('currentLocLabel');
   if(el) el.innerText=`📍 ${savedLoc}`;
   // ★ 폰트 복원 — CSS 변수 + body 모두 적용
@@ -10023,6 +10810,13 @@ document.addEventListener('DOMContentLoaded', ()=>{
   if(savedModel) currentAiModel=savedModel;
   // ★ 기능 버튼 잠금 상태 초기화
   syncFunctionLockState();
+  // ★ TTS 성별 UI 복원 (localStorage → 버튼 active 상태 동기화)
+  (()=>{
+    const g = localStorage.getItem('tts_gender') || 'male';
+    ttsGender = g;
+    ['genderMale','confGenderMale'].forEach(id=>{ const b=document.getElementById(id); if(b) b.classList.toggle('active', g==='male'); });
+    ['genderFemale','confGenderFemale'].forEach(id=>{ const b=document.getElementById(id); if(b) b.classList.toggle('active', g==='female'); });
+  })();
   // ★ 날씨 + 시간대 초기 로드 (비동기 — UI 블로킹 없음)
   updateWeatherAndTime(savedLoc);
 });
