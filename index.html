@@ -1467,11 +1467,6 @@ textarea::-webkit-scrollbar-thumb{background:#334155;border-radius:4px;}
           </select>
         </div>
         <div style="flex:1;"></div>
-        <!-- TTS 성별 -->
-        <div style="display:flex;background:#020617;border:1px solid #334155;border-radius:7px;padding:3px;gap:2px;flex-shrink:0;">
-          <button class="tv-gender-btn active" id="genderMale"   onclick="setTtsGender('male')" data-i18n="voice_male">👨 남자</button>
-          <button class="tv-gender-btn"        id="genderFemale" onclick="setTtsGender('female')" data-i18n="voice_female">👩 여자</button>
-        </div>
       </div>
 
       <!-- 단방향 / 양방향 탭 -->
@@ -1564,17 +1559,6 @@ textarea::-webkit-scrollbar-thumb{background:#334155;border-radius:4px;}
       <!-- 안내 -->
       <div id="confModeNote" style="background:rgba(59,130,246,.07);border:1px solid rgba(59,130,246,.2);border-radius:9px;padding:8px 13px;font-size:11px;color:#64748b;line-height:1.7;flex-shrink:0;">
         💡 <b style="color:#60a5fa;" data-i18n="conf_mode_label">회의 모드:</b> <span data-i18n="conf_mode_desc">상대 언어로 감지된 발화만 자막에 표시됩니다. 종료 시 AI가 전체 회의록을 자동 요약합니다.</span>
-      </div>
-
-      <!-- ★ TTS 성별 선택 (회의 모드) -->
-      <div style="display:flex;align-items:center;gap:8px;padding:6px 2px;flex-shrink:0;">
-        <span style="font-size:11px;color:#64748b;" data-i18n="conf_tts_label">🔊 번역 목소리:</span>
-        <button class="tv-gender-btn active" id="confGenderMale"
-          onclick="setTtsGender('male');document.getElementById('confGenderMale').classList.add('active');document.getElementById('confGenderFemale').classList.remove('active');"
-          data-i18n="voice_male">👨 남자</button>
-        <button class="tv-gender-btn" id="confGenderFemale"
-          onclick="setTtsGender('female');document.getElementById('confGenderFemale').classList.add('active');document.getElementById('confGenderMale').classList.remove('active');"
-          data-i18n="voice_female">👩 여자</button>
       </div>
 
       <!-- 자막창 -->
@@ -6995,16 +6979,18 @@ function renderCalendar(){
   mails.forEach((m,mi)=>{if(m.deadlineDate&&m.deadlineDate!=='null'&&m.deadlineDate!==null){twd++;if(pmap[mi])done++;}});
   const banner=document.getElementById('replyBanner');
   if(banner){
-    const _unit = t('ppt_unit_page')==='장'?'건':''; // KO fallback
-    const _trackUnit = (LANG_PACKS[currentLang]||LANG_PACKS.KO).track_total_count?.replace('${n}','').replace('총','').replace('共','').replace('total','').trim()||'건';
-    banner.innerHTML=`<div class="banner-chip chip-total">${t('mail_banner_count').replace('\${n}',twd)}</div><div class="banner-chip chip-done">✅ ${done}${_trackUnit}</div><div class="banner-chip chip-pend">⏳ ${twd-done}${_trackUnit}</div>`;
+    const _pack = LANG_PACKS[currentLang]||LANG_PACKS.KO;
+    const _rawUnit = (_pack.track_total_count||'').split('${n}')[1]||'';
+    const _suffix = _rawUnit.replace(/^\s/,' ').trimEnd(); // 언어별 단위 접미사 (공백 포함 유지)
+    banner.innerHTML=`<div class="banner-chip chip-total">${t('mail_banner_count').replace('\${n}',twd)}</div><div class="banner-chip chip-done">✅ ${t('status_proc_done')} ${done}${_suffix}</div><div class="banner-chip chip-pend">⏳ ${t('status_proc_pend')} ${twd-done}${_suffix}</div>`;
   }
   if(!g) return; // 다른 뷰면 배너만
 
   g.innerHTML='';
-  const labels=['일','월','화','수','목','금','토'];
+  const _calPack = LANG_PACKS[currentLang]||LANG_PACKS.KO;
+  const _dayKeys=['sun','mon','tue','wed','thu','fri','sat'];
   const labelCls=['sun','','','','','','sat'];
-  labels.forEach((w,i)=>g.insertAdjacentHTML('beforeend',`<div class="cal-day-label ${labelCls[i]}">${w}</div>`));
+  _dayKeys.forEach((k,i)=>g.insertAdjacentHTML('beforeend',`<div class="cal-day-label ${labelCls[i]}">${_calPack[k]||k}</div>`));
   const ml=document.getElementById('calMonthLabel');
   if(ml) ml.innerText=t('cal_month_label').replace('\${year}',calYear).replace('\${month}',calMonth+1);
 
@@ -7750,8 +7736,6 @@ let _confTtsSpeaking   = false;
 // ══════════════════════════════
 // ★ 번역 뷰 트리 구조 제어 함수
 // ══════════════════════════════
-let ttsGender = localStorage.getItem('tts_gender') || 'male'; // localStorage 복원
-
 // ══════════════════════════════
 // ★ 번역 뷰 3탭 제어 + 모드별 언어 설정
 // ══════════════════════════════
@@ -8361,21 +8345,6 @@ function switchVoiceSubMode(sub){
   interpMode = sub;
 }
 
-/** TTS 성별 선택 — localStorage 저장으로 새로고침 후에도 유지 */
-function setTtsGender(gender){
-  ttsGender = gender;
-  localStorage.setItem('tts_gender', gender);
-  // 단방향/회의 모드 버튼 동기화
-  ['genderMale','confGenderMale'].forEach(id=>{
-    const b = document.getElementById(id);
-    if(b) b.classList.toggle('active', gender==='male');
-  });
-  ['genderFemale','confGenderFemale'].forEach(id=>{
-    const b = document.getElementById(id);
-    if(b) b.classList.toggle('active', gender==='female');
-  });
-  showToast(gender==='male' ? t('toast_voice_male') : t('toast_voice_female'));
-}
 
 /**
  * TTS 성별 휴리스틱 보이스 선택 (강화판)
@@ -8402,19 +8371,17 @@ function getVoiceForGender(lang){
   // ── 성별 키워드 패턴 (언어별 실제 보이스명 확장) ──
   const maleKw = /\b(male|man|guy|남성|남자|하준|민준|도현|dong-?hyun|jun|hyun)\b|\b(david|mark|guy|eric|george|daniel|fred|alex|tom|james|rishi|google\s*uk\s*english\s*male)\b/i;
   const femaleKw = /\b(female|woman|여성|여자|서연|지우|민지|ji|seo|yeon)\b|\b(zira|samantha|victoria|kate|alice|karen|lisa|google\s*uk\s*english\s*female|ava|susan|fiona)\b/i;
-  const kw = ttsGender === 'male' ? maleKw : femaleKw;
 
-  // 1차: 타겟 언어 + 성별 키워드 (가장 이상적)
-  let v = voices.find(x => x.lang.toLowerCase().startsWith(baseLang) && kw.test(x.name));
+  // 1차: 타겟 언어 + 타겟 언어 첫 번째 보이스 우선
+  let v = voices.find(x => x.lang.toLowerCase().startsWith(baseLang) && !femaleKw.test(x.name));
 
-  // 2차: 타겟 언어 + 반대 성별 키워드 제외 (= 중립 보이스 선택)
+  // 2차: 타겟 언어 + 성별 무관 첫 번째
   if(!v){
-    const oppKw = ttsGender === 'male' ? femaleKw : maleKw;
-    v = voices.find(x => x.lang.toLowerCase().startsWith(baseLang) && !oppKw.test(x.name));
+    v = voices.find(x => x.lang.toLowerCase().startsWith(baseLang));
   }
 
-  // 3차: 성별 키워드만 매칭 (언어 무관)
-  if(!v) v = voices.find(x => kw.test(x.name));
+  // 3차: 타겟 언어 BCP-47 정확 매칭 (Android에서 lang='ko'인데 voices가 'ko-KR'만 있는 경우)
+  if(!v) v = voices.find(x => x.lang.toLowerCase() === ttsLang.toLowerCase());
 
   // 4차: 타겟 언어 첫 번째 (성별 무관)
   if(!v) v = voices.find(x => x.lang.toLowerCase().startsWith(baseLang));
@@ -8425,7 +8392,7 @@ function getVoiceForGender(lang){
   // 6차: 전체 첫 번째 (최후 fallback — null 반환 없음 보장)
   v = v || voices[0];
 
-  // ★ male 선택 시 voice가 없더라도 null 반환하지 않음
+  // ★ voice가 없더라도 null 반환하지 않음
   //    (null 반환 → utter.voice 미설정 → 브라우저가 lang 속성으로 대체 발화)
   return v || null;
 }
@@ -11098,13 +11065,6 @@ document.addEventListener('DOMContentLoaded', ()=>{
   if(savedModel) currentAiModel=savedModel;
   // ★ 기능 버튼 잠금 상태 초기화
   syncFunctionLockState();
-  // ★ TTS 성별 UI 복원 (localStorage → 버튼 active 상태 동기화)
-  (()=>{
-    const g = localStorage.getItem('tts_gender') || 'male';
-    ttsGender = g;
-    ['genderMale','confGenderMale'].forEach(id=>{ const b=document.getElementById(id); if(b) b.classList.toggle('active', g==='male'); });
-    ['genderFemale','confGenderFemale'].forEach(id=>{ const b=document.getElementById(id); if(b) b.classList.toggle('active', g==='female'); });
-  })();
   // ★ 날씨 + 시간대 초기 로드 (비동기 — UI 블로킹 없음)
   updateWeatherAndTime(savedLoc);
 });
