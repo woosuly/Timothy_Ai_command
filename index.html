@@ -2214,11 +2214,19 @@ textarea::-webkit-scrollbar-thumb{background:#334155;border-radius:4px;}
             </div>
           </div>
           <div style="display:grid;grid-template-columns:80px 1fr 80px;gap:6px;align-items:center;">
-            <div style="font-size:11px;font-weight:600;color:#e2e8f0;" data-i18n="lbl_task_translate">🌐 번역/통역</div>
-            <select id="taskModelSel-translate" class="field-input" style="font-size:11px;cursor:pointer;" onchange="setModelForTask('translate',this.value)"></select>
+            <div style="font-size:11px;font-weight:600;color:#e2e8f0;" data-i18n="lbl_task_translate_doc">📄 문서 번역</div>
+            <select id="taskModelSel-translate-doc" class="field-input" style="font-size:11px;cursor:pointer;" onchange="setModelForTask('translate_doc',this.value)"></select>
             <div style="display:flex;gap:3px;align-items:center;">
-              <span id="taskModelBadge-translate" style="font-size:9px;padding:2px 5px;border-radius:3px;"></span>
-              <button onclick="resetModelForTask('translate')" style="padding:2px 6px;background:rgba(30,41,59,.6);border:1px solid #334155;color:#64748b;border-radius:4px;font-size:10px;cursor:pointer;" data-i18n-title="lbl_reset_default" title="기본값 복원">↩</button>
+              <span id="taskModelBadge-translate-doc" style="font-size:9px;padding:2px 5px;border-radius:3px;"></span>
+              <button onclick="resetModelForTask('translate_doc')" style="padding:2px 6px;background:rgba(30,41,59,.6);border:1px solid #334155;color:#64748b;border-radius:4px;font-size:10px;cursor:pointer;" data-i18n-title="lbl_reset_default" title="기본값 복원">↩</button>
+            </div>
+          </div>
+          <div style="display:grid;grid-template-columns:80px 1fr 80px;gap:6px;align-items:center;">
+            <div style="font-size:11px;font-weight:600;color:#e2e8f0;" data-i18n="lbl_task_translate_voice">🎙️ 음성 통역</div>
+            <select id="taskModelSel-translate-voice" class="field-input" style="font-size:11px;cursor:pointer;" onchange="setModelForTask('translate_voice',this.value)"></select>
+            <div style="display:flex;gap:3px;align-items:center;">
+              <span id="taskModelBadge-translate-voice" style="font-size:9px;padding:2px 5px;border-radius:3px;"></span>
+              <button onclick="resetModelForTask('translate_voice')" style="padding:2px 6px;background:rgba(30,41,59,.6);border:1px solid #334155;color:#64748b;border-radius:4px;font-size:10px;cursor:pointer;" data-i18n-title="lbl_reset_default" title="기본값 복원">↩</button>
             </div>
           </div>
         </div>
@@ -2860,7 +2868,7 @@ const LANG_PACKS = {
     confirm_del_calev:'이 일정을 삭제하시겠습니까?',
     confirm_del_fallback:'삭제?', confirm_no_recovery:'복구 불가',
     // ── API 설정 ──
-    model_default_hint:'기본값: 분석=Gemini Pro / 작성=Claude / 번역=GPT-4o',
+    model_default_hint:'기본값: 분석=Gemini / 작성=Claude / 문서번역=GPT-4o / 음성통역=GPT-4o',
     api_key_btn_locked:'API 키 등록 후 사용 가능합니다',
     deepl_registered:'🌿 DeepL (고품질)', deepl_not_registered:'🌿 DeepL (키 미등록)',
     // ── 처리 상태 ──
@@ -2920,6 +2928,8 @@ const LANG_PACKS = {
     lbl_task_analyze:'📊 AI 분석',
     lbl_task_write:'✉️ 문서 작성',
     lbl_task_translate:'🌐 번역/통역',
+    lbl_task_translate_doc:'📄 문서 번역',
+    lbl_task_translate_voice:'🎙️ 음성 통역',
     lbl_task_voice:'🎙️ 음성 통역',
     lbl_task_conf:'🏢 회의 모드',
     lbl_reset_default:'기본값 복원',
@@ -3340,7 +3350,7 @@ const LANG_PACKS = {
     confirm_del_mail:'确定删除此分析邮件吗？', confirm_del_track:'确定删除此任务吗？',
     confirm_del_style:'确定删除此文体数据吗？', confirm_del_calev:'确定删除此日程吗？',
     confirm_del_fallback:'删除？', confirm_no_recovery:'无法恢复',
-    model_default_hint:'默认：分析=Gemini Pro / 文档=Claude / 翻译=GPT-4o',
+    model_default_hint:'默认：分析=Gemini / 文档=Claude / 文档翻译=GPT-4o / 语音口译=GPT-4o',
     api_key_btn_locked:'请先注册API密钥后使用',
     status_proc_done:'已处理', status_proc_pend:'未处理',
     weekly_mail_label:'邮件', weekly_empty:'无',
@@ -3380,6 +3390,8 @@ const LANG_PACKS = {
     lbl_task_analyze:'📊 AI分析',
     lbl_task_write:'✉️ 文档撰写',
     lbl_task_translate:'🌐 翻译/口译',
+    lbl_task_translate_doc:'📄 文档翻译',
+    lbl_task_translate_voice:'🎙️ 语音口译',
     lbl_task_voice:'🎙️ 语音口译',
     lbl_task_conf:'🏢 会议模式',
     lbl_reset_default:'恢复默认值',
@@ -3756,7 +3768,7 @@ const LANG_PACKS = {
     confirm_del_mail:'Delete this analyzed mail?', confirm_del_track:'Delete this task?',
     confirm_del_style:'Delete this style data?', confirm_del_calev:'Delete this event?',
     confirm_del_fallback:'Delete?', confirm_no_recovery:'Cannot be undone',
-    model_default_hint:'Default: Analysis=Gemini Pro / Write=Claude / Translate=GPT-4o',
+    model_default_hint:'Default: Analysis=Gemini / Write=Claude / Doc Trans=GPT-4o / Voice Interp=GPT-4o',
     api_key_btn_locked:'Register API key to use this feature',
     status_proc_done:'Done', status_proc_pend:'Pending',
     weekly_mail_label:'Mail', weekly_empty:'None',
@@ -3796,6 +3808,8 @@ const LANG_PACKS = {
     lbl_task_analyze:'📊 AI Analysis',
     lbl_task_write:'✉️ Doc Writing',
     lbl_task_translate:'🌐 Translate/Interpret',
+    lbl_task_translate_doc:'📄 Doc Translation',
+    lbl_task_translate_voice:'🎙️ Voice Interp',
     lbl_task_voice:'🎙️ Voice Interpret',
     lbl_task_conf:'🏢 Conference Mode',
     lbl_reset_default:'Reset to Default',
@@ -4212,6 +4226,8 @@ const LANG_PACKS = {
     lbl_task_analyze:'📊 AI分析',
     lbl_task_write:'✉️ 文書作成',
     lbl_task_translate:'🌐 翻訳/通訳',
+    lbl_task_translate_doc:'📄 文書翻訳',
+    lbl_task_translate_voice:'🎙️ 音声通訳',
     lbl_task_voice:'🎙️ 音声通訳',
     lbl_task_conf:'🏢 会議モード',
     lbl_reset_default:'デフォルトに戻す',
@@ -5485,11 +5501,13 @@ function updateUI(){
 
   // ★ TASK_LABELS 동적 갱신 (JS 상수이므로 updateUI에서 재할당)
   if(typeof TASK_LABELS !== 'undefined'){
-    TASK_LABELS.analyze   = pack.lbl_task_analyze   || TASK_LABELS.analyze;
-    TASK_LABELS.write     = pack.lbl_task_write     || TASK_LABELS.write;
-    TASK_LABELS.translate = pack.lbl_task_translate || TASK_LABELS.translate;
-    TASK_LABELS.voice     = pack.lbl_task_voice     || TASK_LABELS.voice;
-    TASK_LABELS.conf      = pack.lbl_task_conf      || TASK_LABELS.conf;
+    TASK_LABELS.analyze         = pack.lbl_task_analyze         || TASK_LABELS.analyze;
+    TASK_LABELS.write           = pack.lbl_task_write           || TASK_LABELS.write;
+    TASK_LABELS.translate       = pack.lbl_task_translate       || TASK_LABELS.translate;
+    TASK_LABELS.translate_doc   = pack.lbl_task_translate_doc   || TASK_LABELS.translate_doc;
+    TASK_LABELS.translate_voice = pack.lbl_task_translate_voice || TASK_LABELS.translate_voice;
+    TASK_LABELS.voice           = pack.lbl_task_voice           || TASK_LABELS.voice;
+    TASK_LABELS.conf            = pack.lbl_task_conf            || TASK_LABELS.conf;
   }
 
   console.log(`[Timothy] updateUI 완료 — 언어: ${lang}`);
@@ -5523,6 +5541,7 @@ function getBackupKeys(){
     'doc_my_lang','doc_peer_lang','voice_my_lang','voice_peer_lang',
     'conf_my_lang','conf_peer_lang',
     'model_task_analyze','model_task_write','model_task_translate',
+    'model_task_translate_doc','model_task_translate_voice',
   ];
   // API 키는 보안상 백업에서 제외
   return { userKeys: userKeys.map(k=>u+'_'+k), globalKeys };
@@ -6207,15 +6226,26 @@ function toggleApiKeyVisibility(inputId, btn){
 
 
 function updateTransEngineBadge(){
-  // ★ model_task_translate 우선, 없으면 trans_engine 참조
-  const taskModel = localStorage.getItem('model_task_translate') || '';
-  const engine    = taskModel === 'deepl' ? 'deepl'
-                  : (localStorage.getItem('trans_engine') || 'gemini');
+  // ★ translate_doc 우선, 없으면 레거시 translate, 없으면 trans_engine 참조
+  const taskModelDoc  = localStorage.getItem('model_task_translate_doc') || '';
+  const taskModelLeg  = localStorage.getItem('model_task_translate') || '';
+  const taskModel     = taskModelDoc || taskModelLeg;
+  const engine        = taskModel === 'deepl' ? 'deepl'
+                      : taskModel || (localStorage.getItem('trans_engine') || 'gemini');
   const badge = document.getElementById('transEngineBadge');
   if(!badge) return;
-  const labels = { deepl:'🌿 DeepL', 'gemini-2.5-flash':'🟦 Gemini', 'gpt-4o':'🟩 GPT-4o' };
+  const labels = {
+    deepl:'🌿 DeepL',
+    'gemini-2.5-flash':'🟦 Gemini 2.5',
+    'gemini-2.0-flash':'🟦 Gemini 2.0',
+    'gpt-4o':'🟩 GPT-4o',
+    'gpt-4o-mini':'🟩 GPT-4o mini',
+    gemini:'🟦 Gemini',
+  };
   badge.innerText = labels[engine] || labels[taskModel] || '🟦 Gemini';
-  badge.style.color = engine==='deepl' ? '#34d399' : taskModel.startsWith('gpt') ? '#10b981' : '#60a5fa';
+  badge.style.color = engine==='deepl' ? '#34d399'
+                    : (engine||taskModel||'').startsWith('gpt') ? '#10b981'
+                    : '#60a5fa';
 }
 
 function mdToHtml(md){
@@ -7555,11 +7585,15 @@ async function runTranslate(){
   const docPeerName = (typeof LANG_NAMES!=='undefined' ? LANG_NAMES[docPeerLang] : null) || transTargetName || docPeerLang;
   const sysRole = `당신은 전문 번역가입니다. 입력 언어: ${docMyName}, 출력 언어: ${docPeerName}. 번역문만 출력하세요.`;
 
-  // ★ 번역 엔진 선택
-  // ★ 번역 엔진: model_task_translate=deepl이면 DeepL, 아니면 trans_engine 참조
-  const taskModel = localStorage.getItem('model_task_translate') || '';
-  const engine = taskModel === 'deepl' ? 'deepl'
-               : (localStorage.getItem('trans_engine') || 'gemini');
+  // ★ 번역 엔진 선택 — translate_doc 우선, 없으면 레거시 translate 참조
+  const taskModelDoc = localStorage.getItem('model_task_translate_doc')
+                    || localStorage.getItem('model_task_translate')
+                    || '';
+  const engine = taskModelDoc === 'deepl' ? 'deepl'
+               : taskModelDoc ? 'ai'
+               : (localStorage.getItem('trans_engine') === 'deepl' ? 'deepl' : 'gemini');
+  // AI 엔진일 때 사용할 실제 모델ID
+  const docAiModel = (taskModelDoc && taskModelDoc !== 'deepl') ? taskModelDoc : 'gemini-2.5-flash';
 
   try{
     let translated = '';
@@ -7573,14 +7607,14 @@ async function runTranslate(){
         // ★ DeepL 실패(CORS 포함) → Gemini로 자동 폴백 계속 진행
         showToast('⚠️ DeepL fail → Gemini');
         const prompt = `다음 텍스트를 ${docPeerName}(${docPeerLang})으로 번역하세요. 번역문만 출력하세요.\n\n${text}`;
-        translated = await callAI(prompt, sysRole, 'translate');
+        translated = await callAI(prompt, sysRole, 'translate_doc');
       }
 
     // ──────────── DeepL + 파일 → 파일은 AI로 (DeepL은 텍스트 전용) ────────────
     } else if(engine === 'deepl' && transFileData){
       showToast('ℹ️ DeepL no file → Gemini');
       const prompt = `첨부 파일의 텍스트 내용을 모두 ${docPeerName}(${docPeerLang})으로 번역하세요. 번역문만 출력하세요.${text ? '\n\n추가 지시사항: '+text : ''}`;
-      translated = await callAI(prompt, sysRole, 'translate');
+      translated = await callAI(prompt, sysRole, 'translate_doc');
 
     // ──────────── Gemini / GPT ────────────
     } else {
@@ -7599,7 +7633,7 @@ async function runTranslate(){
         const data = await res.json();
         translated = data.candidates?.[0]?.content?.parts?.[0]?.text?.trim() || '';
       } else {
-        translated = await callAI(prompt, sysRole, 'translate');
+        translated = await callAI(prompt, sysRole, 'translate_doc');
       }
     } // ← Gemini/GPT else 블록 닫기
 
@@ -8795,8 +8829,53 @@ async function quickTranslateBidir(text, fromLang, toLang, toLangName, targetElI
   const toLangLabel = toLangName || toLang;
   const prompt = `Translate to ${toLangLabel}. Output only the translation.\n${text}`;
 
-  // ★ gemini-2.5-flash (안정적) → gemini-2.0-flash (빠름) 순서로 시도
-  const MODELS = ['gemini-2.5-flash', 'gemini-2.0-flash'];
+  // ★ 음성 통역 모델: model_task_translate_voice 우선, 없으면 레거시 참조
+  const voiceModelKey = localStorage.getItem('model_task_translate_voice')
+                      || localStorage.getItem('model_task_translate')
+                      || '';
+  // GPT 계열 선택 시 OpenAI API 키 필요 — 없으면 Gemini 폴백
+  const hasOpenai = !!localStorage.getItem('openai_api_key');
+  const resolvedVoiceModel = (voiceModelKey && voiceModelKey !== 'deepl'
+      && !(voiceModelKey.startsWith('gpt') && !hasOpenai))
+    ? voiceModelKey : null;
+
+  // 선택된 모델이 OpenAI 계열이면 OpenAI API로 분기
+  if(resolvedVoiceModel && resolvedVoiceModel.startsWith('gpt')){
+    try{
+      const oaiKey = localStorage.getItem('openai_api_key');
+      if(oaiKey){
+        const controller = new AbortController();
+        const timer = setTimeout(() => controller.abort(), 5000);
+        const res = await fetch('https://api.openai.com/v1/chat/completions', {
+          method:'POST',
+          headers:{'Content-Type':'application/json','Authorization':`Bearer ${oaiKey}`},
+          body: JSON.stringify({
+            model: resolvedVoiceModel,
+            messages:[{role:'user',content:prompt}],
+            max_tokens:200, temperature:0,
+          }),
+          signal: controller.signal,
+        });
+        clearTimeout(timer);
+        if(res.ok){
+          const data = await res.json();
+          const translated = data.choices?.[0]?.message?.content?.trim() || '';
+          if(translated){
+            if(targetElId === 'transResult') appendToResultArea(translated);
+            else appendToTextarea(targetElId, translated);
+            speakBidir(translated, ttsLang);
+            return;
+          }
+        }
+      }
+    } catch(e){ console.warn('[통역 OpenAI]', e.message); }
+    // OpenAI 실패 시 Gemini 폴백으로 계속 진행
+  }
+
+  // ★ Gemini 계열 (기본 + 폴백): 선택 모델 우선, 없으면 2.5-flash → 2.0-flash
+  const MODELS = resolvedVoiceModel && resolvedVoiceModel.startsWith('gemini')
+    ? [resolvedVoiceModel, 'gemini-2.0-flash']
+    : ['gemini-2.5-flash', 'gemini-2.0-flash'];
 
   let translated = '';
   for(const model of MODELS){
@@ -10439,11 +10518,21 @@ function syncModelSelectsToKeys(){
   const hasAnthropic = !!localStorage.getItem('anthropic_api_key');
   const hasDeepL     = !!localStorage.getItem('deepl_api_key');
 
-  const selIds = ['aiModelSelect','taskModelSel-analyze','taskModelSel-write','taskModelSel-translate'];
+  // ★ translate → translate_doc, translate_voice 분리
+  const selIds = [
+    'aiModelSelect',
+    'taskModelSel-analyze',
+    'taskModelSel-write',
+    'taskModelSel-translate-doc',
+    'taskModelSel-translate-voice',
+  ];
   selIds.forEach(selId=>{
     const sel = document.getElementById(selId);
     if(!sel) return;
+
+    // AI 모델 키 활성/비활성 동기화
     Array.from(sel.options).forEach(opt=>{
+      if(opt.value === 'deepl') return; // DeepL은 별도 처리
       const meta = AI_MODELS.find(m=>m.id===opt.value);
       if(!meta) return;
       const hasKey = meta.provider==='openai'     ? hasOpenai
@@ -10453,9 +10542,8 @@ function syncModelSelectsToKeys(){
       opt.style.color = hasKey ? '' : '#64748b';
     });
 
-    // ★ 번역/통역 셀렉트에만 DeepL 옵션 추가
-    if(selId === 'taskModelSel-translate'){
-      // 기존 deepl 옵션 제거 후 재추가 (중복 방지)
+    // ★ 문서 번역 셀렉트에만 DeepL 옵션 추가 (음성 통역은 DeepL 미지원)
+    if(selId === 'taskModelSel-translate-doc'){
       Array.from(sel.options).forEach(o=>{ if(o.value==='deepl') o.remove(); });
       const deeplOpt = document.createElement('option');
       deeplOpt.value = 'deepl';
@@ -10463,10 +10551,9 @@ function syncModelSelectsToKeys(){
       deeplOpt.disabled = !hasDeepL;
       deeplOpt.style.color = hasDeepL ? '#34d399' : '#64748b';
       sel.appendChild(deeplOpt);
-
-      // 현재 저장된 trans_engine이 deepl이면 선택 상태 복원
-      const savedEngine = localStorage.getItem('trans_engine') || 'gemini';
-      if(savedEngine === 'deepl' && hasDeepL) sel.value = 'deepl';
+      // 저장된 translate_doc 값이 deepl이면 복원
+      const savedDoc = localStorage.getItem('model_task_translate_doc') || '';
+      if(savedDoc === 'deepl' && hasDeepL) sel.value = 'deepl';
     }
   });
 }
@@ -10509,59 +10596,93 @@ function updateApiKeyStatus(){
  * 사용자가 설정에서 변경하면 localStorage에 저장되어 기본값 덮어씀
  */
 const MODEL_DEFAULTS = {
-  analyze:   'gemini-2.5-flash',  // 📊 AI 분석 → Gemini 2.5 Flash
-  write:     'claude-3-5-sonnet', // ✉️ 문서 작성 → Claude 3.5 Sonnet
-  translate: 'gpt-4o',            // 🌐 번역/통역 → GPT-4o
-  voice:     'gpt-4o',            // 🎙️ 음성 통역 → GPT-4o
-  conf:      'gemini-2.5-flash',  // 🏢 회의 모드 → Gemini 2.5 Flash
+  analyze:          'gemini-2.5-flash',  // 📊 AI 분석 → Gemini 2.5 Flash
+  write:            'claude-3-5-sonnet', // ✉️ 문서 작성 → Claude 3.5 Sonnet
+  translate:        'gpt-4o',            // 🌐 번역/통역 (레거시 호환키)
+  translate_doc:    'gpt-4o',            // 📄 문서 번역 → GPT-4o
+  translate_voice:  'gpt-4o',            // 🎙️ 음성 통역 → GPT-4o
+  voice:            'gpt-4o',            // 🎙️ 음성 통역 → GPT-4o
+  conf:             'gemini-2.5-flash',  // 🏢 회의 모드 → Gemini 2.5 Flash
 };
 
 /** 태스크별 기본 모델 ID 로드 (사용자 커스텀 우선) */
 function getModelForTask(taskType){
   if(taskType === 'auto' || !MODEL_DEFAULTS[taskType]) return currentAiModel;
   const userCustom = localStorage.getItem(`model_task_${taskType}`);
-  return userCustom || MODEL_DEFAULTS[taskType];
+  if(userCustom) return userCustom;
+  // ★ translate_doc/voice에 저장값 없으면 레거시 translate 키 참조 후 기본값
+  if(taskType === 'translate_doc' || taskType === 'translate_voice'){
+    const legacy = localStorage.getItem('model_task_translate');
+    if(legacy) return legacy;
+  }
+  return MODEL_DEFAULTS[taskType];
 }
 
 /** 태스크별 기본 모델 저장 */
 function setModelForTask(taskType, modelId){
   localStorage.setItem(`model_task_${taskType}`, modelId);
-  // ★ 번역 태스크에서 DeepL 선택 시 trans_engine 동기화
-  if(taskType === 'translate'){
+
+  // ★ 문서 번역 DeepL 선택 시 trans_engine 동기화 (레거시 호환)
+  if(taskType === 'translate_doc'){
     if(modelId === 'deepl'){
       localStorage.setItem('trans_engine', 'deepl');
     } else {
       if(localStorage.getItem('trans_engine') === 'deepl')
-        localStorage.setItem('trans_engine', 'gemini');
+        localStorage.setItem('trans_engine', modelId);
     }
     updateTransEngineBadge();
   }
+  // ★ 레거시 translate 키도 translate_doc으로 동기화
+  if(taskType === 'translate'){
+    localStorage.setItem('model_task_translate_doc', modelId);
+    if(modelId === 'deepl'){
+      localStorage.setItem('trans_engine', 'deepl');
+    }
+    updateTransEngineBadge();
+  }
+
   // 설정 배지 업데이트
   renderTaskModelBadges();
   const label = modelId === 'deepl' ? '🌿 DeepL' : (AI_MODELS.find(m=>m.id===modelId)?.label || modelId);
-  showToast(`✅ [${TASK_LABELS[taskType]}] ${label}`);
+  const taskLabel = TASK_LABELS[taskType] || taskType;
+  showToast(`✅ [${taskLabel}] ${label}`);
 }
 
 /** 태스크별 기본값 리셋 */
 function resetModelForTask(taskType){
   localStorage.removeItem(`model_task_${taskType}`);
+  // translate_doc 리셋 시 trans_engine도 기본값으로
+  if(taskType === 'translate_doc'){
+    const def = MODEL_DEFAULTS.translate_doc || 'gpt-4o';
+    if(localStorage.getItem('trans_engine') === 'deepl')
+      localStorage.setItem('trans_engine', def);
+    updateTransEngineBadge();
+  }
   const sel = document.getElementById(`taskModelSel-${taskType}`);
-  if(sel) sel.value = MODEL_DEFAULTS[taskType];
+  if(sel) sel.value = MODEL_DEFAULTS[taskType] || MODEL_DEFAULTS.translate || 'gpt-4o';
   renderTaskModelBadges();
-  showToast(`↩️ [${TASK_LABELS[taskType]}] reset`);
+  const taskLabel = TASK_LABELS[taskType] || taskType;
+  showToast(`↩️ [${taskLabel}] reset`);
 }
 
 const TASK_LABELS = {
-  analyze:   '📊 AI 분석',
-  write:     '✉️ 문서 작성',
-  translate: '🌐 번역/통역',
-  voice:     '🎙️ 음성 통역',
-  conf:      '🏢 회의 모드',
+  analyze:         '📊 AI 분석',
+  write:           '✉️ 문서 작성',
+  translate:       '🌐 번역/통역',   // 레거시 호환
+  translate_doc:   '📄 문서 번역',
+  translate_voice: '🎙️ 음성 통역',
+  voice:           '🎙️ 음성 통역',
+  conf:            '🏢 회의 모드',
 };
 
 /** 설정 모달 — 태스크별 모델 선택 렌더링 */
 function renderTaskModelSelects(){
-  ['analyze','write','translate'].forEach(task=>{
+  // ★ translate_doc, translate_voice 분리 추가
+  ['analyze','write','translate_doc','translate_voice'].forEach(task=>{
+    // 구 셀렉트(translate)가 남아있으면 숨김 처리 (레거시 안전장치)
+    const legacySel = document.getElementById('taskModelSel-translate');
+    if(legacySel) legacySel.closest('div[style*="grid"]') && (legacySel.closest('div[style*="grid"]').style.display='none');
+
     const sel = document.getElementById(`taskModelSel-${task}`);
     if(!sel) return;
 
@@ -10585,20 +10706,30 @@ function renderTaskModelSelects(){
 
 /** 현재 활성 모델 배지 업데이트 */
 function renderTaskModelBadges(){
-  ['analyze','write','translate'].forEach(task=>{
-    const badge = document.getElementById(`taskModelBadge-${task}`);
+  // ★ translate_doc, translate_voice 분리 반영
+  ['analyze','write','translate_doc','translate_voice'].forEach(task=>{
     const sel   = document.getElementById(`taskModelSel-${task}`);
     if(!sel) return;
+    const badge = document.getElementById(`taskModelBadge-${task}`);
     const modelId = getModelForTask(task);
-    if(sel) sel.value = modelId;
+    sel.value = modelId;
     if(badge){
-      const m = AI_MODELS.find(x=>x.id===modelId);
+      // DeepL 선택 시 특별 배지
+      if(modelId === 'deepl'){
+        badge.innerText = '🌿 DeepL';
+        badge.style.background = 'rgba(52,211,153,.12)';
+        badge.style.color = '#34d399';
+        return;
+      }
       const isCustom = !!localStorage.getItem(`model_task_${task}`);
       badge.innerText = isCustom ? '🔧 사용자 지정' : '⚙️ 기본값';
       badge.style.background = isCustom ? 'rgba(168,85,247,.15)' : 'rgba(59,130,246,.12)';
       badge.style.color = isCustom ? '#a855f7' : '#60a5fa';
     }
   });
+  // 레거시 translate 배지도 동기화 (혹시 남아있을 경우)
+  const legBadge = document.getElementById('taskModelBadge-translate');
+  if(legBadge) legBadge.innerText = '';
 }
 
 /**
@@ -10764,6 +10895,11 @@ function switchSettingsTab(tab){
       renderTaskModelSelects();
       loadApiKeyInputs();
       syncModelSelectsToKeys(); // ★ 키 상태에 따라 모델 옵션 비활성화
+      // ★ translate_doc/voice 셀렉트 초기값 강제 복원
+      (['translate-doc','translate-voice']).forEach(sub=>{
+        const sel=document.getElementById(`taskModelSel-${sub}`);
+        if(sel){ const v=getModelForTask(sub.replace('-','_')); if(v) sel.value=v; }
+      });
     }, 10);
   }
   if(tab==='account') syncAccountTab();
