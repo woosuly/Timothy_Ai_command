@@ -8896,6 +8896,7 @@ async function quickTranslateBidir(text, fromLang, toLang, toLangName, targetElI
           'Content-Type': 'application/json',
           'x-api-key': anthKey,
           'anthropic-version': '2023-06-01',
+          'anthropic-dangerous-direct-browser-access': 'true',
         },
         body: JSON.stringify({
           model: claudeModel,
@@ -10832,7 +10833,12 @@ async function callAI(prompt, systemRole = '', taskType = 'auto'){
     const ctl=new AbortController(); const t=setTimeout(()=>ctl.abort(),30000);
     const res=await fetch('https://api.anthropic.com/v1/messages',{
       method:'POST',
-      headers:{'Content-Type':'application/json','x-api-key':anthropicKey,'anthropic-version':'2023-06-01'},
+      headers:{
+        'Content-Type':'application/json',
+        'x-api-key':anthropicKey,
+        'anthropic-version':'2023-06-01',
+        'anthropic-dangerous-direct-browser-access':'true',
+      },
       body:JSON.stringify({model:claudeModel,max_tokens:2000,system:fullSystemRole||undefined,messages:[{role:'user',content:prompt}]}),
       signal:ctl.signal
     });
