@@ -394,6 +394,12 @@ main.active-view{display:flex;}
 /* ★ 논리 보강 버튼 */
 .logic-boost-btn{padding:5px 12px;background:rgba(168,85,247,.12);color:#a855f7;border:1px solid rgba(168,85,247,.3);border-radius:6px;font-size:10px;font-weight:700;cursor:pointer;white-space:nowrap;transition:.15s;}
 .logic-boost-btn:hover{background:rgba(168,85,247,.25);}
+/* ★ 분석 모드 토글 칩 */
+.analyze-mode-row{display:flex;gap:6px;margin-bottom:6px;}
+.analyze-mode-chip{flex:1;padding:6px 0;border-radius:7px;font-size:11px;font-weight:700;cursor:pointer;border:1px solid #1e293b;background:#0f172a;color:#64748b;text-align:center;transition:.15s;user-select:none;}
+.analyze-mode-chip.active-simple{background:rgba(37,99,235,.18);color:#60a5fa;border-color:rgba(37,99,235,.5);}
+.analyze-mode-chip.active-detail{background:rgba(16,185,129,.15);color:#34d399;border-color:rgba(16,185,129,.45);}
+.analyze-mode-chip:hover:not(.active-simple):not(.active-detail){background:rgba(255,255,255,.04);color:#94a3b8;}
 .feedback-btn-row{display:flex;gap:6px;flex-wrap:wrap;}
 /* SAG 검색 진행 단계 표시 */
 .sag-steps{display:none;flex-wrap:wrap;gap:5px;font-size:10px;}
@@ -1211,6 +1217,13 @@ textarea::-webkit-scrollbar-thumb{background:#334155;border-radius:4px;}
             <label for="multimodalFile" class="file-label-btn" data-i18n="file_select">📷 파일 선택</label>
             <input type="file" id="multimodalFile" accept="image/*,application/pdf,.pdf,.txt,.md,.csv,.xlsx,.xls,.docx,.pptx,.ppt" style="display:none;" onchange="handleFileSelection(event)">
             <span id="fileNameBadge" style="font-size:10px;color:#64748b;" data-i18n="no_file">선택된 파일 없음</span>
+          </div>
+          <!-- ★ 분석 모드 선택 토글 칩 -->
+          <div class="analyze-mode-row">
+            <div class="analyze-mode-chip active-simple" id="modeChipSimple"
+              onclick="setAnalyzeMode('simple')" data-i18n="mode_simple">🗂 간단히</div>
+            <div class="analyze-mode-chip" id="modeChipDetail"
+              onclick="setAnalyzeMode('detail')" data-i18n="mode_detail">🔬 상세히</div>
           </div>
           <button id="analyzeBtn" class="analyze-run-btn" data-i18n="btn_start_analyze" onclick="analyzeMail()">▶ 분석 시작</button>
         </div>
@@ -2565,6 +2578,7 @@ const LANG_PACKS = {
     modal_title:'일정 등록', btn_save:'💾 저장', btn_close:'닫기',
     placeholder_input:'분석할 내용을 입력하세요...',
     btn_start_analyze:'▶ 분석 시작',
+    mode_simple:'🗂 간단히', mode_detail:'🔬 상세히',
     status_ready:'● 대기 중', status_processing:'처리 중...',
     nav_no_file:'선택된 파일 없음',
     stt_analyze_btn:'▶ STT/회의록 분석', tab_stt:'🎙️ STT(음성) 분석',
@@ -3055,6 +3069,7 @@ const LANG_PACKS = {
     modal_title:'添加日程', btn_save:'💾 保存', btn_close:'关闭',
     placeholder_input:'请输入要分析的内容...',
     btn_start_analyze:'▶ 开始分析',
+    mode_simple:'🗂 简要', mode_detail:'🔬 详细',
     status_ready:'● 待机中', status_processing:'处理中...',
     no_file:'未选择文件', nav_no_file:'未选择文件',
     stt_analyze_btn:'▶ 开始STT/会议分析', tab_stt:'🎙️ STT语音分析',
@@ -3520,6 +3535,7 @@ const LANG_PACKS = {
     modal_title:'Add Schedule', btn_save:'💾 Save', btn_close:'Close',
     placeholder_input:'Enter content to analyze...',
     btn_start_analyze:'▶ Start Analysis',
+    mode_simple:'🗂 Simple', mode_detail:'🔬 Detail',
     status_ready:'● Ready', status_processing:'Processing...',
     no_file:'No file selected', nav_no_file:'No file selected',
     stt_analyze_btn:'▶ Analyze STT/Meeting', tab_stt:'🎙️ STT Analysis',
@@ -3941,6 +3957,7 @@ const LANG_PACKS = {
     modal_title:'予定登録', btn_save:'💾 保存', btn_close:'閉じる',
     placeholder_input:'分析する内容を入力してください...',
     btn_start_analyze:'▶ 分析開始',
+    mode_simple:'🗂 簡易', mode_detail:'🔬 詳細',
     status_ready:'● 待機中', status_processing:'処理中...',
     no_file:'ファイル未選択', nav_no_file:'ファイル未選択',
     stt_analyze_btn:'▶ STT/議事録分析', tab_stt:'🎙️ STT音声分析',
@@ -5023,6 +5040,18 @@ function switchAnalyzeTab(tab){
 // ══════════════════════════════
 // 10. AI 메일 분석
 // ══════════════════════════════
+// ★ 분석 모드 상태 변수
+let _analyzeMode = 'simple'; // 'simple' | 'detail'
+
+function setAnalyzeMode(mode){
+  _analyzeMode = mode;
+  const cs = document.getElementById('modeChipSimple');
+  const cd = document.getElementById('modeChipDetail');
+  if(!cs || !cd) return;
+  cs.className = 'analyze-mode-chip' + (mode==='simple' ? ' active-simple' : '');
+  cd.className = 'analyze-mode-chip' + (mode==='detail' ? ' active-detail' : '');
+}
+
 async function analyzeMail(){
   console.log('[Timothy] analyzeMail 호출');
   if(!requireApiKey()) return;
@@ -5044,42 +5073,56 @@ async function analyzeMail(){
   const langOut = t('ai_lang_out');
   const url=`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
 
-  // 프롬프트 — 스타일 컨텍스트가 있으면 맨 뒤에 분리해서 첨부
-  const systemPrompt=`${aiRole}
+  // ── 공통 JSON 스키마 ──
+  const _jsonSchema = `{"subject":"메일 제목","sender":"발신인 조직·직함·성명 (메일 문맥에서 파악)","category":"'제조','설비','제조기술','개발','품질','GOC','지원','인사','인프라','EHS' 중 하나","deadlineDate":"YYYY-MM-DD 또는 null","deadlineText":"납기일 구체 설명 (없으면 없음)","summary":["요약항목1","요약항목2"],"guide":{"worker":"이 건 처리에 가장 적합한 담당자 또는 부서 (메일 문맥 기반)","due":"처리 기한 (구체적으로)","instruction":"즉시 실행 가능한 지시사항 2~3문장"},"reply_draft":"회신 초안 전문","deptRequests":[{"dept":"유관 부서명","task":"협조 내용 및 기한"}]}`;
+
+  // ── 회신 초안 공통 룰 ──
+  const _replyRule = `
+【회신 메일 초안 작성 규칙 — 반드시 준수】
+다음 5단계 구조를 완전히 갖춘 비즈니스 메일로 작성할 것 (최소 300자 이상)
+① 접수 확인 및 인사말: 메일 수신·검토 완료를 간결하게 명시
+② 요점 재확인: 상대방 요청/전달 사항의 핵심을 1~2문장으로 재정리
+③ 조치사항 상세: 담당 부서·일정·방법을 개조식 불릿(- 항목)으로 구체화
+④ 향후 일정: 다음 단계 액션 또는 회신 예정일 명시
+⑤ 맺음말 및 서명: "감사합니다." 후 서명란은 [소속 부서명] 부서장 [성명] 드림 형태 공란 처리
+- 특정 개인명·부서명을 임의로 고정하지 말 것. 수신·발신 관계는 메일 문맥에서 동적으로 파악할 것.
+- 형식적 미사여구 없이 실무 중심으로 작성할 것.`;
+
+  // ── 간단히 프롬프트 ──
+  const _simplePrompt = `${aiRole}
 ${langOut}
-아래 메일/문서를 심층 분석하여 반드시 순수 JSON만 응답하세요. 마크다운 코드블록 없이.
+아래 메일을 분석하여 반드시 순수 JSON만 응답하세요. 마크다운 코드블록 없이.
 
-【출력 JSON 스키마】
-{
-  "subject": "메일 제목 또는 문서 핵심 주제",
-  "sender": "발신인 부서 · 직함 · 성명 (파악 가능한 경우 모두 기재)",
-  "category": "'제조','설비','제조기술','개발','품질','GOC','지원','인사','인프라','EHS' 중 하나",
-  "deadlineDate": "YYYY-MM-DD 또는 null",
-  "deadlineText": "납기일·마감일에 대한 구체적 설명 (없으면 '없음')",
-  "summary": [
-    "① [배경/목적] 이 메일/문서의 발송 목적과 배경을 1~2문장으로",
-    "② [핵심 요청사항] 수신자(부서장)에게 요구하는 핵심 액션 또는 결정사항",
-    "③ [주요 내용] 본문에서 가장 중요한 수치·일정·조건 등 구체적 사실",
-    "④ [리스크/주의사항] 기한 초과·미처리 시 발생할 수 있는 문제 또는 특이사항",
-    "⑤ [후속 조치] 이 메일 처리 후 연계되어야 할 다음 단계"
-  ],
-  "guide": {
-    "worker": "이 건을 처리할 최적 담당자 또는 부서",
-    "due": "처리 기한 (YYYY-MM-DD 또는 '즉시', '이번 주 내' 등 구체적 표현)",
-    "instruction": "부서장이 담당자에게 즉시 전달해야 할 핵심 지시사항 (실행 가능한 동사로 시작, 2~3문장)"
-  },
-  "reply_draft": "즉시 발송 가능한 공식 회신 초안. 수신자·발신자 맥락 반영, 정중하고 간결하게. 제목 포함 400자 내외.",
-  "deptRequests": [
-    {"dept": "유관 부서명", "task": "해당 부서에 요청할 구체적 협조 내용과 기한"}
-  ]
-}
+【출력 스키마】
+${_jsonSchema}
 
-【분석 지침】
-- summary는 반드시 5개 항목을 ①~⑤ 구조로 작성하고, 각 항목은 단순 나열이 아닌 판단이 담긴 문장으로 작성
-- 수치(금액·수량·날짜·비율), 고유명사(제품명·장비명·프로젝트명)는 원문 그대로 보존
-- guide.instruction은 "~하세요", "~확인 후 보고 바랍니다" 등 즉시 실행 가능한 지시 형태로
-- reply_draft는 형식적 인사말 없이 핵심부터 시작하여 실무에 바로 쓸 수 있게 작성
-- deptRequests는 실제 협조가 필요한 부서만 포함 (해당 없으면 빈 배열 [])`;
+【summary 지침】
+- 3~4개 항목으로 핵심만 간결하게 요약
+- 발신 목적, 핵심 요청사항, 처리 기한 중심으로 작성
+
+${_replyRule}`;
+
+  // ── 상세히 프롬프트 ──
+  const _detailPrompt = `${aiRole}
+${langOut}
+아래 메일을 심층 분석하여 반드시 순수 JSON만 응답하세요. 마크다운 코드블록 없이.
+
+【출력 스키마】
+${_jsonSchema}
+
+【summary 심층 분석 지침 — 반드시 아래 7개 항목을 모두 포함할 것】
+① [발신 배경·목적] 이 메일이 발송된 조직적 맥락과 목적
+② [핵심 요청사항] 수신 측이 취해야 할 구체적 액션 또는 결정사항
+③ [주요 사실·수치] 본문의 핵심 수치·일정·조건·제품명 등 원문 보존
+④ [유관 부서 영향도] 이 건이 영향을 미치는 부서·팀과 각각의 역할
+⑤ [리스크 요소] 기한 미준수·미처리·정보 누락 시 발생 가능한 리스크
+⑥ [우선순위 판단] 긴급도·중요도 기준으로 처리 우선순위 제안
+⑦ [후속 조치 로드맵] 이 건 종결까지의 단계별 후속 액션 플랜
+
+${_replyRule}`;
+
+  // ── 모드에 따라 프롬프트 분기 ──
+  const systemPrompt = _analyzeMode === 'detail' ? _detailPrompt : _simplePrompt;
 
   try{
     let raw;
@@ -6716,23 +6759,8 @@ function renderEmails(){
     const urgent=m.deadlineDate&&m.deadlineDate!=='null'&&m.deadlineDate!==null;
     const isOpen=openMailIdx===i;
     const date=urgent?m.deadlineDate:(m.deadlineText||'-');
-    const sumShort=(m.summary||[]).slice(0,2).map(s=>s.replace(/^[①②③④⑤]\s*/,'')).join(' / ');
-    const bullets=(m.summary||[]).map((s,si)=>{
-      // ①~⑤ 접두사가 이미 있으면 그대로, 없으면 번호 부여
-      const hasPrefix=/^[①②③④⑤]/.test(s);
-      const nums=['①','②','③','④','⑤'];
-      const label=hasPrefix?'':nums[si]||'•';
-      const text=hasPrefix?s:`${label} ${s}`;
-      // 항목별 강조색 (배경/테두리 변주)
-      const accents=[
-        'border-left:3px solid #3b82f6;background:rgba(59,130,246,.06);',
-        'border-left:3px solid #f59e0b;background:rgba(245,158,11,.06);',
-        'border-left:3px solid #10b981;background:rgba(16,185,129,.06);',
-        'border-left:3px solid #ef4444;background:rgba(239,68,68,.06);',
-        'border-left:3px solid #8b5cf6;background:rgba(139,92,246,.06);',
-      ];
-      return `<div style="padding:5px 10px;margin:3px 0;border-radius:4px;font-size:10.5px;line-height:1.6;color:#e2e8f0;${accents[si]||'border-left:3px solid #64748b;'}">${text}</div>`;
-    }).join('');
+    const sumShort=(m.summary||[]).join(' / ');
+    const bullets=(m.summary||[]).map(s=>`<p>• ${s}</p>`).join('');
     const b64=btoa(encodeURIComponent(JSON.stringify(m.guide||{})));
     const deptR=(m.deptRequests||[]).filter(r=>r.task&&r.task!=='null')
       .map(r=>`<div style="background:rgba(30,41,59,.4);border:1px solid #1e293b;border-radius:4px;padding:4px 7px;font-size:10px;margin-top:3px;"><span style="font-size:8px;font-weight:bold;color:#3b82f6;background:rgba(59,130,246,.1);padding:1px 4px;border-radius:2px;margin-right:3px;">${r.dept}</span>${r.task}</div>`).join('');
