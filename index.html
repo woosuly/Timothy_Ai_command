@@ -1209,7 +1209,7 @@ textarea::-webkit-scrollbar-thumb{background:#334155;border-radius:4px;}
             data-i18n-placeholder="mail_ph" placeholder="메일 텍스트를 붙여넣거나, 이미지/PDF를 업로드하세요."></textarea>
           <div class="file-upload-row">
             <label for="multimodalFile" class="file-label-btn" data-i18n="file_select">📷 파일 선택</label>
-            <input type="file" id="multimodalFile" accept="image/*,application/pdf,.txt,.md,.csv,.xlsx,.xls,.docx" style="display:none;" onchange="handleFileSelection(event)">
+            <input type="file" id="multimodalFile" accept="image/*,application/pdf,.pdf,.txt,.md,.csv,.xlsx,.xls,.docx,.pptx,.ppt" style="display:none;" onchange="handleFileSelection(event)">
             <span id="fileNameBadge" style="font-size:10px;color:#64748b;" data-i18n="no_file">선택된 파일 없음</span>
           </div>
           <button id="analyzeBtn" class="analyze-run-btn" data-i18n="btn_start_analyze" onclick="analyzeMail()">▶ 분석 시작</button>
@@ -4768,7 +4768,7 @@ function handleFileSelection(e){
   const mime = f.type;
 
   // ── 이미지 / PDF → Gemini inlineData 직접 전달 ──
-  if(mime.startsWith('image/') || mime === 'application/pdf'){
+  if(mime.startsWith('image/') || mime === 'application/pdf' || ext === 'pdf'){
     const r = new FileReader();
     r.onloadend = () => {
       fileAttachmentData = { mime, base64: r.result.split(',')[1], name: f.name };
@@ -4872,8 +4872,24 @@ function handleFileSelection(e){
     return;
   }
 
-  badge.innerText = f.name + ' ⚠️';
-  showToast('⚠️ Unsupported format');
+  // ── PPTX / PPT → 파일명 + 안내 텍스트로 전달 ──
+  if(ext === 'pptx' || ext === 'ppt'){
+    fileAttachmentData = { mime:'text/plain', text:`[PowerPoint: ${f.name}]\n(슬라이드 파일입니다. 분석할 텍스트 내용이 있다면 아래 입력란에 붙여넣기 해주세요.)`, name: f.name, isText: true };
+    badge.innerText = '📊 ' + f.name;
+    showToast(`✅ "${f.name}" ` + (t('toast_analyze_ok')||'완료'));
+    return;
+  }
+
+  // ── 그 외 알 수 없는 확장자 → 텍스트로 시도 ──
+  const r_fallback = new FileReader();
+  r_fallback.onloadend = () => {
+    const text = `[${f.name}]\n${r_fallback.result.slice(0, 15000)}`;
+    fileAttachmentData = { mime:'text/plain', text, name: f.name, isText: true };
+    badge.innerText = '📄 ' + f.name;
+    showToast(`✅ "${f.name}" ` + (t('toast_analyze_ok')||'완료'));
+  };
+  r_fallback.onerror = () => { badge.innerText = f.name + ' ⚠️'; showToast('⚠️ Unsupported format'); };
+  r_fallback.readAsText(f, 'UTF-8');
 }
 
 /** Excel → 텍스트 테이블 변환 */
