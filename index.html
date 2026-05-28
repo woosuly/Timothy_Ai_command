@@ -2284,7 +2284,7 @@ textarea::-webkit-scrollbar-thumb{background:#334155;border-radius:4px;}
             <button class="api-release-btn" onclick="releaseApiKey('deepl')" data-i18n="api_release_btn">해제</button>
           </div>
           <div class="api-state-input" id="apiInput-deepl">
-            <input type="password" id="inputDeeplKey" class="key-input api-key-input" placeholder="Free: ...​:fx  /  Pro: 일반 키 (deepl.com/pro-api)">
+            <input type="password" id="inputDeeplKey" class="key-input api-key-input" placeholder="Free: ...:fx  /  Pro: 일반 키 (deepl.com/pro-api)">
             <button class="api-save-btn" onclick="saveApiKey('deepl')" data-i18n="api_register_btn">등록</button>
           </div>
         </div>
@@ -2942,6 +2942,7 @@ const LANG_PACKS = {
     // ── collab 스타일 버튼 및 placeholder ──
     collab_formal:'📋 격식체',
     collab_bilingual:'📋 언어병기',
+    lbl_bilingual_suffix:'병기',
     collab_direct:'⚡ 직접 지시체',
     collab_concise:'📌 간결체',
     collab_official:'📜 공식 서한체',
@@ -3095,6 +3096,8 @@ const LANG_PACKS = {
     msg_report_fail:'报告生成失败，请重试。',
     msg_draft_gen:'草稿生成中...',
     btn_translate:'▶ 翻译',
+    btn_copy_trans:'📄 复制',
+    btn_swap:'⇄ 替换',
     btn_end_meeting:'⏹ 结束并摘要',
     btn_summarizing:'摘要中...',
     // ─── 추가 키 ───
@@ -3404,6 +3407,7 @@ const LANG_PACKS = {
     // ── collab 스타일 ──
     collab_formal:'📋 正式体',
     collab_bilingual:'📋 语言并列',
+    lbl_bilingual_suffix:'并列',
     collab_direct:'⚡ 直接指示体',
     collab_concise:'📌 简洁体',
     collab_official:'📜 公式信函体',
@@ -3557,6 +3561,8 @@ const LANG_PACKS = {
     msg_report_fail:'Report generation failed. Please retry.',
     msg_draft_gen:'Generating draft...',
     btn_translate:'▶ Translate',
+    btn_copy_trans:'📄 Copy',
+    btn_swap:'⇄ Swap',
     btn_end_meeting:'⏹ End & Summarize',
     btn_summarizing:'Summarizing...',
     // ─── Additional keys ───
@@ -3822,6 +3828,7 @@ const LANG_PACKS = {
     // ── collab 스타일 ──
     collab_formal:'📋 Formal',
     collab_bilingual:'📋 Bilingual',
+    lbl_bilingual_suffix:'Bilingual',
     collab_direct:'⚡ Direct Directive',
     collab_concise:'📌 Concise',
     collab_official:'📜 Official Letter',
@@ -3975,6 +3982,8 @@ const LANG_PACKS = {
     msg_report_fail:'レポート生成失敗。再試行してください。',
     msg_draft_gen:'下書き生成中...',
     btn_translate:'▶ 翻訳',
+    btn_copy_trans:'📄 コピー',
+    btn_swap:'⇄ 交換',
     btn_end_meeting:'⏹ 終了して要約',
     btn_summarizing:'要約中...',
     // ─── 追加キー ───
@@ -4240,6 +4249,7 @@ const LANG_PACKS = {
     // ── collab 스타일 ──
     collab_formal:'📋 格式体',
     collab_bilingual:'📋 言語併記',
+    lbl_bilingual_suffix:'併記',
     collab_direct:'⚡ 直接指示体',
     collab_concise:'📌 簡潔体',
     collab_official:'📜 公式書簡体',
@@ -7764,7 +7774,7 @@ function onDocLangChange(){
   const _mn = (typeof LANG_NAMES!=='undefined' ? LANG_NAMES[my]   : null) || my;
   const _pn = (typeof LANG_NAMES!=='undefined' ? LANG_NAMES[peer] : null) || peer;
   const biBtn = document.getElementById('collabBilingualBtn');
-  if(biBtn) biBtn.innerText = `📋 ${_mn}/${_pn} 병기`;
+  if(biBtn) biBtn.innerText = `📋 ${_mn}/${_pn} ${t('lbl_bilingual_suffix')}`;
   localStorage.setItem('doc_my_lang',   my);
   localStorage.setItem('doc_peer_lang', peer);
   const srcTitle = document.getElementById('docSrcTitle');
@@ -9092,7 +9102,7 @@ async function genCollabMail(){
   const _peerName = (typeof LANG_NAMES!=='undefined' ? LANG_NAMES[_peerLang] : null) || _peerLang;
   // 언어병기 버튼 텍스트 동적 업데이트
   const biBtn = document.getElementById('collabBilingualBtn');
-  if(biBtn) biBtn.innerText = `📋 ${_myName}/${_peerName} 병기`;
+  if(biBtn) biBtn.innerText = `📋 ${_myName}/${_peerName} ${t('lbl_bilingual_suffix')}`;
 
   const resultEl = document.getElementById('collabResult');
   if(!resultEl) return;
@@ -10477,7 +10487,9 @@ function loadApiKeyInputs(){
 /** [등록] 버튼 */
 function saveApiKey(provider){
   const cfg = API_KEY_MAP[provider];
-  const val = (document.getElementById(cfg.inputId)?.value||'').trim();
+  // ★ 붙여넣기 시 포함될 수 있는 제로폭 공백·제어문자 제거
+  const rawVal = document.getElementById(cfg.inputId)?.value || '';
+  const val = rawVal.replace(/[\u200B\u200C\u200D\uFEFF\u00A0\r\n\t]/g, '').trim();
   if(!val){ showToast(t('toast_api_key_enter')); return; }
   localStorage.setItem(cfg.storage, val);
   // gemini_api_key는 기존 로그인 시스템과 동기화
