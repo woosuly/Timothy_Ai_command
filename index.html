@@ -4872,11 +4872,52 @@ function handleFileSelection(e){
     return;
   }
 
-  // ── PPTX / PPT → 파일명 + 안내 텍스트로 전달 ──
+  // ── PPTX / PPT → JSZip으로 압축 해제 후 슬라이드 XML에서 텍스트 추출 ──
   if(ext === 'pptx' || ext === 'ppt'){
-    fileAttachmentData = { mime:'text/plain', text:`[PowerPoint: ${f.name}]\n(슬라이드 파일입니다. 분석할 텍스트 내용이 있다면 아래 입력란에 붙여넣기 해주세요.)`, name: f.name, isText: true };
-    badge.innerText = '📊 ' + f.name;
-    showToast(`✅ "${f.name}" ` + (t('toast_analyze_ok')||'완료'));
+    const parsePptx = () => {
+      const r = new FileReader();
+      r.onloadend = async () => {
+        try{
+          const zip = await JSZip.loadAsync(r.result);
+          // ppt/slides/slide1.xml, slide2.xml ... 순서대로 수집
+          const slideEntries = Object.keys(zip.files)
+            .filter(p => /^ppt\/slides\/slide\d+\.xml$/i.test(p))
+            .sort((a, b) => {
+              const na = parseInt(a.match(/\d+/)[0]);
+              const nb = parseInt(b.match(/\d+/)[0]);
+              return na - nb;
+            });
+          if(slideEntries.length === 0) throw new Error('슬라이드를 찾을 수 없습니다.');
+          let allText = `[PowerPoint: ${f.name}] (총 ${slideEntries.length}슬라이드)\n`;
+          for(let i = 0; i < slideEntries.length; i++){
+            const xml  = await zip.files[slideEntries[i]].async('string');
+            // <a:t> 태그 안의 텍스트 노드만 추출 (DrawingML 텍스트 런)
+            const matches = xml.match(/<a:t[^>]*>([^<]+)<\/a:t>/g) || [];
+            const slideText = matches
+              .map(m => m.replace(/<[^>]+>/g, '').trim())
+              .filter(s => s.length > 0)
+              .join(' ');
+            if(slideText) allText += `\n[슬라이드 ${i+1}]\n${slideText}\n`;
+          }
+          if(allText.length > 15000) allText = allText.slice(0, 15000) + '\n...(이하 생략)';
+          fileAttachmentData = { mime:'text/plain', text: allText, name: f.name, isText: true };
+          badge.innerText = '📊 ' + f.name;
+          showToast(`✅ PPTX "${f.name}" — ${slideEntries.length}슬라이드 텍스트 추출 완료`);
+        }catch(err){
+          badge.innerText = f.name + ' ❌';
+          showToast('⚠️ PPTX 파싱 오류: ' + err.message);
+        }
+      };
+      r.readAsArrayBuffer(f);
+    };
+    if(typeof JSZip === 'undefined'){
+      badge.innerText = f.name + ' ⏳';
+      const scr = document.createElement('script');
+      scr.src = 'https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js';
+      scr.onload  = parsePptx;
+      scr.onerror = () => { badge.innerText = f.name + ' ❌'; showToast('⚠️ JSZip 로드 실패'); };
+      document.head.appendChild(scr);
+    } else { parsePptx(); }
     return;
   }
 
