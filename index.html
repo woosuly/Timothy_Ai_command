@@ -2862,6 +2862,7 @@ const LANG_PACKS = {
     // ── confirmDelete ──
     confirm_del_mail:'이 분석 메일을 삭제하시겠습니까?',
     confirm_del_track:'이 업무를 삭제하시겠습니까?',
+    confirm_del_mailtrack:'트래킹 목록에서 이 항목을 숨기겠습니까?\n(메일 원본은 보존됩니다)',
     confirm_del_style:'이 문체 데이터를 삭제하시겠습니까?',
     confirm_del_calev:'이 일정을 삭제하시겠습니까?',
     confirm_del_fallback:'삭제?', confirm_no_recovery:'복구 불가',
@@ -3350,6 +3351,7 @@ const LANG_PACKS = {
     cal_detail_change_pend:'↩️ 改为未处理', cal_detail_mark_done:'✅ 处理完成',
     cal_detail_edit:'✏️ 修改', cal_detail_delete:'🗑️ 删除', cal_detail_close:'✕ 关闭',
     confirm_del_mail:'确定删除此分析邮件吗？', confirm_del_track:'确定删除此任务吗？',
+    confirm_del_mailtrack:'从跟踪列表中隐藏此项目吗？\n（原始邮件将保留）',
     confirm_del_style:'确定删除此文体数据吗？', confirm_del_calev:'确定删除此日程吗？',
     confirm_del_fallback:'删除？', confirm_no_recovery:'无法恢复',
     model_default_hint:'默认：分析=Gemini / 文档=Claude / 文档翻译=GPT-4o / 语音口译=GPT-4o',
@@ -3772,6 +3774,7 @@ const LANG_PACKS = {
     cal_detail_change_pend:'↩️ Mark as Pending', cal_detail_mark_done:'✅ Mark as Done',
     cal_detail_edit:'✏️ Edit', cal_detail_delete:'🗑️ Delete', cal_detail_close:'✕ Close',
     confirm_del_mail:'Delete this analyzed mail?', confirm_del_track:'Delete this task?',
+    confirm_del_mailtrack:'Hide this item from tracking list?\n(Original mail will be kept)',
     confirm_del_style:'Delete this style data?', confirm_del_calev:'Delete this event?',
     confirm_del_fallback:'Delete?', confirm_no_recovery:'Cannot be undone',
     model_default_hint:'Default: Analysis=Gemini / Write=Claude / Doc Trans=GPT-4o / Voice Interp=GPT-4o',
@@ -4194,6 +4197,7 @@ const LANG_PACKS = {
     cal_detail_change_pend:'↩️ 未処理に変更', cal_detail_mark_done:'✅ 処理完了',
     cal_detail_edit:'✏️ 修正', cal_detail_delete:'🗑️ 削除', cal_detail_close:'✕ 閉じる',
     confirm_del_mail:'この分析メールを削除しますか？', confirm_del_track:'このタスクを削除しますか？',
+    confirm_del_mailtrack:'トラッキングリストからこの項目を非表示にしますか？\n（元のメールは保持されます）',
     confirm_del_style:'この文体データを削除しますか？', confirm_del_calev:'この日程を削除しますか？',
     confirm_del_fallback:'削除？', confirm_no_recovery:'復元不可',
     model_default_hint:'デフォルト：分析=Gemini Pro / 作成=Claude / 翻訳=GPT-4o',
@@ -4721,6 +4725,7 @@ function confirmDelete(type, idx, id){
   const msgs={
     mail:  t('confirm_del_mail'),
     track: t('confirm_del_track'),
+    mailtrack: t('confirm_del_mailtrack'),
     style: t('confirm_del_style'),
     calev: t('confirm_del_calev')
   };
@@ -4759,6 +4764,12 @@ function confirmDelete(type, idx, id){
     } else if(type==='track'){
       const a=lsArr('tasks'); a.splice(idx,1); lsSet('tasks',a);
       renderTracking(); renderCalendar(); renderWeekly();
+    } else if(type==='mailtrack'){
+      // 메일 원본 보존, 트래킹에서만 숨김 처리
+      const hidden=lsGet('track_hidden')||[];
+      if(!hidden.includes(idx)) hidden.push(idx);
+      lsSet('track_hidden', hidden);
+      renderTracking(); renderWeekly();
     } else if(type==='style'){
       const a=lsArr('styles'); a.splice(idx,1); lsSet('styles',a);
       renderLearning();
@@ -6990,10 +7001,11 @@ function renderTracking(){
   const mails=lsArr('emails');
   const tasks=lsArr('tasks');
   const pmap=lsGet('pmap')||{};
+  const hidden=lsGet('track_hidden')||[];
   const combined=[];
   tasks.forEach((t,i)=>combined.push({...t,_src:'task',_idx:i}));
   mails.forEach((m,i)=>{
-    if(m.deadlineDate&&m.deadlineDate!=='null'&&m.deadlineDate!==null){
+    if(m.deadlineDate&&m.deadlineDate!=='null'&&m.deadlineDate!==null&&!hidden.includes(i)){
       combined.push({
         id:'mail_'+i, type:t('weekly_mail_label'),
         title:`[${m.category}] ${m.subject}`,
@@ -7014,7 +7026,10 @@ function renderTracking(){
         <div class="track-top">
           <span class="track-type-badge badge-${t.type}">${t.type}</span>
           <span class="track-title" style="${isDone?'text-decoration:line-through':''}">${t.title}</span>
-          ${t._src==='task'?`<button class="track-del" onclick="event.stopPropagation();confirmDelete('track',${t._idx})">×</button>`:''}
+          ${t._src==='task'
+            ? `<button class="track-del" onclick="event.stopPropagation();confirmDelete('track',${t._idx})">×</button>`
+            : `<button class="track-del" onclick="event.stopPropagation();confirmDelete('mailtrack',${t._idx})" title="트래킹에서 숨기기">×</button>`
+          }
         </div>
         <div class="track-meta">${t.worker?`👤 ${t.worker} · `:''}${t.dueDate?`📅 ${t.dueDate}`:''}</div>
       </div>`);
