@@ -1212,8 +1212,7 @@ textarea::-webkit-scrollbar-thumb{background:#334155;border-radius:4px;}
         <!-- 메일 분석 패널 -->
         <div id="panel-mail" class="analyze-panel-wrap">
           <textarea id="emailPasteInput" class="analyze-paste" data-i18n-placeholder="mail_ph"
-            placeholder="메일 텍스트를 붙여넣거나, 이미지/PDF를 업로드하세요."
-            onpaste="handleMailInputPaste(event)"></textarea>
+            data-i18n-placeholder="mail_ph" placeholder="메일 텍스트를 붙여넣거나, 이미지/PDF를 업로드하세요."></textarea>
           <div class="file-upload-row">
             <label for="multimodalFile" class="file-label-btn" data-i18n="file_select">📷 파일 선택</label>
             <input type="file" id="multimodalFile" accept="image/*,application/pdf,.pdf,.txt,.md,.csv,.xlsx,.xls,.docx,.pptx,.ppt" style="display:none;" onchange="handleFileSelection(event)">
@@ -6227,29 +6226,6 @@ function handlePasteImage(e){
 }
 
 
-/** 메일 분석 입력란 — 이미지 붙여넣기 처리 */
-function handleMailInputPaste(e){
-  const items = e.clipboardData?.items;
-  if(!items) return;
-  for(const item of items){
-    if(item.type.startsWith('image/')){
-      e.preventDefault();
-      const file = item.getAsFile();
-      if(!file) continue;
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        fileAttachmentData = { mime: item.type, base64: reader.result.split(',')[1], name: t('paste_image_name')||'붙여넣기 이미지' };
-        const badge = document.getElementById('fileNameBadge');
-        if(badge) badge.innerText = '🖼️ ' + (t('paste_image_name')||'붙여넣기 이미지');
-        showToast('🖼️ ' + (t('toast_translate_ok')||'이미지 첨부 완료'));
-      };
-      reader.readAsDataURL(file);
-      return;
-    }
-  }
-  // 이미지 아닌 경우 기본 텍스트 붙여넣기 허용
-}
-
 function handleTransInputPaste(e){
   const items = e.clipboardData?.items;
 
@@ -6283,45 +6259,33 @@ function handleTransInputPaste(e){
     // ★ 코드/스타일 등 불필요 태그 텍스트가 섞이지 않도록 먼저 제거
     tmp.querySelectorAll('style, head, meta, link, noscript, code, pre, textarea').forEach(el => el.remove());
 
-    // ★ HTML 표 → 마크다운 표 변환 (구조 보존)
+    // ★ HTML 표 → 텍스트 셀만 추출 (마크다운 표 문법 없이)
     tmp.querySelectorAll('table').forEach(table => {
-      let mdTable = '\n';
+      let tableText = '\n';
       const rows = Array.from(table.querySelectorAll('tr'));
-      let headerDone = false;
       rows.forEach(row => {
         const cells = row.querySelectorAll('td, th');
         if(!cells.length) return;
-        const isHeader = !!row.querySelector('th');
         const cellTexts = Array.from(cells).map(c =>
           (c.innerText || c.textContent || '').replace(/\n+/g,' ').replace(/\|/g,'').trim()
-        );
-        mdTable += '| ' + cellTexts.join(' | ') + ' |\n';
-        if((isHeader || !headerDone) && rows.length > 1){
-          mdTable += '| ' + cellTexts.map(() => '---').join(' | ') + ' |\n';
-          headerDone = true;
-        }
+        ).filter(s => s.length > 0);
+        if(cellTexts.length) tableText += cellTexts.join('  ') + '\n';
       });
-      mdTable += '\n';
-      table.replaceWith(document.createTextNode(mdTable));
+      tableText += '\n';
+      table.replaceWith(document.createTextNode(tableText));
     });
 
-    // ★ 이미지 처리 — http URL은 마크다운으로 보존, base64는 첨부로
+    // ★ 이미지 — base64만 첨부로 저장, 나머지는 조용히 제거 (텍스트 대체 없음)
     tmp.querySelectorAll('img').forEach(img => {
       const src = img.getAttribute('src') || '';
-      const alt = img.getAttribute('alt') || '이미지';
-      if(src.startsWith('http')){
-        img.replaceWith(document.createTextNode(`\n![${alt}](${src})\n`));
-      } else if(src.startsWith('data:')){
+      if(src.startsWith('data:')){
         const mimeMatch = src.match(/^data:([^;]+);/);
         if(mimeMatch && !transFileData){
           transFileData = { mime: mimeMatch[1], base64: src.split(',')[1], name: t('paste_image_name') };
           showToast('🖼️ '+t('toast_copy_ok'));
         }
-        img.replaceWith(document.createTextNode('\n[' + t('img_attached_msg') + ']\n'));
-      } else {
-        // blob: URL 등 — 텍스트로 대체
-        img.replaceWith(document.createTextNode('\n[' + t('img_placeholder') + ']\n'));
       }
+      img.remove(); // ★ 어떤 이미지든 텍스트 흔적 없이 제거
     });
 
     // 블록 요소 줄바꿈
@@ -6352,7 +6316,38 @@ function handleTransInputPaste(e){
     }
     return;
   }
-  // ③ 일반 텍스트 → 기본 붙여넣기
+
+  // ③ 일반 텍스트 — 마크다운 표/이미지 문법 제거 후 삽입
+  const plainText = e.clipboardData?.getData('text/plain') || '';
+  if(plainText){
+    e.preventDefault();
+    // ★ 마크다운 표 문법(| --- | 행) 및 이미지 문법 제거
+    const cleaned = plainText
+      .split('\n')
+      .filter(line => !/^\s*\|[\s\-|:]+\|\s*$/.test(line))   // | --- | 구분선 행 제거
+      .map(line => line.replace(/!\[[^\]]*\]\([^)]*\)/g, '')) // ![alt](url) 제거
+      .join('\n')
+      .replace(/\n{3,}/g, '\n\n')
+      .trim();
+
+    const ti = document.getElementById('transInput');
+    if(ti){
+      ti.focus();
+      const sel = window.getSelection();
+      if(sel && sel.rangeCount){
+        sel.deleteFromDocument();
+        const range = sel.getRangeAt(0);
+        const textNode = document.createTextNode(cleaned);
+        range.insertNode(textNode);
+        range.setStartAfter(textNode);
+        range.setEndAfter(textNode);
+        sel.removeAllRanges();
+        sel.addRange(range);
+      } else {
+        ti.innerText = (ti.innerText ? ti.innerText + '\n' : '') + cleaned;
+      }
+    }
+  }
 }
 
 
@@ -9293,7 +9288,7 @@ async function genCollabMail(){
   };
 
   const chosen = STYLE_PROMPTS[styleKey] || STYLE_PROMPTS.formal_bilingual;
-  const prompt = `부서장 보좌 AI 비서입니다.\n${chosen.guide}\n\n핵심 요청 내용: ${content}\n\n【추가 출력 규칙】\n- 비교/현황 데이터는 마크다운 표(| 컬럼 |) 형식으로 정리`;
+  const prompt = `부서장 보좌 AI 비서입니다.\n${chosen.guide}\n\n핵심 요청 내용: ${content}\n\n【추가 출력 규칙】\n- 내용과 관련된 이미지가 필요하다면: ![설명](https://image.pollinations.ai/prompt/{영문키워드}?width=800&height=400&nologo=true) 형식으로 삽입\n- 비교/현황 데이터는 마크다운 표(| 컬럼 |) 형식으로 정리`;
 
   // ★ callAI('write')로 통합 — 사용자 설정 모델 자동 반영
   try{
