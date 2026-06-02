@@ -747,7 +747,7 @@ main.active-view{display:flex;}
 .font-size-input{width:50px;background:#020617;border:1px solid #334155;border-radius:5px;padding:4px 6px;color:#e2e8f0;font-size:12px;outline:none;text-align:center;}
 
 /* ── 캘린더 이벤트 상세 모달 ── */
-.cal-detail-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:500;align-items:center;justify-content:center;padding:20px;}
+.cal-detail-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:1000;align-items:center;justify-content:center;padding:20px;}
 .cal-detail-overlay.open{display:flex;}
 .cal-detail-box{background:#0f172a;border:1px solid #334155;border-radius:16px;padding:26px 24px;width:100%;max-width:460px;position:relative;box-shadow:0 16px 48px rgba(0,0,0,.6);}
 .cal-detail-type{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:700;padding:4px 12px;border-radius:5px;margin-bottom:14px;}
@@ -10168,16 +10168,15 @@ function closeCalDetail(){
 /** 수정 버튼 */
 function calDetailEdit(){
   if(!calDetailContext) return;
-  const {mode, idx} = calDetailContext; // ★ closeCalDetail 전에 먼저 추출
   closeCalDetail();
-  if(mode==='event') openEditCal(idx);
+  if(calDetailContext.mode==='event') openEditCal(calDetailContext.idx);
 }
 
 /** 삭제 버튼 */
 function calDetailDelete(){
   if(!calDetailContext) return;
-  const {mode, idx} = calDetailContext; // ★ closeCalDetail 전에 먼저 추출
   closeCalDetail();
+  const {mode, idx} = calDetailContext;
   if(mode==='event') confirmDelete('calev', idx);
   else if(mode==='task') confirmDelete('track', idx);
 }
