@@ -10176,8 +10176,8 @@ function calDetailEdit(){
 /** 삭제 버튼 */
 function calDetailDelete(){
   if(!calDetailContext) return;
+  const {mode, idx} = calDetailContext; // ★ closeCalDetail 전에 먼저 추출
   closeCalDetail();
-  const {mode, idx} = calDetailContext;
   if(mode==='event') confirmDelete('calev', idx);
   else if(mode==='task') confirmDelete('track', idx);
 }
