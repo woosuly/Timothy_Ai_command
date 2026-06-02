@@ -747,7 +747,7 @@ main.active-view{display:flex;}
 .font-size-input{width:50px;background:#020617;border:1px solid #334155;border-radius:5px;padding:4px 6px;color:#e2e8f0;font-size:12px;outline:none;text-align:center;}
 
 /* ── 캘린더 이벤트 상세 모달 ── */
-.cal-detail-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:1000;align-items:center;justify-content:center;padding:20px;}
+.cal-detail-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:500;align-items:center;justify-content:center;padding:20px;}
 .cal-detail-overlay.open{display:flex;}
 .cal-detail-box{background:#0f172a;border:1px solid #334155;border-radius:16px;padding:26px 24px;width:100%;max-width:460px;position:relative;box-shadow:0 16px 48px rgba(0,0,0,.6);}
 .cal-detail-type{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:700;padding:4px 12px;border-radius:5px;margin-bottom:14px;}
@@ -10047,8 +10047,8 @@ function openCalEventPopup(ei, px, py){
   // 하단 버튼: 수정 / 삭제 / 닫기
   document.getElementById('cdActions').className = 'cal-detail-actions';
   document.getElementById('cdActions').innerHTML = `
-    <button class="cda-btn cda-edit" onclick="calDetailEdit()">${t('cal_detail_edit')}</button>
-    <button class="cda-btn cda-del"  onclick="calDetailDelete()">${t('cal_detail_delete')}</button>
+    <button class="cda-btn cda-edit" onclick="calDetailEdit(event)">${t('cal_detail_edit')}</button>
+    <button class="cda-btn cda-del"  onclick="calDetailDelete(event)">${t('cal_detail_delete')}</button>
     <button class="cda-btn cda-close" onclick="closeCalDetail()" style="grid-column:1/-1;">${t('cal_detail_close')}</button>
   `;
   document.getElementById('cdActions').style.gridTemplateColumns = '1fr 1fr';
@@ -10143,7 +10143,7 @@ function openTaskEventPopup(taskIdx){
   const cdA = document.getElementById('cdActions');
   cdA.style.gridTemplateColumns = '1fr 1fr';
   cdA.innerHTML = `
-    <button class="cda-btn cda-del"   onclick="calDetailDelete()">${t('cal_detail_delete')}</button>
+    <button class="cda-btn cda-del"   onclick="calDetailDelete(event)">${t('cal_detail_delete')}</button>
     <button class="cda-btn cda-close" onclick="closeCalDetail()">${t('cal_detail_close')}</button>
   `;
   openCalDetail();
@@ -10166,17 +10166,21 @@ function closeCalDetail(){
 }
 
 /** 수정 버튼 */
-function calDetailEdit(){
+function calDetailEdit(e){
+  if(e){ e.stopPropagation(); e.preventDefault(); }
   if(!calDetailContext) return;
+  const {mode, idx} = calDetailContext; // ★ closeCalDetail 전에 먼저 추출
   closeCalDetail();
-  if(calDetailContext.mode==='event') openEditCal(calDetailContext.idx);
+  if(mode==='event') openEditCal(idx);
 }
 
 /** 삭제 버튼 */
-function calDetailDelete(){
+function calDetailDelete(e){
+  if(e){ e.stopPropagation(); e.preventDefault(); }
   if(!calDetailContext) return;
+  const {mode, idx} = calDetailContext; // ★ closeCalDetail 전에 먼저 추출
+  if(idx == null) return;               // ★ 유효성 체크
   closeCalDetail();
-  const {mode, idx} = calDetailContext;
   if(mode==='event') confirmDelete('calev', idx);
   else if(mode==='task') confirmDelete('track', idx);
 }
@@ -10202,8 +10206,8 @@ document.getElementById('calDetailOverlay')?.addEventListener('click', function(
 // 구버전 호환 함수 (기존 toggleProc은 캘린더 메일 이벤트가 직접 호출)
 // closeCEP, cepEdit, cepDelete 구버전 호환
 function closeCEP(){ closeCalDetail(); }
-function cepEdit(){ calDetailEdit(); }
-function cepDelete(){ calDetailDelete(); }
+function cepEdit(e){ calDetailEdit(e); }
+function cepDelete(e){ calDetailDelete(e); }
 function openDatePicker(fieldId,btnId){
   dpTargetField=fieldId; dpTargetBtn=btnId;
   const cur=document.getElementById(fieldId).value;
