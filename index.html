@@ -1212,7 +1212,8 @@ textarea::-webkit-scrollbar-thumb{background:#334155;border-radius:4px;}
         <!-- 메일 분석 패널 -->
         <div id="panel-mail" class="analyze-panel-wrap">
           <textarea id="emailPasteInput" class="analyze-paste" data-i18n-placeholder="mail_ph"
-            data-i18n-placeholder="mail_ph" placeholder="메일 텍스트를 붙여넣거나, 이미지/PDF를 업로드하세요."></textarea>
+            placeholder="메일 텍스트를 붙여넣거나, 이미지/PDF를 업로드하세요."
+            onpaste="handleMailInputPaste(event)"></textarea>
           <div class="file-upload-row">
             <label for="multimodalFile" class="file-label-btn" data-i18n="file_select">📷 파일 선택</label>
             <input type="file" id="multimodalFile" accept="image/*,application/pdf,.pdf,.txt,.md,.csv,.xlsx,.xls,.docx,.pptx,.ppt" style="display:none;" onchange="handleFileSelection(event)">
@@ -6226,6 +6227,29 @@ function handlePasteImage(e){
 }
 
 
+/** 메일 분석 입력란 — 이미지 붙여넣기 처리 */
+function handleMailInputPaste(e){
+  const items = e.clipboardData?.items;
+  if(!items) return;
+  for(const item of items){
+    if(item.type.startsWith('image/')){
+      e.preventDefault();
+      const file = item.getAsFile();
+      if(!file) continue;
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        fileAttachmentData = { mime: item.type, base64: reader.result.split(',')[1], name: t('paste_image_name')||'붙여넣기 이미지' };
+        const badge = document.getElementById('fileNameBadge');
+        if(badge) badge.innerText = '🖼️ ' + (t('paste_image_name')||'붙여넣기 이미지');
+        showToast('🖼️ ' + (t('toast_translate_ok')||'이미지 첨부 완료'));
+      };
+      reader.readAsDataURL(file);
+      return;
+    }
+  }
+  // 이미지 아닌 경우 기본 텍스트 붙여넣기 허용
+}
+
 function handleTransInputPaste(e){
   const items = e.clipboardData?.items;
 
@@ -6255,6 +6279,9 @@ function handleTransInputPaste(e){
     e.preventDefault();
     const tmp = document.createElement('div');
     tmp.innerHTML = htmlData.replace(/<script[\s\S]*?<\/script>/gi,'');
+
+    // ★ 코드/스타일 등 불필요 태그 텍스트가 섞이지 않도록 먼저 제거
+    tmp.querySelectorAll('style, head, meta, link, noscript, code, pre, textarea').forEach(el => el.remove());
 
     // ★ HTML 표 → 마크다운 표 변환 (구조 보존)
     tmp.querySelectorAll('table').forEach(table => {
@@ -9266,7 +9293,7 @@ async function genCollabMail(){
   };
 
   const chosen = STYLE_PROMPTS[styleKey] || STYLE_PROMPTS.formal_bilingual;
-  const prompt = `부서장 보좌 AI 비서입니다.\n${chosen.guide}\n\n핵심 요청 내용: ${content}\n\n【추가 출력 규칙】\n- 내용과 관련된 이미지가 필요하다면: ![설명](https://image.pollinations.ai/prompt/{영문키워드}?width=800&height=400&nologo=true) 형식으로 삽입\n- 비교/현황 데이터는 마크다운 표(| 컬럼 |) 형식으로 정리`;
+  const prompt = `부서장 보좌 AI 비서입니다.\n${chosen.guide}\n\n핵심 요청 내용: ${content}\n\n【추가 출력 규칙】\n- 비교/현황 데이터는 마크다운 표(| 컬럼 |) 형식으로 정리`;
 
   // ★ callAI('write')로 통합 — 사용자 설정 모델 자동 반영
   try{
@@ -10047,8 +10074,8 @@ function openCalEventPopup(ei, px, py){
   // 하단 버튼: 수정 / 삭제 / 닫기
   document.getElementById('cdActions').className = 'cal-detail-actions';
   document.getElementById('cdActions').innerHTML = `
-    <button class="cda-btn cda-edit" onclick="calDetailEdit(event)">${t('cal_detail_edit')}</button>
-    <button class="cda-btn cda-del"  onclick="calDetailDelete(event)">${t('cal_detail_delete')}</button>
+    <button class="cda-btn cda-edit" onclick="calDetailEdit()">${t('cal_detail_edit')}</button>
+    <button class="cda-btn cda-del"  onclick="calDetailDelete()">${t('cal_detail_delete')}</button>
     <button class="cda-btn cda-close" onclick="closeCalDetail()" style="grid-column:1/-1;">${t('cal_detail_close')}</button>
   `;
   document.getElementById('cdActions').style.gridTemplateColumns = '1fr 1fr';
@@ -10143,7 +10170,7 @@ function openTaskEventPopup(taskIdx){
   const cdA = document.getElementById('cdActions');
   cdA.style.gridTemplateColumns = '1fr 1fr';
   cdA.innerHTML = `
-    <button class="cda-btn cda-del"   onclick="calDetailDelete(event)">${t('cal_detail_delete')}</button>
+    <button class="cda-btn cda-del"   onclick="calDetailDelete()">${t('cal_detail_delete')}</button>
     <button class="cda-btn cda-close" onclick="closeCalDetail()">${t('cal_detail_close')}</button>
   `;
   openCalDetail();
@@ -10166,21 +10193,17 @@ function closeCalDetail(){
 }
 
 /** 수정 버튼 */
-function calDetailEdit(e){
-  if(e){ e.stopPropagation(); e.preventDefault(); }
+function calDetailEdit(){
   if(!calDetailContext) return;
-  const {mode, idx} = calDetailContext; // ★ closeCalDetail 전에 먼저 추출
   closeCalDetail();
-  if(mode==='event') openEditCal(idx);
+  if(calDetailContext.mode==='event') openEditCal(calDetailContext.idx);
 }
 
 /** 삭제 버튼 */
-function calDetailDelete(e){
-  if(e){ e.stopPropagation(); e.preventDefault(); }
+function calDetailDelete(){
   if(!calDetailContext) return;
-  const {mode, idx} = calDetailContext; // ★ closeCalDetail 전에 먼저 추출
-  if(idx == null) return;               // ★ 유효성 체크
   closeCalDetail();
+  const {mode, idx} = calDetailContext;
   if(mode==='event') confirmDelete('calev', idx);
   else if(mode==='task') confirmDelete('track', idx);
 }
@@ -10206,8 +10229,8 @@ document.getElementById('calDetailOverlay')?.addEventListener('click', function(
 // 구버전 호환 함수 (기존 toggleProc은 캘린더 메일 이벤트가 직접 호출)
 // closeCEP, cepEdit, cepDelete 구버전 호환
 function closeCEP(){ closeCalDetail(); }
-function cepEdit(e){ calDetailEdit(e); }
-function cepDelete(e){ calDetailDelete(e); }
+function cepEdit(){ calDetailEdit(); }
+function cepDelete(){ calDetailDelete(); }
 function openDatePicker(fieldId,btnId){
   dpTargetField=fieldId; dpTargetBtn=btnId;
   const cur=document.getElementById(fieldId).value;
