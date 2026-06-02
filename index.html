@@ -10168,8 +10168,9 @@ function closeCalDetail(){
 /** 수정 버튼 */
 function calDetailEdit(){
   if(!calDetailContext) return;
+  const {mode, idx} = calDetailContext; // ★ closeCalDetail 전에 먼저 추출
   closeCalDetail();
-  if(calDetailContext.mode==='event') openEditCal(calDetailContext.idx);
+  if(mode==='event') openEditCal(idx);
 }
 
 /** 삭제 버튼 */
