@@ -2322,6 +2322,51 @@ textarea::-webkit-scrollbar-thumb{background:#334155;border-radius:4px;}
       <div class="settings-section-hdr" style="margin-top:12px;" data-i18n="font_settings_title">🔤 폰트 설정</div>
       <select id="fontSelect" class="field-input" onchange="applyFont(this.value)" style="cursor:pointer;"></select>
       <div style="font-size:10px;color:#475569;margin-top:4px;" data-i18n="font_instant_note">* 선택 즉시 적용 · 저장 시 영구 유지</div>
+
+      <!-- ★ 커스텀 색상 설정 -->
+      <div class="settings-section-hdr" style="margin-top:14px;" data-i18n="ct_title">🎨 커스텀 색상 설정</div>
+      <div style="display:flex;flex-direction:column;gap:7px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
+          <span style="font-size:11px;color:#94a3b8;flex:1;" data-i18n="ct_bg">📱 전체 배경 색상</span>
+          <div style="display:flex;align-items:center;gap:5px;">
+            <input type="color" id="ct-bg" value="#0f172a" style="width:32px;height:26px;border:none;border-radius:4px;cursor:pointer;padding:0;background:none;" oninput="updateCustomTheme()">
+            <input type="text" id="ct-bg-hex" maxlength="7" placeholder="#0f172a" style="width:64px;background:#0a0f1e;border:1px solid #334155;border-radius:4px;padding:3px 6px;color:#e2e8f0;font-size:10px;font-family:monospace;" oninput="syncCTHex('ct-bg','ct-bg-hex')">
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
+          <span style="font-size:11px;color:#94a3b8;flex:1;" data-i18n="ct_sidebar">🧭 사이드바 배경 색상</span>
+          <div style="display:flex;align-items:center;gap:5px;">
+            <input type="color" id="ct-sidebar" value="#020617" style="width:32px;height:26px;border:none;border-radius:4px;cursor:pointer;padding:0;background:none;" oninput="updateCustomTheme()">
+            <input type="text" id="ct-sidebar-hex" maxlength="7" placeholder="#020617" style="width:64px;background:#0a0f1e;border:1px solid #334155;border-radius:4px;padding:3px 6px;color:#e2e8f0;font-size:10px;font-family:monospace;" oninput="syncCTHex('ct-sidebar','ct-sidebar-hex')">
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
+          <span style="font-size:11px;color:#94a3b8;flex:1;" data-i18n="ct_accent">🔘 포인트 및 버튼 색상</span>
+          <div style="display:flex;align-items:center;gap:5px;">
+            <input type="color" id="ct-accent" value="#3b82f6" style="width:32px;height:26px;border:none;border-radius:4px;cursor:pointer;padding:0;background:none;" oninput="updateCustomTheme()">
+            <input type="text" id="ct-accent-hex" maxlength="7" placeholder="#3b82f6" style="width:64px;background:#0a0f1e;border:1px solid #334155;border-radius:4px;padding:3px 6px;color:#e2e8f0;font-size:10px;font-family:monospace;" oninput="syncCTHex('ct-accent','ct-accent-hex')">
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
+          <span style="font-size:11px;color:#94a3b8;flex:1;" data-i18n="ct_modal">💬 모달/팝업 배경 색상</span>
+          <div style="display:flex;align-items:center;gap:5px;">
+            <input type="color" id="ct-modal" value="#0f172a" style="width:32px;height:26px;border:none;border-radius:4px;cursor:pointer;padding:0;background:none;" oninput="updateCustomTheme()">
+            <input type="text" id="ct-modal-hex" maxlength="7" placeholder="#0f172a" style="width:64px;background:#0a0f1e;border:1px solid #334155;border-radius:4px;padding:3px 6px;color:#e2e8f0;font-size:10px;font-family:monospace;" oninput="syncCTHex('ct-modal','ct-modal-hex')">
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
+          <span style="font-size:11px;color:#94a3b8;flex:1;" data-i18n="ct_text">✍️ 메인 글씨 색상</span>
+          <div style="display:flex;align-items:center;gap:5px;">
+            <input type="color" id="ct-text" value="#e2e8f0" style="width:32px;height:26px;border:none;border-radius:4px;cursor:pointer;padding:0;background:none;" oninput="updateCustomTheme()">
+            <input type="text" id="ct-text-hex" maxlength="7" placeholder="#e2e8f0" style="width:64px;background:#0a0f1e;border:1px solid #334155;border-radius:4px;padding:3px 6px;color:#e2e8f0;font-size:10px;font-family:monospace;" oninput="syncCTHex('ct-text','ct-text-hex')">
+          </div>
+        </div>
+        <div style="display:flex;gap:6px;margin-top:4px;">
+          <button onclick="updateCustomTheme(true)" style="flex:1;padding:7px;background:rgba(59,130,246,.18);color:#60a5fa;border:1px solid rgba(59,130,246,.35);border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;" data-i18n="ct_save">✅ 저장 적용</button>
+          <button onclick="resetCustomTheme()" style="flex:1;padding:7px;background:rgba(100,116,139,.1);color:#94a3b8;border:1px solid #334155;border-radius:6px;font-size:11px;cursor:pointer;" data-i18n="ct_reset">↩ 초기화</button>
+        </div>
+        <div style="font-size:9px;color:#475569;" data-i18n="ct_note">* 스킨 선택 후 커스텀 색상 적용 시 스킨 위에 덮어씌워집니다.</div>
+      </div>
     </div><!-- /stab-appear -->
 
     <!-- 공통 하단 버튼 -->
@@ -2790,6 +2835,14 @@ const LANG_PACKS = {
     confirm_yes:'예, 삭제',
     // ── 폰트 설정 ──
     font_instant_note:'* 선택 즉시 적용 · 저장 시 영구 유지',
+    // ── 커스텀 색상 설정 ──
+    ct_title:'🎨 커스텀 색상 설정',
+    ct_bg:'📱 전체 배경 색상', ct_sidebar:'🧭 사이드바 배경 색상',
+    ct_accent:'🔘 포인트 및 버튼 색상', ct_modal:'💬 모달/팝업 배경 색상',
+    ct_text:'✍️ 메인 글씨 색상',
+    ct_save:'✅ 저장 적용', ct_reset:'↩ 초기화',
+    ct_note:'* 스킨 선택 후 커스텀 색상 적용 시 스킨 위에 덮어씌워집니다.',
+    ct_toast_reset:'↩ 커스텀 색상 초기화 완료',
     // ── 도메인 탭 ──
     domain_all:'전체', domain_mfg:'제조', domain_equip:'설비', domain_mfgtech:'제조기술',
     domain_dev:'개발', domain_qa:'품질', domain_support:'지원', domain_hr:'인사', domain_infra:'인프라',
@@ -3295,6 +3348,14 @@ const LANG_PACKS = {
     wmo_fog:'雾', wmo_drizzle:'毛毛雨', wmo_rain:'雨', wmo_heavy_rain:'大雨',
     wmo_snow:'雪', wmo_heavy_snow:'暴雪', wmo_shower:'阵雨', wmo_heavy_shower:'强阵雨',
     font_instant_note:'* 立即应用 · 保存后永久保留',
+    // ── 커스텀 색상 설정 ──
+    ct_title:'🎨 自定义颜色设置',
+    ct_bg:'📱 全局背景颜色', ct_sidebar:'🧭 侧边栏背景颜色',
+    ct_accent:'🔘 强调/按钮颜色', ct_modal:'💬 弹窗背景颜色',
+    ct_text:'✍️ 主文字颜色',
+    ct_save:'✅ 保存应用', ct_reset:'↩ 重置',
+    ct_note:'* 选择皮肤后，自定义颜色将覆盖皮肤颜色。',
+    ct_toast_reset:'↩ 自定义颜色已重置',
     confirm_title:'🗑️ 删除确认', confirm_msg:'确定删除吗？<br>此操作无法撤销。', confirm_yes:'是，删除',
     domain_all:'全部', domain_mfg:'制造', domain_equip:'设备', domain_mfgtech:'制造技术',
     domain_dev:'开发', domain_qa:'品质', domain_support:'支援', domain_hr:'人事', domain_infra:'基础设施',
@@ -3718,6 +3779,14 @@ const LANG_PACKS = {
     wmo_fog:'Fog', wmo_drizzle:'Drizzle', wmo_rain:'Rain', wmo_heavy_rain:'Heavy Rain',
     wmo_snow:'Snow', wmo_heavy_snow:'Heavy Snow', wmo_shower:'Showers', wmo_heavy_shower:'Heavy Showers',
     font_instant_note:'* Applied immediately · Saved permanently',
+    // ── Custom Color Settings ──
+    ct_title:'🎨 Custom Color Settings',
+    ct_bg:'📱 Background Color', ct_sidebar:'🧭 Sidebar Background',
+    ct_accent:'🔘 Accent / Button Color', ct_modal:'💬 Modal / Popup Background',
+    ct_text:'✍️ Main Text Color',
+    ct_save:'✅ Save & Apply', ct_reset:'↩ Reset',
+    ct_note:'* Custom colors override the active skin.',
+    ct_toast_reset:'↩ Custom colors reset',
     confirm_title:'🗑️ Confirm Delete', confirm_msg:'Delete this item?<br>This cannot be undone.', confirm_yes:'Yes, Delete',
     domain_all:'All', domain_mfg:'Manufacturing', domain_equip:'Equipment', domain_mfgtech:'Mfg Tech',
     domain_dev:'Dev', domain_qa:'Quality', domain_support:'Support', domain_hr:'HR', domain_infra:'Infra',
@@ -4141,6 +4210,14 @@ const LANG_PACKS = {
     wmo_fog:'霧', wmo_drizzle:'霧雨', wmo_rain:'雨', wmo_heavy_rain:'大雨',
     wmo_snow:'雪', wmo_heavy_snow:'大雪', wmo_shower:'にわか雨', wmo_heavy_shower:'激しいにわか雨',
     font_instant_note:'* 即時適用 · 保存で永続保持',
+    // ── カスタムカラー設定 ──
+    ct_title:'🎨 カスタムカラー設定',
+    ct_bg:'📱 全体背景色', ct_sidebar:'🧭 サイドバー背景色',
+    ct_accent:'🔘 アクセント/ボタン色', ct_modal:'💬 モーダル/ポップアップ背景色',
+    ct_text:'✍️ メイン文字色',
+    ct_save:'✅ 保存して適用', ct_reset:'↩ リセット',
+    ct_note:'* スキン選択後にカスタムカラーを適用するとスキンの上に上書きされます。',
+    ct_toast_reset:'↩ カスタムカラーをリセットしました',
     confirm_title:'🗑️ 削除確認', confirm_msg:'削除しますか？<br>元に戻せません。', confirm_yes:'はい、削除',
     domain_all:'すべて', domain_mfg:'製造', domain_equip:'設備', domain_mfgtech:'製造技術',
     domain_dev:'開発', domain_qa:'品質', domain_support:'支援', domain_hr:'人事', domain_infra:'インフラ',
@@ -10434,6 +10511,74 @@ function applySkin(skinId){
   document.querySelectorAll('.skin-btn').forEach(b=>b.classList.toggle('active', b.dataset.skin===skinId));
 }
 
+// ════════════════════════════════════════
+// ★ 커스텀 색상 피커 — 독립 모듈
+// ════════════════════════════════════════
+function syncCTHex(pickerId, hexId){
+  const v = (document.getElementById(hexId)?.value||'').trim();
+  if(/^#[0-9a-fA-F]{6}$/.test(v)){
+    const p=document.getElementById(pickerId); if(p) p.value=v;
+    updateCustomTheme();
+  }
+}
+
+function updateCustomTheme(save=false){
+  const get=id=>document.getElementById(id)?.value||'';
+  const bg=get('ct-bg'), sidebar=get('ct-sidebar'), accent=get('ct-accent'),
+        modal=get('ct-modal'), text=get('ct-text');
+  const syncHex=(hexId,val)=>{ const el=document.getElementById(hexId); if(el&&!el.matches(':focus')) el.value=val; };
+  syncHex('ct-bg-hex',bg); syncHex('ct-sidebar-hex',sidebar);
+  syncHex('ct-accent-hex',accent); syncHex('ct-modal-hex',modal); syncHex('ct-text-hex',text);
+  let el=document.getElementById('custom-theme-style');
+  if(!el){ el=document.createElement('style'); el.id='custom-theme-style'; document.head.appendChild(el); }
+  el.textContent=`
+    ${bg?`body,#chatArea,main{background:${bg}!important;}`:''}
+    ${sidebar?`aside,.user-area{background:${sidebar}!important;}`:''}
+    ${accent?`.analyze-run-btn{background:${accent}!important;border-color:${accent}!important;}
+    .analyze-run-btn:hover:not(:disabled){background:${accent}cc!important;}
+    .modal-save-btn,.sync-btn{background:${accent}!important;border-color:${accent}!important;}
+    .stab-btn.active{border-color:${accent}!important;color:${accent}!important;}
+    .settings-section-hdr{color:${accent}!important;}`:''}
+    ${modal?`.modal-box,.settings-modal-box,.stab-panel,.cal-detail-box{background:${modal}!important;}`:''}
+    ${text?`body,.modal-box,.stab-panel,aside{color:${text}!important;}`:''}
+  `;
+  const root=document.documentElement;
+  if(bg)      root.style.setProperty('--skin-bg',bg);
+  if(sidebar) root.style.setProperty('--skin-sidebar',sidebar);
+  if(accent)  root.style.setProperty('--skin-accent',accent);
+  if(text)    root.style.setProperty('--skin-text',text);
+  if(save||localStorage.getItem('ct_bg')){
+    if(bg)      localStorage.setItem('ct_bg',bg);
+    if(sidebar) localStorage.setItem('ct_sidebar',sidebar);
+    if(accent)  localStorage.setItem('ct_accent',accent);
+    if(modal)   localStorage.setItem('ct_modal',modal);
+    if(text)    localStorage.setItem('ct_text',text);
+  }
+}
+
+function resetCustomTheme(){
+  ['ct_bg','ct_sidebar','ct_accent','ct_modal','ct_text'].forEach(k=>localStorage.removeItem(k));
+  const el=document.getElementById('custom-theme-style'); if(el) el.textContent='';
+  ['--skin-bg','--skin-sidebar','--skin-accent','--skin-text'].forEach(v=>document.documentElement.style.removeProperty(v));
+  const defs={'ct-bg':'#0f172a','ct-sidebar':'#020617','ct-accent':'#3b82f6','ct-modal':'#0f172a','ct-text':'#e2e8f0'};
+  Object.entries(defs).forEach(([id,val])=>{
+    const p=document.getElementById(id); const h=document.getElementById(id+'-hex');
+    if(p) p.value=val; if(h) h.value='';
+  });
+  const saved=localStorage.getItem('app_skin'); if(saved) applySkin(saved);
+  showToast(t('ct_toast_reset')); // ★ t() 함수로 다국어 토스트
+}
+
+function restoreCustomColors(){
+  const sv={bg:localStorage.getItem('ct_bg'),sidebar:localStorage.getItem('ct_sidebar'),
+            accent:localStorage.getItem('ct_accent'),modal:localStorage.getItem('ct_modal'),text:localStorage.getItem('ct_text')};
+  if(!Object.values(sv).some(Boolean)) return;
+  const set=(id,val)=>{ if(val){ const el=document.getElementById(id); if(el) el.value=val; } };
+  set('ct-bg',sv.bg); set('ct-sidebar',sv.sidebar); set('ct-accent',sv.accent);
+  set('ct-modal',sv.modal); set('ct-text',sv.text);
+  updateCustomTheme(false);
+}
+
 function renderSkinGrid(){
   const grid = document.getElementById('skinGrid'); if(!grid) return;
   // 다크/라이트 구분하여 섹션 나눠 렌더링
@@ -11217,6 +11362,7 @@ setLanguage = function(lang){
 document.addEventListener('DOMContentLoaded', ()=>{
   const savedSkin=localStorage.getItem('app_skin');
   if(savedSkin) applySkin(savedSkin);
+  restoreCustomColors(); // ★ 커스텀 색상 복원 (스킨 적용 후 덮어씌움)
   // ★ 위치 기본값: localStorage → '청주 사업장' (KO 기본값 유지, 언어 무관)
   const savedLoc=localStorage.getItem('user_location') || t('loc_default').replace('📍 ','');
   const el=document.getElementById('currentLocLabel');
