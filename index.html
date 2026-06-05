@@ -5221,33 +5221,21 @@ ${_replyRule}`;
         const fullPrompt = `${systemPrompt}\n【파일 내용】\n${combined}${sc?'\n'+sc:''}`;
         raw = await callAI(fullPrompt, `${aiRole}\n${langOut}`, 'analyze');
       } else {
-        // 이미지/PDF → 선택된 모델로 라우팅
-        // Gemini: multimodal 직접 호출 / 그 외: base64 설명 텍스트로 변환 후 callAI
-        const modelId = getModelForTask('analyze');
-        const modelMeta = AI_MODELS.find(m=>m.id===modelId);
-        const provider = modelMeta ? modelMeta.provider : 'gemini';
-
-        if(provider === 'gemini'){
-          // Gemini multimodal 직접 호출
-          const parts=[{text:systemPrompt}];
-          if(text) parts.push({text:`【메일 본문】\n${text}`});
-          if(sc)   parts.push({text:`【참고 문체】\n${sc}`});
-          parts.push({inlineData:{mimeType:fileAttachmentData.mime,data:fileAttachmentData.base64}});
-          const mUrl=`https://generativelanguage.googleapis.com/v1beta/models/${modelId}:generateContent?key=${apiKey}`;
-          const ctl=new AbortController(); const t=setTimeout(()=>ctl.abort(),90000);
-          const res=await fetch(mUrl,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({contents:[{parts}]}),signal:ctl.signal});
-          clearTimeout(t);
-          if(!res.ok){ const eb=await res.json().catch(()=>({})); throw new Error(`Gemini ${res.status}: ${eb?.error?.message||res.statusText}`); }
-          const d=await res.json();
-          if(d.error) throw new Error(`Gemini: ${d.error.message}`);
-          if(!d.candidates?.[0]) throw new Error(`AI 응답 없음 (사유: ${d.promptFeedback?.blockReason||'없음'})`);
-          raw=d.candidates[0]?.content?.parts?.[0]?.text||'';
-        } else {
-          // GPT/Claude: 이미지는 base64 설명으로 대체 후 callAI 경유
-          const imgNote = `[첨부파일: ${fileAttachmentData.name||'이미지'} (${fileAttachmentData.mime}) — 이미지/PDF 분석 요청]`;
-          const fullPrompt = `${systemPrompt}\n${imgNote}${text?'\n【메일 본문】\n'+text:''}${sc?'\n【참고 문체】\n'+sc:''}`;
-          raw = await callAI(fullPrompt, `${aiRole}\n${langOut}`, 'analyze');
-        }
+        // 이미지/PDF → Gemini multimodal 직접 호출
+        const parts=[{text:systemPrompt}];
+        if(text) parts.push({text:`【메일 본문】\n${text}`});
+        if(sc)   parts.push({text:`【참고 문체】\n${sc}`});
+        parts.push({inlineData:{mimeType:fileAttachmentData.mime,data:fileAttachmentData.base64}});
+        const mUrl=`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
+        const ctl=new AbortController(); const t=setTimeout(()=>ctl.abort(),90000);
+        const res=await fetch(mUrl,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({contents:[{parts}]}),signal:ctl.signal});
+        clearTimeout(t);
+        if(!res.ok){ const eb=await res.text(); throw new Error(`API HTTP ${res.status}: ${eb.substring(0,200)}`); }
+        const d=await res.json();
+        if(d.error) throw new Error(`API 오류: ${d.error.message||JSON.stringify(d.error)}`);
+        if(!d.candidates?.[0]) throw new Error(`AI 응답 없음 (사유: ${d.promptFeedback?.blockReason||'없음'})`);
+        raw=d.candidates[0]?.content?.parts?.[0]?.text||'';
+      }
     } else {
       // ★ 텍스트 전용 → callAI (analyze 태스크 → Gemini 1.5 Pro 기본)
       const fullPrompt=`${systemPrompt}${text?'\n【메일 본문】\n'+text:''}${sc?'\n【참고 문체】\n'+sc:''}`;
@@ -7877,22 +7865,25 @@ async function runTranslate(){
         : `다음 텍스트를 ${docPeerName}(${docPeerLang})으로 번역하세요. 번역문만 출력하세요.\n\n${text}`;
 
       if(transFileData){
-        // ★ 파일 번역은 인라인 데이터(이미지/문서) 포함이 필요하므로 Gemini API 직접 호출
-        // 선택된 모델이 Gemini 계열이면 그 모델 사용, 아니면 gemini-2.5-flash 폴백
+        // ★ 파일 번역: Gemini 계열이면 multimodal 직접 호출, 그 외는 callAI 경유
         const fileModel = (docAiModel && docAiModel.startsWith('gemini'))
-          ? docAiModel : 'gemini-2.5-flash';
-        const fileUrl = `https://generativelanguage.googleapis.com/v1beta/models/${fileModel}:generateContent?key=${k}`;
-        const parts = [{text:prompt},{inlineData:{mimeType:transFileData.mime,data:transFileData.base64}}];
-        const controller = new AbortController();
-        const timer = setTimeout(()=>controller.abort(), 90000);
-        const res = await fetch(fileUrl,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({contents:[{parts}]}),signal:controller.signal});
-        clearTimeout(timer);
-        if(!res.ok) throw new Error(`HTTP ${res.status}`);
-        const data = await res.json();
-        translated = data.candidates?.[0]?.content?.parts?.[0]?.text?.trim() || '';
-        // GPT/Claude가 선택된 경우 파일 번역은 Gemini로 처리됨을 안내
-        if(docAiModel && !docAiModel.startsWith('gemini')){
-          console.info('[번역] 파일 번역은 Gemini를 사용합니다 (파일 첨부 지원)');
+          ? docAiModel : null;
+        if(fileModel){
+          const geminiKey = localStorage.getItem('gemini_api_key');
+          if(!geminiKey) throw new Error('파일 번역에는 Gemini 키가 필요합니다. 설정에서 Gemini API 키를 입력해 주세요.');
+          const fileUrl = `https://generativelanguage.googleapis.com/v1beta/models/${fileModel}:generateContent?key=${geminiKey}`;
+          const parts = [{text:prompt},{inlineData:{mimeType:transFileData.mime,data:transFileData.base64}}];
+          const controller = new AbortController();
+          const timer = setTimeout(()=>controller.abort(), 90000);
+          const res = await fetch(fileUrl,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({contents:[{parts}]}),signal:controller.signal});
+          clearTimeout(timer);
+          if(!res.ok){ const eb=await res.json().catch(()=>({})); throw new Error(`Gemini ${res.status}: ${eb?.error?.message||res.statusText}`); }
+          const data = await res.json();
+          translated = data.candidates?.[0]?.content?.parts?.[0]?.text?.trim() || '';
+        } else {
+          // GPT/Claude: 파일 내용을 텍스트 설명으로 전달
+          const fileNote = `[첨부파일: ${transFileData.name||'파일'} (${transFileData.mime})]`;
+          translated = await callAI(fileNote + '\n' + prompt, sysRole, 'translate_doc');
         }
       } else {
         translated = await callAI(prompt, sysRole, 'translate_doc');
@@ -10700,9 +10691,12 @@ const API_KEY_MAP = {
  * - 모든 기능 진입점에서 이 함수로 통일
  */
 function requireApiKey(openSettings = true){
-  const k = localStorage.getItem('gemini_api_key');
-  console.log('[Timothy] requireApiKey 호출 — 키 존재:', !!k);
-  if(!k){
+  const gemini   = localStorage.getItem('gemini_api_key');
+  const openai   = localStorage.getItem('openai_api_key');
+  const anthropic= localStorage.getItem('anthropic_api_key');
+  const hasAny   = !!(gemini || openai || anthropic);
+  console.log('[Timothy] requireApiKey — Gemini:', !!gemini, 'OpenAI:', !!openai, 'Claude:', !!anthropic);
+  if(!hasAny){
     alert('🔑 '+t('toast_api_key_enter'));
     if(openSettings){
       setTimeout(()=>{ openSettingsModal(); switchSettingsTab('api'); }, 300);
@@ -10717,7 +10711,9 @@ function requireApiKey(openSettings = true){
  * Gemini 키가 없으면 분석/번역/STT/마이크 버튼을 잠금
  */
 function syncFunctionLockState(){
-  const hasKey = !!localStorage.getItem('gemini_api_key');
+  const hasKey = !!(localStorage.getItem('gemini_api_key')
+                 || localStorage.getItem('openai_api_key')
+                 || localStorage.getItem('anthropic_api_key'));
 
   // 잠금 대상 버튼 IDs
   const lockIds = [
@@ -11050,7 +11046,9 @@ async function callAI(prompt, systemRole = '', taskType = 'auto'){
   // ★ 시스템 언어 가이드라인 자동 주입
   const langNameMap = { KO:'한국어', ZH:'중국어', EN:'영어', JA:'일본어' };
   const sysLangName = langNameMap[currentLang] || '한국어';
-  const langGuideline = `[시스템 가이드라인] 현재 사용자 시스템 언어는 ${sysLangName}임. 모든 분석, 요약, 회의록 결과물은 반드시 ${sysLangName}로 출력할 것. 사용자가 특정 언어를 명시하지 않아도 이 규칙을 따를 것. 전문 기술 용어는 원본 언어를 괄호에 병기할 것.`;
+  const langGuideline = `[시스템 가이드라인] 현재 사용자 시스템 언어는 ${sysLangName}임. 모든 분석, 요약, 회의록 결과물은 반드시 ${sysLangName}로 출력할 것. 사용자가 특정 언어를 명시하지 않아도 이 규칙을 따를 것. 전문 기술 용어는 원본 언어를 괄호에 병기할 것.
+
+[이미지 삽입 가이드라인] 사용자가 답변에 '이미지'나 '사진'을 포함해 달라고 요청할 경우, 구글 검색 도구를 통해 유효한 이미지 URL을 찾아 마크다운 형식 ![이미지 설명](URL)으로 본문에 삽입하라. 만약 검색으로 적절한 이미지를 찾지 못했다면, 동적 이미지 생성 API인 ![이미지 설명](https://image.pollinations.ai/prompt/{영문_검색어}?width=800&height=400&nologo=true) 포맷을 사용하여 본문에 이미지를 강제로 삽입하라.`;
 
   // ★ 학습 데이터 컨텍스트 주입 (학습 적용 ON 상태일 때)
   const learnCtx = await getLearnSystemContext().catch(()=>'');
@@ -11076,15 +11074,17 @@ async function callAI(prompt, systemRole = '', taskType = 'auto'){
   const openaiKey    = localStorage.getItem('openai_api_key');
   const anthropicKey = localStorage.getItem('anthropic_api_key');
 
-  // API 키 없으면 에러 — 무언의 Gemini fallback 금지
+  // API 키 없으면 Gemini fallback + 안내
   if(provider === 'openai' && !openaiKey){
-    throw new Error('OpenAI API 키가 없습니다. 설정에서 GPT 키를 입력해 주세요.');
+    showToast('⚠️ GPT key missing → Gemini fallback');
+    provider = 'gemini'; modelId = 'gemini-2.5-flash';
   }
   if(provider === 'anthropic' && !anthropicKey){
-    throw new Error('Anthropic API 키가 없습니다. 설정에서 Claude 키를 입력해 주세요.');
+    showToast('⚠️ Claude key missing → Gemini fallback');
+    provider = 'gemini'; modelId = 'gemini-2.5-flash';
   }
   if(provider === 'gemini' && !geminiKey){
-    throw new Error('Gemini API 키가 없습니다. 설정에서 Gemini 키를 입력해 주세요.');
+    throw new Error('Gemini API key required');
   }
 
   // ─── Gemini ─────────────────────────────────────
