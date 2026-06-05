@@ -2322,51 +2322,6 @@ textarea::-webkit-scrollbar-thumb{background:#334155;border-radius:4px;}
       <div class="settings-section-hdr" style="margin-top:12px;" data-i18n="font_settings_title">🔤 폰트 설정</div>
       <select id="fontSelect" class="field-input" onchange="applyFont(this.value)" style="cursor:pointer;"></select>
       <div style="font-size:10px;color:#475569;margin-top:4px;" data-i18n="font_instant_note">* 선택 즉시 적용 · 저장 시 영구 유지</div>
-
-      <!-- ★ 커스텀 색상 설정 -->
-      <div class="settings-section-hdr" style="margin-top:14px;" data-i18n="ct_title">🎨 커스텀 색상 설정</div>
-      <div style="display:flex;flex-direction:column;gap:7px;">
-        <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
-          <span style="font-size:11px;color:#94a3b8;flex:1;" data-i18n="ct_bg">📱 전체 배경 색상</span>
-          <div style="display:flex;align-items:center;gap:5px;">
-            <input type="color" id="ct-bg" value="#0f172a" style="width:32px;height:26px;border:none;border-radius:4px;cursor:pointer;padding:0;background:none;" oninput="updateCustomTheme()">
-            <input type="text" id="ct-bg-hex" maxlength="7" placeholder="#0f172a" style="width:64px;background:#0a0f1e;border:1px solid #334155;border-radius:4px;padding:3px 6px;color:#e2e8f0;font-size:10px;font-family:monospace;" oninput="syncCTHex('ct-bg','ct-bg-hex')">
-          </div>
-        </div>
-        <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
-          <span style="font-size:11px;color:#94a3b8;flex:1;" data-i18n="ct_sidebar">🧭 사이드바 배경 색상</span>
-          <div style="display:flex;align-items:center;gap:5px;">
-            <input type="color" id="ct-sidebar" value="#020617" style="width:32px;height:26px;border:none;border-radius:4px;cursor:pointer;padding:0;background:none;" oninput="updateCustomTheme()">
-            <input type="text" id="ct-sidebar-hex" maxlength="7" placeholder="#020617" style="width:64px;background:#0a0f1e;border:1px solid #334155;border-radius:4px;padding:3px 6px;color:#e2e8f0;font-size:10px;font-family:monospace;" oninput="syncCTHex('ct-sidebar','ct-sidebar-hex')">
-          </div>
-        </div>
-        <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
-          <span style="font-size:11px;color:#94a3b8;flex:1;" data-i18n="ct_accent">🔘 포인트 및 버튼 색상</span>
-          <div style="display:flex;align-items:center;gap:5px;">
-            <input type="color" id="ct-accent" value="#3b82f6" style="width:32px;height:26px;border:none;border-radius:4px;cursor:pointer;padding:0;background:none;" oninput="updateCustomTheme()">
-            <input type="text" id="ct-accent-hex" maxlength="7" placeholder="#3b82f6" style="width:64px;background:#0a0f1e;border:1px solid #334155;border-radius:4px;padding:3px 6px;color:#e2e8f0;font-size:10px;font-family:monospace;" oninput="syncCTHex('ct-accent','ct-accent-hex')">
-          </div>
-        </div>
-        <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
-          <span style="font-size:11px;color:#94a3b8;flex:1;" data-i18n="ct_modal">💬 모달/팝업 배경 색상</span>
-          <div style="display:flex;align-items:center;gap:5px;">
-            <input type="color" id="ct-modal" value="#0f172a" style="width:32px;height:26px;border:none;border-radius:4px;cursor:pointer;padding:0;background:none;" oninput="updateCustomTheme()">
-            <input type="text" id="ct-modal-hex" maxlength="7" placeholder="#0f172a" style="width:64px;background:#0a0f1e;border:1px solid #334155;border-radius:4px;padding:3px 6px;color:#e2e8f0;font-size:10px;font-family:monospace;" oninput="syncCTHex('ct-modal','ct-modal-hex')">
-          </div>
-        </div>
-        <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
-          <span style="font-size:11px;color:#94a3b8;flex:1;" data-i18n="ct_text">✍️ 메인 글씨 색상</span>
-          <div style="display:flex;align-items:center;gap:5px;">
-            <input type="color" id="ct-text" value="#e2e8f0" style="width:32px;height:26px;border:none;border-radius:4px;cursor:pointer;padding:0;background:none;" oninput="updateCustomTheme()">
-            <input type="text" id="ct-text-hex" maxlength="7" placeholder="#e2e8f0" style="width:64px;background:#0a0f1e;border:1px solid #334155;border-radius:4px;padding:3px 6px;color:#e2e8f0;font-size:10px;font-family:monospace;" oninput="syncCTHex('ct-text','ct-text-hex')">
-          </div>
-        </div>
-        <div style="display:flex;gap:6px;margin-top:4px;">
-          <button onclick="updateCustomTheme(true)" style="flex:1;padding:7px;background:rgba(59,130,246,.18);color:#60a5fa;border:1px solid rgba(59,130,246,.35);border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;" data-i18n="ct_save">✅ 저장 적용</button>
-          <button onclick="resetCustomTheme()" style="flex:1;padding:7px;background:rgba(100,116,139,.1);color:#94a3b8;border:1px solid #334155;border-radius:6px;font-size:11px;cursor:pointer;" data-i18n="ct_reset">↩ 초기화</button>
-        </div>
-        <div style="font-size:9px;color:#475569;" data-i18n="ct_note">* 스킨 선택 후 커스텀 색상 적용 시 스킨 위에 덮어씌워집니다.</div>
-      </div>
     </div><!-- /stab-appear -->
 
     <!-- 공통 하단 버튼 -->
@@ -2835,14 +2790,6 @@ const LANG_PACKS = {
     confirm_yes:'예, 삭제',
     // ── 폰트 설정 ──
     font_instant_note:'* 선택 즉시 적용 · 저장 시 영구 유지',
-    // ── 커스텀 색상 설정 ──
-    ct_title:'🎨 커스텀 색상 설정',
-    ct_bg:'📱 전체 배경 색상', ct_sidebar:'🧭 사이드바 배경 색상',
-    ct_accent:'🔘 포인트 및 버튼 색상', ct_modal:'💬 모달/팝업 배경 색상',
-    ct_text:'✍️ 메인 글씨 색상',
-    ct_save:'✅ 저장 적용', ct_reset:'↩ 초기화',
-    ct_note:'* 스킨 선택 후 커스텀 색상 적용 시 스킨 위에 덮어씌워집니다.',
-    ct_toast_reset:'↩ 커스텀 색상 초기화 완료',
     // ── 도메인 탭 ──
     domain_all:'전체', domain_mfg:'제조', domain_equip:'설비', domain_mfgtech:'제조기술',
     domain_dev:'개발', domain_qa:'품질', domain_support:'지원', domain_hr:'인사', domain_infra:'인프라',
@@ -3348,14 +3295,6 @@ const LANG_PACKS = {
     wmo_fog:'雾', wmo_drizzle:'毛毛雨', wmo_rain:'雨', wmo_heavy_rain:'大雨',
     wmo_snow:'雪', wmo_heavy_snow:'暴雪', wmo_shower:'阵雨', wmo_heavy_shower:'强阵雨',
     font_instant_note:'* 立即应用 · 保存后永久保留',
-    // ── 커스텀 색상 설정 ──
-    ct_title:'🎨 自定义颜色设置',
-    ct_bg:'📱 全局背景颜色', ct_sidebar:'🧭 侧边栏背景颜色',
-    ct_accent:'🔘 强调/按钮颜色', ct_modal:'💬 弹窗背景颜色',
-    ct_text:'✍️ 主文字颜色',
-    ct_save:'✅ 保存应用', ct_reset:'↩ 重置',
-    ct_note:'* 选择皮肤后，自定义颜色将覆盖皮肤颜色。',
-    ct_toast_reset:'↩ 自定义颜色已重置',
     confirm_title:'🗑️ 删除确认', confirm_msg:'确定删除吗？<br>此操作无法撤销。', confirm_yes:'是，删除',
     domain_all:'全部', domain_mfg:'制造', domain_equip:'设备', domain_mfgtech:'制造技术',
     domain_dev:'开发', domain_qa:'品质', domain_support:'支援', domain_hr:'人事', domain_infra:'基础设施',
@@ -3779,14 +3718,6 @@ const LANG_PACKS = {
     wmo_fog:'Fog', wmo_drizzle:'Drizzle', wmo_rain:'Rain', wmo_heavy_rain:'Heavy Rain',
     wmo_snow:'Snow', wmo_heavy_snow:'Heavy Snow', wmo_shower:'Showers', wmo_heavy_shower:'Heavy Showers',
     font_instant_note:'* Applied immediately · Saved permanently',
-    // ── Custom Color Settings ──
-    ct_title:'🎨 Custom Color Settings',
-    ct_bg:'📱 Background Color', ct_sidebar:'🧭 Sidebar Background',
-    ct_accent:'🔘 Accent / Button Color', ct_modal:'💬 Modal / Popup Background',
-    ct_text:'✍️ Main Text Color',
-    ct_save:'✅ Save & Apply', ct_reset:'↩ Reset',
-    ct_note:'* Custom colors override the active skin.',
-    ct_toast_reset:'↩ Custom colors reset',
     confirm_title:'🗑️ Confirm Delete', confirm_msg:'Delete this item?<br>This cannot be undone.', confirm_yes:'Yes, Delete',
     domain_all:'All', domain_mfg:'Manufacturing', domain_equip:'Equipment', domain_mfgtech:'Mfg Tech',
     domain_dev:'Dev', domain_qa:'Quality', domain_support:'Support', domain_hr:'HR', domain_infra:'Infra',
@@ -4210,14 +4141,6 @@ const LANG_PACKS = {
     wmo_fog:'霧', wmo_drizzle:'霧雨', wmo_rain:'雨', wmo_heavy_rain:'大雨',
     wmo_snow:'雪', wmo_heavy_snow:'大雪', wmo_shower:'にわか雨', wmo_heavy_shower:'激しいにわか雨',
     font_instant_note:'* 即時適用 · 保存で永続保持',
-    // ── カスタムカラー設定 ──
-    ct_title:'🎨 カスタムカラー設定',
-    ct_bg:'📱 全体背景色', ct_sidebar:'🧭 サイドバー背景色',
-    ct_accent:'🔘 アクセント/ボタン色', ct_modal:'💬 モーダル/ポップアップ背景色',
-    ct_text:'✍️ メイン文字色',
-    ct_save:'✅ 保存して適用', ct_reset:'↩ リセット',
-    ct_note:'* スキン選択後にカスタムカラーを適用するとスキンの上に上書きされます。',
-    ct_toast_reset:'↩ カスタムカラーをリセットしました',
     confirm_title:'🗑️ 削除確認', confirm_msg:'削除しますか？<br>元に戻せません。', confirm_yes:'はい、削除',
     domain_all:'すべて', domain_mfg:'製造', domain_equip:'設備', domain_mfgtech:'製造技術',
     domain_dev:'開発', domain_qa:'品質', domain_support:'支援', domain_hr:'人事', domain_infra:'インフラ',
@@ -5221,80 +5144,21 @@ ${_replyRule}`;
         const fullPrompt = `${systemPrompt}\n【파일 내용】\n${combined}${sc?'\n'+sc:''}`;
         raw = await callAI(fullPrompt, `${aiRole}\n${langOut}`, 'analyze');
       } else {
-        // 이미지/PDF → 선택된 모델 provider에 맞게 라우팅
-        const _modelId   = getModelForTask('analyze');
-        const _modelMeta = AI_MODELS.find(m=>m.id===_modelId);
-        const _provider  = _modelMeta ? _modelMeta.provider : 'gemini';
-        const _geminiKey = localStorage.getItem('gemini_api_key');
-        const _openaiKey = localStorage.getItem('openai_api_key');
-        const _claudeKey = localStorage.getItem('anthropic_api_key');
-
-        if(_provider === 'gemini' || (!_openaiKey && !_claudeKey)){
-          // ── Gemini multimodal ──
-          if(!_geminiKey) throw new Error('이미지/PDF 분석에 Gemini 키가 필요합니다. 설정에서 입력해 주세요.');
-          const _mid  = (_provider==='gemini' && _modelId) ? _modelId : 'gemini-2.5-flash';
-          const parts = [{text:systemPrompt}];
-          if(text) parts.push({text:`【메일 본문】\n${text}`});
-          if(sc)   parts.push({text:`【참고 문체】\n${sc}`});
-          parts.push({inlineData:{mimeType:fileAttachmentData.mime,data:fileAttachmentData.base64}});
-          const mUrl=`https://generativelanguage.googleapis.com/v1beta/models/${_mid}:generateContent?key=${_geminiKey}`;
-          const ctl=new AbortController(); const t=setTimeout(()=>ctl.abort(),90000);
-          const res=await fetch(mUrl,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({contents:[{parts}]}),signal:ctl.signal});
-          clearTimeout(t);
-          if(!res.ok){ const eb=await res.json().catch(()=>({})); throw new Error(`Gemini ${res.status}: ${eb?.error?.message||res.statusText}`); }
-          const d=await res.json();
-          if(d.error) throw new Error(`Gemini: ${d.error.message}`);
-          if(!d.candidates?.[0]) throw new Error(`AI 응답 없음 (사유: ${d.promptFeedback?.blockReason||'없음'})`);
-          raw=d.candidates[0]?.content?.parts?.[0]?.text||'';
-
-        } else if(_provider === 'openai' && _openaiKey){
-          // ── GPT-4o Vision ──
-          const _content = [];
-          _content.push({type:'text', text: systemPrompt + (text ? `\n【메일 본문】\n${text}` : '') + (sc ? `\n【참고 문체】\n${sc}` : '')});
-          const _isImage = fileAttachmentData.mime.startsWith('image/');
-          if(_isImage){
-            _content.push({type:'image_url', image_url:{url:`data:${fileAttachmentData.mime};base64,${fileAttachmentData.base64}`}});
-          } else {
-            // PDF 등 비이미지 → 텍스트 안내로 대체
-            _content.push({type:'text', text:`[첨부파일: ${fileAttachmentData.name||'파일'} (${fileAttachmentData.mime}) — 내용을 분석해 주세요]`});
-          }
-          const ctl=new AbortController(); const t=setTimeout(()=>ctl.abort(),90000);
-          const res=await fetch('https://api.openai.com/v1/chat/completions',{
-            method:'POST',
-            headers:{'Content-Type':'application/json','Authorization':`Bearer ${_openaiKey}`},
-            body:JSON.stringify({model:_modelId||'gpt-4o', messages:[{role:'user',content:_content}], max_tokens:2000}),
-            signal:ctl.signal
-          });
-          clearTimeout(t);
-          if(!res.ok){ const eb=await res.json().catch(()=>({})); throw new Error(`OpenAI ${res.status}: ${eb?.error?.message||res.statusText}`); }
-          const d=await res.json();
-          raw=d.choices?.[0]?.message?.content?.trim()||'';
-
-        } else if(_provider === 'anthropic' && _claudeKey){
-          // ── Claude Vision ──
-          const _claudeModel = _modelId==='claude-3-5-sonnet' ? 'claude-3-5-sonnet-20241022'
-                             : _modelId==='claude-3-haiku'    ? 'claude-3-haiku-20240307'
-                             : 'claude-3-5-sonnet-20241022';
-          const _isImage = fileAttachmentData.mime.startsWith('image/');
-          const _msgContent = _isImage
-            ? [{type:'image',source:{type:'base64',media_type:fileAttachmentData.mime,data:fileAttachmentData.base64}},
-               {type:'text', text: systemPrompt + (text ? `\n【메일 본문】\n${text}` : '') + (sc ? `\n【참고 문체】\n${sc}` : '')}]
-            : [{type:'text', text: `[첨부파일: ${fileAttachmentData.name||'파일'} (${fileAttachmentData.mime})]\n` + systemPrompt + (text ? `\n【메일 본문】\n${text}` : '')}];
-          const ctl=new AbortController(); const t=setTimeout(()=>ctl.abort(),90000);
-          const res=await fetch('https://api.anthropic.com/v1/messages',{
-            method:'POST',
-            headers:{'Content-Type':'application/json','x-api-key':_claudeKey,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
-            body:JSON.stringify({model:_claudeModel, max_tokens:2000, messages:[{role:'user',content:_msgContent}]}),
-            signal:ctl.signal
-          });
-          clearTimeout(t);
-          if(!res.ok){ const eb=await res.json().catch(()=>({})); throw new Error(`Anthropic ${res.status}: ${eb?.error?.message||res.statusText}`); }
-          const d=await res.json();
-          raw=d.content?.[0]?.text?.trim()||'';
-
-        } else {
-          throw new Error('사용 가능한 API 키가 없습니다. 설정에서 API 키를 입력해 주세요.');
-        }
+        // 이미지/PDF → Gemini multimodal 직접 호출
+        const parts=[{text:systemPrompt}];
+        if(text) parts.push({text:`【메일 본문】\n${text}`});
+        if(sc)   parts.push({text:`【참고 문체】\n${sc}`});
+        parts.push({inlineData:{mimeType:fileAttachmentData.mime,data:fileAttachmentData.base64}});
+        const mUrl=`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
+        const ctl=new AbortController(); const t=setTimeout(()=>ctl.abort(),90000);
+        const res=await fetch(mUrl,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({contents:[{parts}]}),signal:ctl.signal});
+        clearTimeout(t);
+        if(!res.ok){ const eb=await res.text(); throw new Error(`API HTTP ${res.status}: ${eb.substring(0,200)}`); }
+        const d=await res.json();
+        if(d.error) throw new Error(`API 오류: ${d.error.message||JSON.stringify(d.error)}`);
+        if(!d.candidates?.[0]) throw new Error(`AI 응답 없음 (사유: ${d.promptFeedback?.blockReason||'없음'})`);
+        raw=d.candidates[0]?.content?.parts?.[0]?.text||'';
+      }
     } else {
       // ★ 텍스트 전용 → callAI (analyze 태스크 → Gemini 1.5 Pro 기본)
       const fullPrompt=`${systemPrompt}${text?'\n【메일 본문】\n'+text:''}${sc?'\n【참고 문체】\n'+sc:''}`;
@@ -7924,25 +7788,22 @@ async function runTranslate(){
         : `다음 텍스트를 ${docPeerName}(${docPeerLang})으로 번역하세요. 번역문만 출력하세요.\n\n${text}`;
 
       if(transFileData){
-        // ★ 파일 번역: Gemini 계열이면 multimodal 직접 호출, 그 외는 callAI 경유
+        // ★ 파일 번역은 인라인 데이터(이미지/문서) 포함이 필요하므로 Gemini API 직접 호출
+        // 선택된 모델이 Gemini 계열이면 그 모델 사용, 아니면 gemini-2.5-flash 폴백
         const fileModel = (docAiModel && docAiModel.startsWith('gemini'))
-          ? docAiModel : null;
-        if(fileModel){
-          const geminiKey = localStorage.getItem('gemini_api_key');
-          if(!geminiKey) throw new Error('파일 번역에는 Gemini 키가 필요합니다. 설정에서 Gemini API 키를 입력해 주세요.');
-          const fileUrl = `https://generativelanguage.googleapis.com/v1beta/models/${fileModel}:generateContent?key=${geminiKey}`;
-          const parts = [{text:prompt},{inlineData:{mimeType:transFileData.mime,data:transFileData.base64}}];
-          const controller = new AbortController();
-          const timer = setTimeout(()=>controller.abort(), 90000);
-          const res = await fetch(fileUrl,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({contents:[{parts}]}),signal:controller.signal});
-          clearTimeout(timer);
-          if(!res.ok){ const eb=await res.json().catch(()=>({})); throw new Error(`Gemini ${res.status}: ${eb?.error?.message||res.statusText}`); }
-          const data = await res.json();
-          translated = data.candidates?.[0]?.content?.parts?.[0]?.text?.trim() || '';
-        } else {
-          // GPT/Claude: 파일 내용을 텍스트 설명으로 전달
-          const fileNote = `[첨부파일: ${transFileData.name||'파일'} (${transFileData.mime})]`;
-          translated = await callAI(fileNote + '\n' + prompt, sysRole, 'translate_doc');
+          ? docAiModel : 'gemini-2.5-flash';
+        const fileUrl = `https://generativelanguage.googleapis.com/v1beta/models/${fileModel}:generateContent?key=${k}`;
+        const parts = [{text:prompt},{inlineData:{mimeType:transFileData.mime,data:transFileData.base64}}];
+        const controller = new AbortController();
+        const timer = setTimeout(()=>controller.abort(), 90000);
+        const res = await fetch(fileUrl,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({contents:[{parts}]}),signal:controller.signal});
+        clearTimeout(timer);
+        if(!res.ok) throw new Error(`HTTP ${res.status}`);
+        const data = await res.json();
+        translated = data.candidates?.[0]?.content?.parts?.[0]?.text?.trim() || '';
+        // GPT/Claude가 선택된 경우 파일 번역은 Gemini로 처리됨을 안내
+        if(docAiModel && !docAiModel.startsWith('gemini')){
+          console.info('[번역] 파일 번역은 Gemini를 사용합니다 (파일 첨부 지원)');
         }
       } else {
         translated = await callAI(prompt, sysRole, 'translate_doc');
@@ -10573,74 +10434,6 @@ function applySkin(skinId){
   document.querySelectorAll('.skin-btn').forEach(b=>b.classList.toggle('active', b.dataset.skin===skinId));
 }
 
-// ════════════════════════════════════════
-// ★ 커스텀 색상 피커 — 독립 모듈
-// ════════════════════════════════════════
-function syncCTHex(pickerId, hexId){
-  const v = (document.getElementById(hexId)?.value||'').trim();
-  if(/^#[0-9a-fA-F]{6}$/.test(v)){
-    const p=document.getElementById(pickerId); if(p) p.value=v;
-    updateCustomTheme();
-  }
-}
-
-function updateCustomTheme(save=false){
-  const get=id=>document.getElementById(id)?.value||'';
-  const bg=get('ct-bg'), sidebar=get('ct-sidebar'), accent=get('ct-accent'),
-        modal=get('ct-modal'), text=get('ct-text');
-  const syncHex=(hexId,val)=>{ const el=document.getElementById(hexId); if(el&&!el.matches(':focus')) el.value=val; };
-  syncHex('ct-bg-hex',bg); syncHex('ct-sidebar-hex',sidebar);
-  syncHex('ct-accent-hex',accent); syncHex('ct-modal-hex',modal); syncHex('ct-text-hex',text);
-  let el=document.getElementById('custom-theme-style');
-  if(!el){ el=document.createElement('style'); el.id='custom-theme-style'; document.head.appendChild(el); }
-  el.textContent=`
-    ${bg?`body,#chatArea,main{background:${bg}!important;}`:''}
-    ${sidebar?`aside,.user-area{background:${sidebar}!important;}`:''}
-    ${accent?`.analyze-run-btn{background:${accent}!important;border-color:${accent}!important;}
-    .analyze-run-btn:hover:not(:disabled){background:${accent}cc!important;}
-    .modal-save-btn,.sync-btn{background:${accent}!important;border-color:${accent}!important;}
-    .stab-btn.active{border-color:${accent}!important;color:${accent}!important;}
-    .settings-section-hdr{color:${accent}!important;}`:''}
-    ${modal?`.modal-box,.settings-modal-box,.stab-panel,.cal-detail-box{background:${modal}!important;}`:''}
-    ${text?`body,.modal-box,.stab-panel,aside{color:${text}!important;}`:''}
-  `;
-  const root=document.documentElement;
-  if(bg)      root.style.setProperty('--skin-bg',bg);
-  if(sidebar) root.style.setProperty('--skin-sidebar',sidebar);
-  if(accent)  root.style.setProperty('--skin-accent',accent);
-  if(text)    root.style.setProperty('--skin-text',text);
-  if(save||localStorage.getItem('ct_bg')){
-    if(bg)      localStorage.setItem('ct_bg',bg);
-    if(sidebar) localStorage.setItem('ct_sidebar',sidebar);
-    if(accent)  localStorage.setItem('ct_accent',accent);
-    if(modal)   localStorage.setItem('ct_modal',modal);
-    if(text)    localStorage.setItem('ct_text',text);
-  }
-}
-
-function resetCustomTheme(){
-  ['ct_bg','ct_sidebar','ct_accent','ct_modal','ct_text'].forEach(k=>localStorage.removeItem(k));
-  const el=document.getElementById('custom-theme-style'); if(el) el.textContent='';
-  ['--skin-bg','--skin-sidebar','--skin-accent','--skin-text'].forEach(v=>document.documentElement.style.removeProperty(v));
-  const defs={'ct-bg':'#0f172a','ct-sidebar':'#020617','ct-accent':'#3b82f6','ct-modal':'#0f172a','ct-text':'#e2e8f0'};
-  Object.entries(defs).forEach(([id,val])=>{
-    const p=document.getElementById(id); const h=document.getElementById(id+'-hex');
-    if(p) p.value=val; if(h) h.value='';
-  });
-  const saved=localStorage.getItem('app_skin'); if(saved) applySkin(saved);
-  showToast(t('ct_toast_reset')); // ★ t() 함수로 다국어 토스트
-}
-
-function restoreCustomColors(){
-  const sv={bg:localStorage.getItem('ct_bg'),sidebar:localStorage.getItem('ct_sidebar'),
-            accent:localStorage.getItem('ct_accent'),modal:localStorage.getItem('ct_modal'),text:localStorage.getItem('ct_text')};
-  if(!Object.values(sv).some(Boolean)) return;
-  const set=(id,val)=>{ if(val){ const el=document.getElementById(id); if(el) el.value=val; } };
-  set('ct-bg',sv.bg); set('ct-sidebar',sv.sidebar); set('ct-accent',sv.accent);
-  set('ct-modal',sv.modal); set('ct-text',sv.text);
-  updateCustomTheme(false);
-}
-
 function renderSkinGrid(){
   const grid = document.getElementById('skinGrid'); if(!grid) return;
   // 다크/라이트 구분하여 섹션 나눠 렌더링
@@ -10750,12 +10543,9 @@ const API_KEY_MAP = {
  * - 모든 기능 진입점에서 이 함수로 통일
  */
 function requireApiKey(openSettings = true){
-  const gemini   = localStorage.getItem('gemini_api_key');
-  const openai   = localStorage.getItem('openai_api_key');
-  const anthropic= localStorage.getItem('anthropic_api_key');
-  const hasAny   = !!(gemini || openai || anthropic);
-  console.log('[Timothy] requireApiKey — Gemini:', !!gemini, 'OpenAI:', !!openai, 'Claude:', !!anthropic);
-  if(!hasAny){
+  const k = localStorage.getItem('gemini_api_key');
+  console.log('[Timothy] requireApiKey 호출 — 키 존재:', !!k);
+  if(!k){
     alert('🔑 '+t('toast_api_key_enter'));
     if(openSettings){
       setTimeout(()=>{ openSettingsModal(); switchSettingsTab('api'); }, 300);
@@ -10770,9 +10560,7 @@ function requireApiKey(openSettings = true){
  * Gemini 키가 없으면 분석/번역/STT/마이크 버튼을 잠금
  */
 function syncFunctionLockState(){
-  const hasKey = !!(localStorage.getItem('gemini_api_key')
-                 || localStorage.getItem('openai_api_key')
-                 || localStorage.getItem('anthropic_api_key'));
+  const hasKey = !!localStorage.getItem('gemini_api_key');
 
   // 잠금 대상 버튼 IDs
   const lockIds = [
@@ -11133,55 +10921,17 @@ async function callAI(prompt, systemRole = '', taskType = 'auto'){
   const openaiKey    = localStorage.getItem('openai_api_key');
   const anthropicKey = localStorage.getItem('anthropic_api_key');
 
-  // 키 없는 provider → 가용 provider로 자동 전환
+  // API 키 없으면 Gemini fallback + 안내
   if(provider === 'openai' && !openaiKey){
-    if(geminiKey){ showToast('⚠️ GPT 키 없음 → Gemini 전환'); provider='gemini'; modelId='gemini-2.5-flash'; }
-    else if(anthropicKey){ showToast('⚠️ GPT 키 없음 → Claude 전환'); provider='anthropic'; modelId='claude-3-5-sonnet'; }
-    else throw new Error('사용 가능한 API 키가 없습니다. 설정에서 키를 입력해 주세요.');
+    showToast('⚠️ GPT key missing → Gemini fallback');
+    provider = 'gemini'; modelId = 'gemini-2.5-flash';
   }
   if(provider === 'anthropic' && !anthropicKey){
-    if(geminiKey){ showToast('⚠️ Claude 키 없음 → Gemini 전환'); provider='gemini'; modelId='gemini-2.5-flash'; }
-    else if(openaiKey){ showToast('⚠️ Claude 키 없음 → GPT 전환'); provider='openai'; modelId='gpt-4o'; }
-    else throw new Error('사용 가능한 API 키가 없습니다. 설정에서 키를 입력해 주세요.');
+    showToast('⚠️ Claude key missing → Gemini fallback');
+    provider = 'gemini'; modelId = 'gemini-2.5-flash';
   }
   if(provider === 'gemini' && !geminiKey){
-    if(openaiKey){ showToast('⚠️ Gemini 키 없음 → GPT 전환'); provider='openai'; modelId='gpt-4o'; }
-    else if(anthropicKey){ showToast('⚠️ Gemini 키 없음 → Claude 전환'); provider='anthropic'; modelId='claude-3-5-sonnet'; }
-    else throw new Error('사용 가능한 API 키가 없습니다. 설정에서 키를 입력해 주세요.');
-  }
-
-  // ★ 429 발생 시 다른 provider로 자동 재시도
-  async function _withFallback(primaryCall, curProvider){
-    try{ return await primaryCall(); }
-    catch(err){
-      const is429 = err.message.includes('429')||err.message.includes('quota')||err.message.includes('RESOURCE_EXHAUSTED');
-      if(!is429) throw err;
-      const order = ['gemini','openai','anthropic'].filter(p=>p!==curProvider);
-      for(const fp of order){
-        const fk = fp==='gemini'?geminiKey:fp==='openai'?openaiKey:anthropicKey;
-        if(!fk) continue;
-        showToast(`⚠️ ${curProvider} 한도 초과 → ${fp} 자동 전환`);
-        try{
-          if(fp==='gemini'){
-            const r=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${fk}`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({contents:[{parts:[...(fullSystemRole?[{text:fullSystemRole}]:[]),{text:prompt}]}]})});
-            if(!r.ok){const e=await r.json().catch(()=>({}));throw new Error(`Gemini ${r.status}: ${e?.error?.message||r.statusText}`);}
-            const d=await r.json(); return d.candidates?.[0]?.content?.parts?.[0]?.text?.trim()||'';
-          }
-          if(fp==='openai'){
-            const msgs=[]; if(fullSystemRole) msgs.push({role:'system',content:fullSystemRole}); msgs.push({role:'user',content:prompt});
-            const r=await fetch('https://api.openai.com/v1/chat/completions',{method:'POST',headers:{'Content-Type':'application/json','Authorization':`Bearer ${fk}`},body:JSON.stringify({model:'gpt-4o',messages:msgs,max_tokens:2000})});
-            if(!r.ok){const e=await r.json().catch(()=>({}));throw new Error(`OpenAI ${r.status}: ${e?.error?.message||r.statusText}`);}
-            const d=await r.json(); return d.choices?.[0]?.message?.content?.trim()||'';
-          }
-          if(fp==='anthropic'){
-            const r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json','x-api-key':fk,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},body:JSON.stringify({model:'claude-3-5-sonnet-20241022',max_tokens:2000,system:fullSystemRole||undefined,messages:[{role:'user',content:prompt}]})});
-            if(!r.ok){const e=await r.json().catch(()=>({}));throw new Error(`Anthropic ${r.status}: ${e?.error?.message||r.statusText}`);}
-            const d=await r.json(); return d.content?.[0]?.text?.trim()||'';
-          }
-        } catch(fe){ console.warn(`[fallback ${fp}]`,fe.message); }
-      }
-      throw new Error(t('err_api_429'));
-    }
+    throw new Error('Gemini API key required');
   }
 
   // ─── Gemini ─────────────────────────────────────
@@ -11191,16 +10941,14 @@ async function callAI(prompt, systemRole = '', taskType = 'auto'){
       ...(fullSystemRole ? [{text:fullSystemRole}] : []),
       {text:prompt}
     ]}]};
-    return await _withFallback(async ()=>{
-      const ctl=new AbortController(); const t=setTimeout(()=>ctl.abort(),90000);
-      const res=await fetch(url,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body),signal:ctl.signal});
-      clearTimeout(t);
-      if(!res.ok){ const e=await res.json().catch(()=>({})); throw new Error(`Gemini ${res.status}: ${e?.error?.message||res.statusText}`); }
-      const data=await res.json();
-      if(data.error) throw new Error(`Gemini: ${data.error.message}`);
-      if(!data.candidates?.[0]) throw new Error('Gemini: 응답 없음');
-      return data.candidates[0].content.parts[0].text?.trim()||'';
-    }, 'gemini');
+    const ctl=new AbortController(); const t=setTimeout(()=>ctl.abort(),90000);
+    const res=await fetch(url,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body),signal:ctl.signal});
+    clearTimeout(t);
+    if(!res.ok){ const e=await res.json().catch(()=>({})); throw new Error(`Gemini ${res.status}: ${e?.error?.message||res.statusText}`); }
+    const data=await res.json();
+    if(data.error) throw new Error(`Gemini: ${data.error.message}`);
+    if(!data.candidates?.[0]) throw new Error('Gemini: 응답 없음');
+    return data.candidates[0].content.parts[0].text?.trim()||'';
   }
 
   // ─── OpenAI ─────────────────────────────────────
@@ -11208,22 +10956,20 @@ async function callAI(prompt, systemRole = '', taskType = 'auto'){
     const messages=[];
     if(fullSystemRole) messages.push({role:'system',content:fullSystemRole});
     messages.push({role:'user',content:prompt});
-    return await _withFallback(async ()=>{
-      const ctl=new AbortController(); const t=setTimeout(()=>ctl.abort(),90000);
-      const res=await fetch('https://api.openai.com/v1/chat/completions',{
-        method:'POST',
-        headers:{'Content-Type':'application/json','Authorization':`Bearer ${openaiKey}`},
-        body:JSON.stringify({model:modelId,messages,max_tokens:2000,temperature:0.7}),
-        signal:ctl.signal
-      });
-      clearTimeout(t);
-      if(!res.ok){ const e=await res.json().catch(()=>({}));
-        if(res.status===401||res.status===403) throw new Error('OpenAI 키 인증 실패');
-        throw new Error(`OpenAI ${res.status}: ${e?.error?.message||res.statusText}`);
-      }
-      const data=await res.json();
-      return data.choices?.[0]?.message?.content?.trim()||'';
-    }, 'openai');
+    const ctl=new AbortController(); const t=setTimeout(()=>ctl.abort(),90000);
+    const res=await fetch('https://api.openai.com/v1/chat/completions',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','Authorization':`Bearer ${openaiKey}`},
+      body:JSON.stringify({model:modelId,messages,max_tokens:2000,temperature:0.7}),
+      signal:ctl.signal
+    });
+    clearTimeout(t);
+    if(!res.ok){ const e=await res.json().catch(()=>({}));
+      if(res.status===401||res.status===403) throw new Error('OpenAI 키 인증 실패');
+      throw new Error(`OpenAI ${res.status}: ${e?.error?.message||res.statusText}`);
+    }
+    const data=await res.json();
+    return data.choices?.[0]?.message?.content?.trim()||'';
   }
 
   // ─── Anthropic Claude ────────────────────────────
@@ -11231,27 +10977,25 @@ async function callAI(prompt, systemRole = '', taskType = 'auto'){
     const claudeModel = modelId==='claude-3-5-sonnet' ? 'claude-3-5-sonnet-20241022'
                       : modelId==='claude-3-haiku'    ? 'claude-3-haiku-20240307'
                       : 'claude-3-5-sonnet-20241022';
-    return await _withFallback(async ()=>{
-      const ctl=new AbortController(); const t=setTimeout(()=>ctl.abort(),90000);
-      const res=await fetch('https://api.anthropic.com/v1/messages',{
-        method:'POST',
-        headers:{
-          'Content-Type':'application/json',
-          'x-api-key':anthropicKey,
-          'anthropic-version':'2023-06-01',
-          'anthropic-dangerous-direct-browser-access':'true',
-        },
-        body:JSON.stringify({model:claudeModel,max_tokens:2000,system:fullSystemRole||undefined,messages:[{role:'user',content:prompt}]}),
-        signal:ctl.signal
-      });
-      clearTimeout(t);
-      if(!res.ok){ const e=await res.json().catch(()=>({}));
-        if(res.status===401) throw new Error('Anthropic 키 인증 실패');
-        throw new Error(`Anthropic ${res.status}: ${e?.error?.message||res.statusText}`);
-      }
-      const data=await res.json();
-      return data.content?.[0]?.text?.trim()||'';
-    }, 'anthropic');
+    const ctl=new AbortController(); const t=setTimeout(()=>ctl.abort(),90000);
+    const res=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{
+        'Content-Type':'application/json',
+        'x-api-key':anthropicKey,
+        'anthropic-version':'2023-06-01',
+        'anthropic-dangerous-direct-browser-access':'true',
+      },
+      body:JSON.stringify({model:claudeModel,max_tokens:2000,system:fullSystemRole||undefined,messages:[{role:'user',content:prompt}]}),
+      signal:ctl.signal
+    });
+    clearTimeout(t);
+    if(!res.ok){ const e=await res.json().catch(()=>({}));
+      if(res.status===401) throw new Error('Anthropic 키 인증 실패');
+      throw new Error(`Anthropic ${res.status}: ${e?.error?.message||res.statusText}`);
+    }
+    const data=await res.json();
+    return data.content?.[0]?.text?.trim()||'';
   }
 
   throw new Error(`알 수 없는 provider: ${provider}`);
@@ -11473,7 +11217,6 @@ setLanguage = function(lang){
 document.addEventListener('DOMContentLoaded', ()=>{
   const savedSkin=localStorage.getItem('app_skin');
   if(savedSkin) applySkin(savedSkin);
-  restoreCustomColors(); // ★ 커스텀 색상 복원 (스킨 적용 후 덮어씌움)
   // ★ 위치 기본값: localStorage → '청주 사업장' (KO 기본값 유지, 언어 무관)
   const savedLoc=localStorage.getItem('user_location') || t('loc_default').replace('📍 ','');
   const el=document.getElementById('currentLocLabel');
