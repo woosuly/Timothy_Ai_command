@@ -5221,21 +5221,80 @@ ${_replyRule}`;
         const fullPrompt = `${systemPrompt}\n【파일 내용】\n${combined}${sc?'\n'+sc:''}`;
         raw = await callAI(fullPrompt, `${aiRole}\n${langOut}`, 'analyze');
       } else {
-        // 이미지/PDF → Gemini multimodal 직접 호출
-        const parts=[{text:systemPrompt}];
-        if(text) parts.push({text:`【메일 본문】\n${text}`});
-        if(sc)   parts.push({text:`【참고 문체】\n${sc}`});
-        parts.push({inlineData:{mimeType:fileAttachmentData.mime,data:fileAttachmentData.base64}});
-        const mUrl=`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
-        const ctl=new AbortController(); const t=setTimeout(()=>ctl.abort(),90000);
-        const res=await fetch(mUrl,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({contents:[{parts}]}),signal:ctl.signal});
-        clearTimeout(t);
-        if(!res.ok){ const eb=await res.text(); throw new Error(`API HTTP ${res.status}: ${eb.substring(0,200)}`); }
-        const d=await res.json();
-        if(d.error) throw new Error(`API 오류: ${d.error.message||JSON.stringify(d.error)}`);
-        if(!d.candidates?.[0]) throw new Error(`AI 응답 없음 (사유: ${d.promptFeedback?.blockReason||'없음'})`);
-        raw=d.candidates[0]?.content?.parts?.[0]?.text||'';
-      }
+        // 이미지/PDF → 선택된 모델 provider에 맞게 라우팅
+        const _modelId   = getModelForTask('analyze');
+        const _modelMeta = AI_MODELS.find(m=>m.id===_modelId);
+        const _provider  = _modelMeta ? _modelMeta.provider : 'gemini';
+        const _geminiKey = localStorage.getItem('gemini_api_key');
+        const _openaiKey = localStorage.getItem('openai_api_key');
+        const _claudeKey = localStorage.getItem('anthropic_api_key');
+
+        if(_provider === 'gemini' || (!_openaiKey && !_claudeKey)){
+          // ── Gemini multimodal ──
+          if(!_geminiKey) throw new Error('이미지/PDF 분석에 Gemini 키가 필요합니다. 설정에서 입력해 주세요.');
+          const _mid  = (_provider==='gemini' && _modelId) ? _modelId : 'gemini-2.5-flash';
+          const parts = [{text:systemPrompt}];
+          if(text) parts.push({text:`【메일 본문】\n${text}`});
+          if(sc)   parts.push({text:`【참고 문체】\n${sc}`});
+          parts.push({inlineData:{mimeType:fileAttachmentData.mime,data:fileAttachmentData.base64}});
+          const mUrl=`https://generativelanguage.googleapis.com/v1beta/models/${_mid}:generateContent?key=${_geminiKey}`;
+          const ctl=new AbortController(); const t=setTimeout(()=>ctl.abort(),90000);
+          const res=await fetch(mUrl,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({contents:[{parts}]}),signal:ctl.signal});
+          clearTimeout(t);
+          if(!res.ok){ const eb=await res.json().catch(()=>({})); throw new Error(`Gemini ${res.status}: ${eb?.error?.message||res.statusText}`); }
+          const d=await res.json();
+          if(d.error) throw new Error(`Gemini: ${d.error.message}`);
+          if(!d.candidates?.[0]) throw new Error(`AI 응답 없음 (사유: ${d.promptFeedback?.blockReason||'없음'})`);
+          raw=d.candidates[0]?.content?.parts?.[0]?.text||'';
+
+        } else if(_provider === 'openai' && _openaiKey){
+          // ── GPT-4o Vision ──
+          const _content = [];
+          _content.push({type:'text', text: systemPrompt + (text ? `\n【메일 본문】\n${text}` : '') + (sc ? `\n【참고 문체】\n${sc}` : '')});
+          const _isImage = fileAttachmentData.mime.startsWith('image/');
+          if(_isImage){
+            _content.push({type:'image_url', image_url:{url:`data:${fileAttachmentData.mime};base64,${fileAttachmentData.base64}`}});
+          } else {
+            // PDF 등 비이미지 → 텍스트 안내로 대체
+            _content.push({type:'text', text:`[첨부파일: ${fileAttachmentData.name||'파일'} (${fileAttachmentData.mime}) — 내용을 분석해 주세요]`});
+          }
+          const ctl=new AbortController(); const t=setTimeout(()=>ctl.abort(),90000);
+          const res=await fetch('https://api.openai.com/v1/chat/completions',{
+            method:'POST',
+            headers:{'Content-Type':'application/json','Authorization':`Bearer ${_openaiKey}`},
+            body:JSON.stringify({model:_modelId||'gpt-4o', messages:[{role:'user',content:_content}], max_tokens:2000}),
+            signal:ctl.signal
+          });
+          clearTimeout(t);
+          if(!res.ok){ const eb=await res.json().catch(()=>({})); throw new Error(`OpenAI ${res.status}: ${eb?.error?.message||res.statusText}`); }
+          const d=await res.json();
+          raw=d.choices?.[0]?.message?.content?.trim()||'';
+
+        } else if(_provider === 'anthropic' && _claudeKey){
+          // ── Claude Vision ──
+          const _claudeModel = _modelId==='claude-3-5-sonnet' ? 'claude-3-5-sonnet-20241022'
+                             : _modelId==='claude-3-haiku'    ? 'claude-3-haiku-20240307'
+                             : 'claude-3-5-sonnet-20241022';
+          const _isImage = fileAttachmentData.mime.startsWith('image/');
+          const _msgContent = _isImage
+            ? [{type:'image',source:{type:'base64',media_type:fileAttachmentData.mime,data:fileAttachmentData.base64}},
+               {type:'text', text: systemPrompt + (text ? `\n【메일 본문】\n${text}` : '') + (sc ? `\n【참고 문체】\n${sc}` : '')}]
+            : [{type:'text', text: `[첨부파일: ${fileAttachmentData.name||'파일'} (${fileAttachmentData.mime})]\n` + systemPrompt + (text ? `\n【메일 본문】\n${text}` : '')}];
+          const ctl=new AbortController(); const t=setTimeout(()=>ctl.abort(),90000);
+          const res=await fetch('https://api.anthropic.com/v1/messages',{
+            method:'POST',
+            headers:{'Content-Type':'application/json','x-api-key':_claudeKey,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+            body:JSON.stringify({model:_claudeModel, max_tokens:2000, messages:[{role:'user',content:_msgContent}]}),
+            signal:ctl.signal
+          });
+          clearTimeout(t);
+          if(!res.ok){ const eb=await res.json().catch(()=>({})); throw new Error(`Anthropic ${res.status}: ${eb?.error?.message||res.statusText}`); }
+          const d=await res.json();
+          raw=d.content?.[0]?.text?.trim()||'';
+
+        } else {
+          throw new Error('사용 가능한 API 키가 없습니다. 설정에서 API 키를 입력해 주세요.');
+        }
     } else {
       // ★ 텍스트 전용 → callAI (analyze 태스크 → Gemini 1.5 Pro 기본)
       const fullPrompt=`${systemPrompt}${text?'\n【메일 본문】\n'+text:''}${sc?'\n【참고 문체】\n'+sc:''}`;
@@ -11074,17 +11133,55 @@ async function callAI(prompt, systemRole = '', taskType = 'auto'){
   const openaiKey    = localStorage.getItem('openai_api_key');
   const anthropicKey = localStorage.getItem('anthropic_api_key');
 
-  // API 키 없으면 Gemini fallback + 안내
+  // 키 없는 provider → 가용 provider로 자동 전환
   if(provider === 'openai' && !openaiKey){
-    showToast('⚠️ GPT key missing → Gemini fallback');
-    provider = 'gemini'; modelId = 'gemini-2.5-flash';
+    if(geminiKey){ showToast('⚠️ GPT 키 없음 → Gemini 전환'); provider='gemini'; modelId='gemini-2.5-flash'; }
+    else if(anthropicKey){ showToast('⚠️ GPT 키 없음 → Claude 전환'); provider='anthropic'; modelId='claude-3-5-sonnet'; }
+    else throw new Error('사용 가능한 API 키가 없습니다. 설정에서 키를 입력해 주세요.');
   }
   if(provider === 'anthropic' && !anthropicKey){
-    showToast('⚠️ Claude key missing → Gemini fallback');
-    provider = 'gemini'; modelId = 'gemini-2.5-flash';
+    if(geminiKey){ showToast('⚠️ Claude 키 없음 → Gemini 전환'); provider='gemini'; modelId='gemini-2.5-flash'; }
+    else if(openaiKey){ showToast('⚠️ Claude 키 없음 → GPT 전환'); provider='openai'; modelId='gpt-4o'; }
+    else throw new Error('사용 가능한 API 키가 없습니다. 설정에서 키를 입력해 주세요.');
   }
   if(provider === 'gemini' && !geminiKey){
-    throw new Error('Gemini API key required');
+    if(openaiKey){ showToast('⚠️ Gemini 키 없음 → GPT 전환'); provider='openai'; modelId='gpt-4o'; }
+    else if(anthropicKey){ showToast('⚠️ Gemini 키 없음 → Claude 전환'); provider='anthropic'; modelId='claude-3-5-sonnet'; }
+    else throw new Error('사용 가능한 API 키가 없습니다. 설정에서 키를 입력해 주세요.');
+  }
+
+  // ★ 429 발생 시 다른 provider로 자동 재시도
+  async function _withFallback(primaryCall, curProvider){
+    try{ return await primaryCall(); }
+    catch(err){
+      const is429 = err.message.includes('429')||err.message.includes('quota')||err.message.includes('RESOURCE_EXHAUSTED');
+      if(!is429) throw err;
+      const order = ['gemini','openai','anthropic'].filter(p=>p!==curProvider);
+      for(const fp of order){
+        const fk = fp==='gemini'?geminiKey:fp==='openai'?openaiKey:anthropicKey;
+        if(!fk) continue;
+        showToast(`⚠️ ${curProvider} 한도 초과 → ${fp} 자동 전환`);
+        try{
+          if(fp==='gemini'){
+            const r=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${fk}`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({contents:[{parts:[...(fullSystemRole?[{text:fullSystemRole}]:[]),{text:prompt}]}]})});
+            if(!r.ok){const e=await r.json().catch(()=>({}));throw new Error(`Gemini ${r.status}: ${e?.error?.message||r.statusText}`);}
+            const d=await r.json(); return d.candidates?.[0]?.content?.parts?.[0]?.text?.trim()||'';
+          }
+          if(fp==='openai'){
+            const msgs=[]; if(fullSystemRole) msgs.push({role:'system',content:fullSystemRole}); msgs.push({role:'user',content:prompt});
+            const r=await fetch('https://api.openai.com/v1/chat/completions',{method:'POST',headers:{'Content-Type':'application/json','Authorization':`Bearer ${fk}`},body:JSON.stringify({model:'gpt-4o',messages:msgs,max_tokens:2000})});
+            if(!r.ok){const e=await r.json().catch(()=>({}));throw new Error(`OpenAI ${r.status}: ${e?.error?.message||r.statusText}`);}
+            const d=await r.json(); return d.choices?.[0]?.message?.content?.trim()||'';
+          }
+          if(fp==='anthropic'){
+            const r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json','x-api-key':fk,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},body:JSON.stringify({model:'claude-3-5-sonnet-20241022',max_tokens:2000,system:fullSystemRole||undefined,messages:[{role:'user',content:prompt}]})});
+            if(!r.ok){const e=await r.json().catch(()=>({}));throw new Error(`Anthropic ${r.status}: ${e?.error?.message||r.statusText}`);}
+            const d=await r.json(); return d.content?.[0]?.text?.trim()||'';
+          }
+        } catch(fe){ console.warn(`[fallback ${fp}]`,fe.message); }
+      }
+      throw new Error(t('err_api_429'));
+    }
   }
 
   // ─── Gemini ─────────────────────────────────────
@@ -11094,14 +11191,16 @@ async function callAI(prompt, systemRole = '', taskType = 'auto'){
       ...(fullSystemRole ? [{text:fullSystemRole}] : []),
       {text:prompt}
     ]}]};
-    const ctl=new AbortController(); const t=setTimeout(()=>ctl.abort(),90000);
-    const res=await fetch(url,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body),signal:ctl.signal});
-    clearTimeout(t);
-    if(!res.ok){ const e=await res.json().catch(()=>({})); throw new Error(`Gemini ${res.status}: ${e?.error?.message||res.statusText}`); }
-    const data=await res.json();
-    if(data.error) throw new Error(`Gemini: ${data.error.message}`);
-    if(!data.candidates?.[0]) throw new Error('Gemini: 응답 없음');
-    return data.candidates[0].content.parts[0].text?.trim()||'';
+    return await _withFallback(async ()=>{
+      const ctl=new AbortController(); const t=setTimeout(()=>ctl.abort(),90000);
+      const res=await fetch(url,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body),signal:ctl.signal});
+      clearTimeout(t);
+      if(!res.ok){ const e=await res.json().catch(()=>({})); throw new Error(`Gemini ${res.status}: ${e?.error?.message||res.statusText}`); }
+      const data=await res.json();
+      if(data.error) throw new Error(`Gemini: ${data.error.message}`);
+      if(!data.candidates?.[0]) throw new Error('Gemini: 응답 없음');
+      return data.candidates[0].content.parts[0].text?.trim()||'';
+    }, 'gemini');
   }
 
   // ─── OpenAI ─────────────────────────────────────
@@ -11109,20 +11208,22 @@ async function callAI(prompt, systemRole = '', taskType = 'auto'){
     const messages=[];
     if(fullSystemRole) messages.push({role:'system',content:fullSystemRole});
     messages.push({role:'user',content:prompt});
-    const ctl=new AbortController(); const t=setTimeout(()=>ctl.abort(),90000);
-    const res=await fetch('https://api.openai.com/v1/chat/completions',{
-      method:'POST',
-      headers:{'Content-Type':'application/json','Authorization':`Bearer ${openaiKey}`},
-      body:JSON.stringify({model:modelId,messages,max_tokens:2000,temperature:0.7}),
-      signal:ctl.signal
-    });
-    clearTimeout(t);
-    if(!res.ok){ const e=await res.json().catch(()=>({}));
-      if(res.status===401||res.status===403) throw new Error('OpenAI 키 인증 실패');
-      throw new Error(`OpenAI ${res.status}: ${e?.error?.message||res.statusText}`);
-    }
-    const data=await res.json();
-    return data.choices?.[0]?.message?.content?.trim()||'';
+    return await _withFallback(async ()=>{
+      const ctl=new AbortController(); const t=setTimeout(()=>ctl.abort(),90000);
+      const res=await fetch('https://api.openai.com/v1/chat/completions',{
+        method:'POST',
+        headers:{'Content-Type':'application/json','Authorization':`Bearer ${openaiKey}`},
+        body:JSON.stringify({model:modelId,messages,max_tokens:2000,temperature:0.7}),
+        signal:ctl.signal
+      });
+      clearTimeout(t);
+      if(!res.ok){ const e=await res.json().catch(()=>({}));
+        if(res.status===401||res.status===403) throw new Error('OpenAI 키 인증 실패');
+        throw new Error(`OpenAI ${res.status}: ${e?.error?.message||res.statusText}`);
+      }
+      const data=await res.json();
+      return data.choices?.[0]?.message?.content?.trim()||'';
+    }, 'openai');
   }
 
   // ─── Anthropic Claude ────────────────────────────
@@ -11130,25 +11231,27 @@ async function callAI(prompt, systemRole = '', taskType = 'auto'){
     const claudeModel = modelId==='claude-3-5-sonnet' ? 'claude-3-5-sonnet-20241022'
                       : modelId==='claude-3-haiku'    ? 'claude-3-haiku-20240307'
                       : 'claude-3-5-sonnet-20241022';
-    const ctl=new AbortController(); const t=setTimeout(()=>ctl.abort(),90000);
-    const res=await fetch('https://api.anthropic.com/v1/messages',{
-      method:'POST',
-      headers:{
-        'Content-Type':'application/json',
-        'x-api-key':anthropicKey,
-        'anthropic-version':'2023-06-01',
-        'anthropic-dangerous-direct-browser-access':'true',
-      },
-      body:JSON.stringify({model:claudeModel,max_tokens:2000,system:fullSystemRole||undefined,messages:[{role:'user',content:prompt}]}),
-      signal:ctl.signal
-    });
-    clearTimeout(t);
-    if(!res.ok){ const e=await res.json().catch(()=>({}));
-      if(res.status===401) throw new Error('Anthropic 키 인증 실패');
-      throw new Error(`Anthropic ${res.status}: ${e?.error?.message||res.statusText}`);
-    }
-    const data=await res.json();
-    return data.content?.[0]?.text?.trim()||'';
+    return await _withFallback(async ()=>{
+      const ctl=new AbortController(); const t=setTimeout(()=>ctl.abort(),90000);
+      const res=await fetch('https://api.anthropic.com/v1/messages',{
+        method:'POST',
+        headers:{
+          'Content-Type':'application/json',
+          'x-api-key':anthropicKey,
+          'anthropic-version':'2023-06-01',
+          'anthropic-dangerous-direct-browser-access':'true',
+        },
+        body:JSON.stringify({model:claudeModel,max_tokens:2000,system:fullSystemRole||undefined,messages:[{role:'user',content:prompt}]}),
+        signal:ctl.signal
+      });
+      clearTimeout(t);
+      if(!res.ok){ const e=await res.json().catch(()=>({}));
+        if(res.status===401) throw new Error('Anthropic 키 인증 실패');
+        throw new Error(`Anthropic ${res.status}: ${e?.error?.message||res.statusText}`);
+      }
+      const data=await res.json();
+      return data.content?.[0]?.text?.trim()||'';
+    }, 'anthropic');
   }
 
   throw new Error(`알 수 없는 provider: ${provider}`);
