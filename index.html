@@ -7886,6 +7886,11 @@ function clearTrans(){
   transFileData    = null;
   fileAttachmentData = null;
   clearTransFile();
+  // ★ 유관부서 협조 요청 메일 빌더 초기화
+  const collabContent = document.getElementById('collabContent');
+  if(collabContent) collabContent.value = '';
+  const collabRes = document.getElementById('collabResult');
+  if(collabRes){ collabRes.innerHTML = ''; collabRes.style.display = 'none'; }
   showToast(t('toast_trans_cleared'));
 }
 
