@@ -7990,7 +7990,7 @@ function initConfRecognition(){
     if(_queue.length > 1) _queue.splice(0, _queue.length - 1);
     while(_queue.length > 0){
       const item = _queue.shift();
-      await translateConfCaption(item.text, item.from, item.to);
+      await translateConfCaption(item.text, item.from, item.to, item.interim);
     }
     _qRunning = false;
   }
@@ -8075,7 +8075,8 @@ function initConfRecognition(){
             const partial = text.replace(INSTANT_PUNCT,'').trim();
             // ★ 최소 3자 이상일 때만 즉시 번역 트리거 (너무 짧으면 노이즈)
             if(partial.length >= 3){
-              _queue.push({ text: partial, from: fromLang, to: toLang });
+              // ★ interim:true 플래그 — isFinal 캐시와 키 분리
+              _queue.push({ text: partial, from: fromLang, to: toLang, interim: true });
               drainQueue();
             }
           }
@@ -8139,7 +8140,7 @@ function initConfRecognition(){
 }
 
 /** 회의 자막 번역 + 출력 */
-async function translateConfCaption(text, fromLang, toLang){
+async function translateConfCaption(text, fromLang, toLang, interim){
   const apiKey = localStorage.getItem('gemini_api_key');
   if(!apiKey){
     // API 키 없어도 원문은 자막에 표시
@@ -8147,11 +8148,10 @@ async function translateConfCaption(text, fromLang, toLang){
     return;
   }
 
-  // ★ 중복 방지 — 3초 내 동일 텍스트 재번역 차단
+  // ★ 중복 방지 — interim과 isFinal 캐시 키 분리
   if(!window._confCache) window._confCache = {};
-  const cacheKey = `${fromLang}:${text}`;
+  const cacheKey = `${interim ? 'i' : 'f'}:${fromLang}:${text}`;
   const now = Date.now();
-  // ★ 2초 내 동일 텍스트 재번역 차단 (3000→2000: 응답성 개선)
   if(window._confCache[cacheKey] && now - window._confCache[cacheKey] < 2000) return;
   window._confCache[cacheKey] = now;
 
@@ -8174,7 +8174,7 @@ async function translateConfCaption(text, fromLang, toLang){
           headers: { 'Content-Type':'application/json' },
           body: JSON.stringify({
             contents: [{ parts:[{ text: prompt }] }],
-            generationConfig: { maxOutputTokens: 50, temperature: 0 },
+            generationConfig: { maxOutputTokens: 150, temperature: 0 },
           }),
           signal: ctrl.signal,
         }
@@ -8989,7 +8989,7 @@ async function quickTranslateBidir(text, fromLang, toLang, toLangName, targetElI
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             contents: [{ parts: [{ text: prompt }] }],
-            generationConfig: { maxOutputTokens: 50, temperature: 0 },
+            generationConfig: { maxOutputTokens: 150, temperature: 0 },
           }),
           signal: controller.signal,
         }
