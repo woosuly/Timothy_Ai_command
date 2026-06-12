@@ -8017,12 +8017,68 @@ function initConfRecognition(){
     }
   }
 
+  // ★ ID 기반 자막 카드 렌더러 — 같은 ID면 기존 카드 업데이트, 없으면 신규 생성
+  function _renderCaption(id, original, translated, lang){
+    const log = document.getElementById('confCaptionLog');
+    if(!log) return;
+    const emptyEl = log.querySelector('.conf-caption-empty');
+    if(emptyEl) emptyEl.remove();
+
+    let card = document.getElementById(`cap-${id}`);
+    if(!card){
+      card = document.createElement('div');
+      card.id = `cap-${id}`;
+      card.className = 'conf-caption-item';
+      log.appendChild(card);
+    }
+
+    const langLabel = { ko:'KR', en:'EN', zh:'CN', ja:'JP' }[lang] || lang.toUpperCase();
+    const _localeMap = {ko:'ko-KR', zh:'zh-CN', en:'en-US', ja:'ja-JP'};
+    const timeStr = new Date().toLocaleTimeString(_localeMap[lang] || 'ko-KR',
+      {hour:'2-digit', minute:'2-digit', second:'2-digit'});
+
+    if(translated){
+      card.innerHTML = `
+        <div class="conf-caption-meta">
+          <span class="conf-lang-badge ${lang}">${langLabel}</span>
+          <span class="conf-caption-time">${timeStr} · ${original}</span>
+        </div>
+        <div class="conf-caption-text">${translated}</div>`;
+    } else {
+      card.innerHTML = `
+        <div class="conf-caption-meta">
+          <span class="conf-lang-badge ${lang}">${langLabel}</span>
+          <span class="conf-caption-time">${timeStr} · ${original}</span>
+        </div>
+        <div class="conf-caption-text" style="color:#e2e8f0;font-size:15px;">${original}</div>`;
+    }
+    log.scrollTop = log.scrollHeight;
+
+    // meetingScript 저장 (addConfCaption과 동일 구조)
+    if(Array.isArray(meetingScript)){
+      // 중복 방지: 같은 ID 카드는 meetingScript도 한 번만
+      if(!meetingScript.find(x => x._captionId === id)){
+        meetingScript.push({
+          _captionId: id,
+          speaker: langLabel,
+          originalText: original,
+          translatedText: translated || '',
+          timestamp: timeStr,
+          langTag: lang,
+        });
+        const badge = document.getElementById('confBufBadge');
+        if(badge) badge.setAttribute('data-i18n-n', meetingScript.length);
+        if(badge) badge.innerText = t('conf_speech_cnt').replace('{n}', meetingScript.length) || `발화 ${meetingScript.length}건`;
+      }
+    }
+  }
+
   async function _translateAndRender(item){
     const apiKey = localStorage.getItem('gemini_api_key');
     const statusEl = document.getElementById('confStatus');
 
     if(!apiKey){
-      addConfCaption(item.text, null, item.from);
+      _renderCaption(item.id, item.text, null, item.from);
       return;
     }
 
@@ -8030,7 +8086,7 @@ function initConfRecognition(){
     const cacheKey = `${item.from}:${item.text}`;
     const now = Date.now();
     if(_confTrCache[cacheKey] && now - _confTrCache[cacheKey].ts < 800){
-      addConfCaption(item.text, _confTrCache[cacheKey].result, item.from);
+      _renderCaption(item.id, item.text, _confTrCache[cacheKey].result, item.from);
       confSpeakBidir(_confTrCache[cacheKey].result, LANG_BCP47[item.to] || 'zh-CN');
       return;
     }
@@ -8054,7 +8110,7 @@ function initConfRecognition(){
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
               contents: [{ parts: [{ text: prompt }] }],
-              generationConfig: { maxOutputTokens: 150, temperature: 0.1 },
+              generationConfig: { maxOutputTokens: 150, temperature: 0 },
             }),
             signal: ctrl.signal,
           }
@@ -8072,10 +8128,10 @@ function initConfRecognition(){
 
     if(result){
       _confTrCache[cacheKey] = { result, ts: Date.now() };
-      addConfCaption(item.text, result, item.from);
+      _renderCaption(item.id, item.text, result, item.from);
       confSpeakBidir(result, LANG_BCP47[item.to] || 'zh-CN');
     } else {
-      addConfCaption(item.text, null, item.from);
+      _renderCaption(item.id, item.text, null, item.from);
     }
 
     if(statusEl && isConfRunning) statusEl.innerText = t('conf_status_listen');
@@ -8105,6 +8161,9 @@ function initConfRecognition(){
     if(statusEl) statusEl.innerText = t('conf_status_listen');
   };
 
+  // ★ resultIndex → 세션 내 단조증가 순번으로 ID 매핑 (중복 카드 방지)
+  const _idMap = new Map(); // resultIndex → uttId
+
   confRecognition.onresult = (e) => {
     const bar      = document.getElementById('confInterimBar');
     const statusEl = document.getElementById('confStatus');
@@ -8117,27 +8176,19 @@ function initConfRecognition(){
 
       if(res.isFinal){
         if(bar) bar.innerText = t('conf_interim_hint');
+        // ★ 이미 이 resultIndex에 할당된 ID가 있으면 재사용, 없으면 신규 채번
+        if(!_idMap.has(i)) _idMap.set(i, `utt-${++_confSeq}`);
+        const id = _idMap.get(i);
         if(isBilingual){
-          // ★ isFinal: 발화 ID 채번 → 번역 큐 적재
-          const id = `utt-${++_confSeq}`;
           _pushOrUpdate(id, text, fromLang, toLang, true);
         } else {
-          // 회의록 모드: 번역 없이 원문 출력
-          addConfCaption(text, null, fromLang);
+          _renderCaption(id, text, null, fromLang);
           if(statusEl) statusEl.innerText = t('conf_status_listen');
         }
       } else {
         // Interim: 자막 바 표시만
         if(bar) bar.innerText = '🎙️ ' + text;
         if(statusEl) statusEl.innerText = t('conf_status_listen');
-        // 구두점 감지 시 선처리 (미완성 문장 즉시 번역)
-        if(isBilingual && INSTANT_PUNCT.test(text)){
-          const partial = text.replace(INSTANT_PUNCT,'').trim();
-          if(partial.length >= 3){
-            const id = `utt-pre-${_confSeq + 1}`;
-            _pushOrUpdate(id, partial, fromLang, toLang, true);
-          }
-        }
       }
     }
   };
