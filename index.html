@@ -8068,8 +8068,10 @@ function initConfRecognition(){
           // Interim: 실시간으로 화면에 표시
           if(bar) bar.innerText = '🎙️ ' + text;
           if(statusEl) statusEl.innerText = t('conf_status_listen');
-          // 구두점 감지 시 즉시 번역 트리거 (빠른 응답성)
-          if(isBilingual && fromLang !== toLang && INSTANT_PUNCT.test(text)){
+          // 구두점 감지 또는 10자 이상 시 즉시 번역 트리거 (빠른 응답성)
+          const _hasPunct = INSTANT_PUNCT.test(text);
+          const _longEnough = text.length >= 10;
+          if(isBilingual && fromLang !== toLang && (_hasPunct || _longEnough)){
             const partial = text.replace(INSTANT_PUNCT,'').trim();
             // ★ 최소 3자 이상일 때만 즉시 번역 트리거 (너무 짧으면 노이즈)
             if(partial.length >= 3){
@@ -8172,7 +8174,7 @@ async function translateConfCaption(text, fromLang, toLang){
           headers: { 'Content-Type':'application/json' },
           body: JSON.stringify({
             contents: [{ parts:[{ text: prompt }] }],
-            generationConfig: { maxOutputTokens: 200, temperature: 0 },
+            generationConfig: { maxOutputTokens: 50, temperature: 0 },
           }),
           signal: ctrl.signal,
         }
@@ -8987,7 +8989,7 @@ async function quickTranslateBidir(text, fromLang, toLang, toLangName, targetElI
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             contents: [{ parts: [{ text: prompt }] }],
-            generationConfig: { maxOutputTokens: 200, temperature: 0 },
+            generationConfig: { maxOutputTokens: 50, temperature: 0 },
           }),
           signal: controller.signal,
         }
