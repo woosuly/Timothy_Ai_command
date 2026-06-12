@@ -7980,50 +7980,136 @@ function initConfRecognition(){
   const peerLang = document.getElementById('confPeerLang')?.value || 'en';
   const isBilingual = (myLang !== peerLang);
 
-  // ── 번역 큐 ──
-  let _queue = [], _qRunning = false;
-  async function drainQueue(){
-    if(_qRunning) return; // 이미 루프 중 → 새 항목은 push 후 루프가 자동 소화
-    _qRunning = true;
-    while(_queue.length > 0){
-      // ★ interim만 드롭 — isFinal은 절대 드롭하지 않음
-      const finals   = _queue.filter(x => !x.interim);
-      const interims = _queue.filter(x =>  x.interim);
-      _queue.length = 0;
-      if(interims.length > 0) _queue.push(interims[interims.length - 1]);
-      finals.forEach(x => _queue.push(x));
-      if(_queue.length === 0) break;
-      const item = _queue.shift();
-      await translateConfCaption(item.text, item.from, item.to, item.interim);
+  // ══ 발화 ID 기반 순차 번역 큐 (Gemini 설계 + Timothy 연동) ══
+  // 발화마다 고유 ID를 부여해 중복 push 대신 기존 항목을 업데이트
+  // isFinal만 번역 API 호출, interim은 자막 바에만 표시
+  let _confSeq    = 0;                  // 발화 순번 (ID 생성용)
+  let _confQueue  = [];                 // { id, text, from, to, isFinal }
+  let _confQRun   = false;              // 큐 실행 중 플래그
+  let _confTrCache = {};                // 번역 결과 캐시 { cacheKey: { result, ts } }
+
+  function _pushOrUpdate(id, text, from, to, isFinal){
+    const idx = _confQueue.findIndex(x => x.id === id);
+    if(idx !== -1){
+      // 같은 발화 ID가 이미 대기 중 → 텍스트/상태 최신화 (isFinal은 한 번 확정되면 유지)
+      if(!_confQueue[idx].isFinal){
+        _confQueue[idx].text    = text;
+        _confQueue[idx].isFinal = isFinal;
+      }
+    } else {
+      _confQueue.push({ id, text, from, to, isFinal });
     }
-    _qRunning = false;
+    _kickQueue();
+  }
+
+  function _kickQueue(){
+    if(_confQRun) return;
+    _confQRun = true;
+    _drainQueue().finally(() => {
+      _confQRun = false;
+      // 처리 완료 후 잔여 항목 확인 — 루프 중 push된 isFinal 누락 방지
+      if(_confQueue.length > 0) _kickQueue();
+    });
+  }
+
+  async function _drainQueue(){
+    while(_confQueue.length > 0){
+      const item = _confQueue.shift();
+      if(!item.isFinal) continue; // interim은 번역 없이 스킵 (자막 바는 onresult에서 처리)
+      await _translateAndRender(item);
+    }
+  }
+
+  async function _translateAndRender(item){
+    const apiKey = localStorage.getItem('gemini_api_key');
+    const statusEl = document.getElementById('confStatus');
+
+    if(!apiKey){
+      addConfCaption(item.text, null, item.from);
+      return;
+    }
+
+    // 캐시 확인 (800ms 이내 동일 텍스트 중복 번역 차단)
+    const cacheKey = `${item.from}:${item.text}`;
+    const now = Date.now();
+    if(_confTrCache[cacheKey] && now - _confTrCache[cacheKey].ts < 800){
+      addConfCaption(item.text, _confTrCache[cacheKey].result, item.from);
+      confSpeakBidir(_confTrCache[cacheKey].result, LANG_BCP47[item.to] || 'ko-KR');
+      return;
+    }
+
+    if(statusEl) statusEl.innerText = t('conf_status_translating');
+
+    const toLangName = LANG_NAMES[item.to] || item.to;
+    const prompt = `Translate the following text to ${toLangName}. Output ONLY the translated text. No explanations, no parentheses, no quotes, no ellipsis. If the sentence is incomplete, translate as-is.\n${item.text}`;
+
+    let result = '';
+    const maxAttempts = 2;
+    for(let attempt = 1; attempt <= maxAttempts; attempt++){
+      try{
+        const timeout = attempt === 1 ? 2500 : 3000;
+        const ctrl = new AbortController();
+        const timer = setTimeout(() => ctrl.abort(), timeout);
+        const res = await fetch(
+          `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent?key=${apiKey}`,
+          {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              contents: [{ parts: [{ text: prompt }] }],
+              generationConfig: { maxOutputTokens: 150, temperature: 0 },
+            }),
+            signal: ctrl.signal,
+          }
+        );
+        clearTimeout(timer);
+        if(!res.ok){ console.warn(`[Conf 번역] HTTP ${res.status} (시도 ${attempt})`); continue; }
+        const data = await res.json();
+        result = data.candidates?.[0]?.content?.parts?.[0]?.text?.trim() || '';
+        if(result) break;
+      } catch(err){
+        console.warn(`[Conf 번역] 시도 ${attempt} 실패:`, err.message);
+        if(attempt < maxAttempts) await new Promise(r => setTimeout(r, 150));
+      }
+    }
+
+    if(result){
+      // 캐시 저장 + meetingScript 적재
+      _confTrCache[cacheKey] = { result, ts: Date.now() };
+      if(typeof meetingScript !== 'undefined' && Array.isArray(meetingScript)){
+        meetingScript.push({ speaker: item.from, originalText: item.text, translatedText: result, timestamp: new Date().toISOString(), langTag: item.from });
+        const badge = document.getElementById('confBufBadge');
+        if(badge) badge.setAttribute('data-i18n-n', meetingScript.length);
+        if(badge) badge.innerText = t('conf_speech_cnt').replace('{n}', meetingScript.length) || `발화 ${meetingScript.length}건`;
+      }
+      addConfCaption(item.text, result, item.from);
+      confSpeakBidir(result, LANG_BCP47[item.to] || 'ko-KR');
+    } else {
+      // 최종 실패 시 원문 표시
+      addConfCaption(item.text, null, item.from);
+    }
+
+    if(statusEl && isConfRunning) statusEl.innerText = t('conf_status_listen');
   }
 
   const INSTANT_PUNCT = /[,.!?;，。！？；、…]\s*$/;
 
   // ── STT 인식기 생성 함수 ──
-  // ★ lang     : BCP-47 인식 언어 (이 언어의 음성을 인식)
-  // ★ fromLang : 원문 언어 코드 (번역 출발어)
-  // ★ toLang   : 목표 언어 코드 (번역 도착어)
-  // ★ labelId  : 'my' | 'peer' — 어느 쪽 발화인지 구분용
   function createRecognizer(lang, fromLang, toLang, labelId){
     const r = new SR();
     r.lang = LANG_BCP47[lang] || 'ko-KR';
 
-    // ★ Android Chrome은 continuous=true 시 onend가 잘 안 발생 → 안정성 우선 false
-    // ★ iOS Safari는 continuous=true 지원 → 감지 후 분기
     const isAndroid = /android/i.test(navigator.userAgent);
-    r.continuous     = !isAndroid; // Android: false+재시작 / iOS·Desktop: true
+    r.continuous     = !isAndroid;
     r.interimResults = true;
     r.maxAlternatives = 1;
 
     let _restartTimer = null;
-    let _noSpeechCount = 0; // no-speech 연속 카운트
+    let _noSpeechCount = 0;
     function safeRestart(delay){
       if(_restartTimer) clearTimeout(_restartTimer);
       _restartTimer = setTimeout(()=>{
         if(!isConfRunning || _confStopIntentional) return;
-        // ★ TTS 발화 중이면 재시작 대기 — Android에서 STT/TTS 동시 실행 충돌 방지
         if(_confTtsSpeaking){ safeRestart(200); return; }
         try{
           r.start();
@@ -8031,7 +8117,6 @@ function initConfRecognition(){
         }
         catch(e){
           const msg = e.message || '';
-          // "already started" 오류는 무시
           if(msg.includes('already') || msg.includes('InvalidStateError')) return;
           console.warn('[STT Conf] 재시작 실패:', lang, msg);
           if(isConfRunning && !_confStopIntentional) safeRestart(800);
@@ -8047,7 +8132,7 @@ function initConfRecognition(){
     r.onresult = (e) => {
       const bar      = document.getElementById('confInterimBar');
       const statusEl = document.getElementById('confStatus');
-      _noSpeechCount = 0; // 발화 감지 → 카운트 리셋
+      _noSpeechCount = 0;
 
       for(let i = e.resultIndex; i < e.results.length; i++){
         const res  = e.results[i];
@@ -8057,30 +8142,25 @@ function initConfRecognition(){
         if(res.isFinal){
           if(bar) bar.innerText = t('conf_interim_hint');
           if(isBilingual && fromLang !== toLang){
-            // ★ isFinal: 길이 무관하게 무조건 번역 큐에 추가
-            if(statusEl) statusEl.innerText = t('conf_status_translating');
-            _queue.push({ text, from: fromLang, to: toLang, interim: false });
-            drainQueue().finally(()=>{
-              if(isConfRunning && statusEl) statusEl.innerText = t('conf_status_listen');
-            });
+            // isFinal: 발화 ID 채번 후 큐에 적재 → 순차 번역
+            const id = `utt-${++_confSeq}`;
+            _pushOrUpdate(id, text, fromLang, toLang, true);
           } else {
-            // ★ 번역 불필요 — 원문 그대로 자막 출력 (회의록 모드)
+            // 회의록 모드: 번역 없이 원문 출력
             addConfCaption(text, null, fromLang);
             if(statusEl) statusEl.innerText = t('conf_status_listen');
           }
         } else {
-          // Interim: 실시간으로 화면에 표시
+          // Interim: 자막 바에만 표시 (번역 API 호출 없음)
           if(bar) bar.innerText = '🎙️ ' + text;
           if(statusEl) statusEl.innerText = t('conf_status_listen');
-          // 구두점 감지 시 즉시 번역 트리거 (빠른 응답성)
+          // 구두점 감지 시 즉시 선처리 큐 등록 (같은 발화 ID로 update → 중복 방지)
           const _hasPunct = INSTANT_PUNCT.test(text);
           if(isBilingual && fromLang !== toLang && _hasPunct){
             const partial = text.replace(INSTANT_PUNCT,'').trim();
-            // ★ 최소 3자 이상일 때만 즉시 번역 트리거 (너무 짧으면 노이즈)
             if(partial.length >= 3){
-              // ★ interim:true 플래그 — isFinal 캐시와 키 분리
-              _queue.push({ text: partial, from: fromLang, to: toLang, interim: true });
-              drainQueue();
+              const id = `utt-${_confSeq + 1}-pre`; // isFinal과 다른 ID → 별도 처리
+              _pushOrUpdate(id, partial, fromLang, toLang, true);
             }
           }
         }
@@ -8088,12 +8168,8 @@ function initConfRecognition(){
     };
 
     r.onend = () => {
-      // ★ continuous=false(Android)일 때 자동 재시작
       if(isConfRunning && !_confStopIntentional){
-        // ★ TTS 발화 중이면 발화 완료 후 재시작 (confSpeakBidir의 onend에서 처리)
         if(_confTtsSpeaking) return;
-        // ★ 딜레이 튜닝: no-speech 누적에 따라 세분화
-        //   정상 발화 후 재시작: 80ms (빠른 응답) / no-speech 반복 시: 점진적 증가
         const delay = _noSpeechCount === 0 ? 80
                     : _noSpeechCount < 3  ? 200
                     : _noSpeechCount < 6  ? 400
@@ -8107,8 +8183,6 @@ function initConfRecognition(){
       if(e.error === 'aborted') return;
       if(e.error === 'no-speech'){
         _noSpeechCount++;
-        // no-speech가 너무 많으면 잠시 쉬었다 재시작
-        // ★ no-speech: 초반 빠른 재시도, 반복 시 쉬어가기
         safeRestart(_noSpeechCount > 5 ? 800 : _noSpeechCount > 2 ? 400 : 200);
         return;
       }
@@ -8126,121 +8200,18 @@ function initConfRecognition(){
   }
 
   if(isBilingual){
-    // ★ 양방향 통역 모드:
-    // - confRecognition  : peerLang 음성 인식 → myLang으로 번역 (상대방 말 → 내가 이해)
-    // - _confRecognition2: myLang 음성 인식 → peerLang으로 번역 (내 말 → 상대방 이해)
-    // 두 인식기를 동시에 구동하면 Android에서 충돌 → 발화 감지 방향 버튼으로 사용자가 토글
-    // 우선 peerLang 인식기만 구동 (상대방 말 통역이 주 용도)
     confRecognition = createRecognizer(peerLang, peerLang, myLang, 'peer');
     window._confRecognition2 = null;
     console.log(`[Timothy Conf] 통역 모드: ${peerLang}→${myLang} 인식 시작`);
   } else {
-    // 단방향: 내 언어만 인식 (회의록 모드)
     confRecognition = createRecognizer(myLang, myLang, myLang, 'my');
     window._confRecognition2 = null;
     console.log(`[Timothy Conf] 회의록 모드: ${myLang} 인식 시작`);
   }
 }
 
-/** 회의 자막 번역 + 출력 */
-async function translateConfCaption(text, fromLang, toLang, interim){
-  const apiKey = localStorage.getItem('gemini_api_key');
-  if(!apiKey){
-    // API 키 없어도 원문은 자막에 표시
-    addConfCaption(text, null, fromLang);
-    return;
-  }
-
-  // ★ 중복 방지 — interim과 isFinal 캐시 키 분리
-  if(!window._confCache) window._confCache = {};
-  const cacheKey = `${interim ? 'i' : 'f'}:${fromLang}:${text}`;
-  const now = Date.now();
-  if(window._confCache[cacheKey] && now - window._confCache[cacheKey] < 800) return;
-  window._confCache[cacheKey] = now;
-
-  const toName = LANG_NAMES[toLang] || toLang;
-  const prompt = `Translate the following text to ${toName}. Output ONLY the translated text. No explanations, no parentheses, no quotes, no ellipsis. If the sentence is incomplete, translate as-is.\n${text}`;
-
-  // ★ 모바일 네트워크 고려 — 2.0-flash 우선, 실패 시 2.5-flash 폴백
-  const MODELS = ['gemini-3.5-flash'];
-  let result = '';
-
-  for(const model of MODELS){
-    try{
-      const ctrl  = new AbortController();
-      const timer = setTimeout(() => ctrl.abort(), 2500); // ★ 3.5-flash 기준 2.5초 타임아웃
-
-      const res = await fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`,
-        {
-          method:  'POST',
-          headers: { 'Content-Type':'application/json' },
-          body: JSON.stringify({
-            contents: [{ parts:[{ text: prompt }] }],
-            generationConfig: { maxOutputTokens: 150, temperature: 0 },
-          }),
-          signal: ctrl.signal,
-        }
-      );
-      clearTimeout(timer);
-
-      if(!res.ok){
-        console.warn(`[Conf 번역] ${model} HTTP ${res.status}`);
-        continue; // 다음 모델 시도
-      }
-
-      const data = await res.json();
-      result = data.candidates?.[0]?.content?.parts?.[0]?.text?.trim() || '';
-      if(result) break; // 성공
-
-    } catch(err){
-      if(err.name === 'AbortError'){
-        console.warn(`[Conf 번역] ${model} 타임아웃`);
-        continue;
-      }
-      console.warn('[Conf 번역]', model, err.message);
-    }
-  }
-
-  // ★ 1회 재시도 — 타임아웃/네트워크 순간 실패 대응
-  if(!result){
-    try{
-      const retryCtrl  = new AbortController();
-      const retryTimer = setTimeout(() => retryCtrl.abort(), 3000);
-      const retryKey   = localStorage.getItem('gemini_api_key');
-      const retryRes   = await fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent?key=${retryKey}`,
-        {
-          method: 'POST',
-          headers: { 'Content-Type':'application/json' },
-          body: JSON.stringify({
-            contents: [{ parts:[{ text: prompt }] }],
-            generationConfig: { maxOutputTokens: 150, temperature: 0 },
-          }),
-          signal: retryCtrl.signal,
-        }
-      );
-      clearTimeout(retryTimer);
-      if(retryRes.ok){
-        const retryData = await retryRes.json();
-        result = retryData.candidates?.[0]?.content?.parts?.[0]?.text?.trim() || '';
-      }
-    } catch(e){ console.warn('[Conf 번역] 재시도 실패:', e.message); }
-  }
-  if(!result){
-    // 재시도도 실패 시 원문 표시
-    addConfCaption(text, null, fromLang);
-    return;
-  }
-
-  addConfCaption(text, result, fromLang);
-  // ★ confSpeakBidir 사용: TTS 발화 중 STT 정지 + 발화 완료 후 STT 자동 재개
-  confSpeakBidir(result, LANG_BCP47[toLang] || 'ko-KR');
-
-  // ★ 번역 완료 후 상태를 인식 대기로 복귀
-  const statusEl = document.getElementById('confStatus');
-  if(statusEl && isConfRunning) statusEl.innerText = t('conf_status_listen');
-}
+/** translateConfCaption — 외부 호환용 래퍼 (기존 호출부가 있을 경우 대비) */
+async function translateConfCaption(text, fromLang, toLang, interim){}
 
 
 // ── meetingScript 데이터 버퍼 ─────────────────────────────
