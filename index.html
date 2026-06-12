@@ -7983,16 +7983,16 @@ function initConfRecognition(){
   // ── 번역 큐 ──
   let _queue = [], _qRunning = false;
   async function drainQueue(){
-    if(_qRunning) return;
+    if(_qRunning) return; // 이미 루프 중 → 새 항목은 push 후 루프가 자동 소화
     _qRunning = true;
-    // ★ interim만 드롭 — isFinal은 절대 드롭하지 않음
-    // interim이 2건 이상이면 최신 1건만 유지, isFinal은 전부 보존
-    const finals   = _queue.filter(x => !x.interim);
-    const interims = _queue.filter(x =>  x.interim);
-    _queue.length = 0;
-    if(interims.length > 0) _queue.push(interims[interims.length - 1]);
-    finals.forEach(x => _queue.push(x));
     while(_queue.length > 0){
+      // ★ interim만 드롭 — isFinal은 절대 드롭하지 않음
+      const finals   = _queue.filter(x => !x.interim);
+      const interims = _queue.filter(x =>  x.interim);
+      _queue.length = 0;
+      if(interims.length > 0) _queue.push(interims[interims.length - 1]);
+      finals.forEach(x => _queue.push(x));
+      if(_queue.length === 0) break;
       const item = _queue.shift();
       await translateConfCaption(item.text, item.from, item.to, item.interim);
     }
@@ -8155,7 +8155,7 @@ async function translateConfCaption(text, fromLang, toLang, interim){
   if(!window._confCache) window._confCache = {};
   const cacheKey = `${interim ? 'i' : 'f'}:${fromLang}:${text}`;
   const now = Date.now();
-  if(window._confCache[cacheKey] && now - window._confCache[cacheKey] < 2000) return;
+  if(window._confCache[cacheKey] && now - window._confCache[cacheKey] < 800) return;
   window._confCache[cacheKey] = now;
 
   const toName = LANG_NAMES[toLang] || toLang;
@@ -8202,8 +8202,33 @@ async function translateConfCaption(text, fromLang, toLang, interim){
     }
   }
 
+  // ★ 1회 재시도 — 타임아웃/네트워크 순간 실패 대응
   if(!result){
-    // 번역 실패 시 원문이라도 자막에 표시
+    try{
+      const retryCtrl  = new AbortController();
+      const retryTimer = setTimeout(() => retryCtrl.abort(), 3000);
+      const retryKey   = localStorage.getItem('gemini_api_key');
+      const retryRes   = await fetch(
+        `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent?key=${retryKey}`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type':'application/json' },
+          body: JSON.stringify({
+            contents: [{ parts:[{ text: prompt }] }],
+            generationConfig: { maxOutputTokens: 150, temperature: 0 },
+          }),
+          signal: retryCtrl.signal,
+        }
+      );
+      clearTimeout(retryTimer);
+      if(retryRes.ok){
+        const retryData = await retryRes.json();
+        result = retryData.candidates?.[0]?.content?.parts?.[0]?.text?.trim() || '';
+      }
+    } catch(e){ console.warn('[Conf 번역] 재시도 실패:', e.message); }
+  }
+  if(!result){
+    // 재시도도 실패 시 원문 표시
     addConfCaption(text, null, fromLang);
     return;
   }
