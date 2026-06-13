@@ -7988,6 +7988,8 @@ function initConfRecognition(){
   let _confTrCache = {};
 
   function _pushOrUpdate(id, text, from, to, isFinal){
+    const _dbgBar = document.getElementById('confInterimBar');
+    if(_dbgBar && isFinal) _dbgBar.innerText = `📥 큐진입: ${text} (${from}→${to})`;
     const idx = _confQueue.findIndex(x => x.id === id);
     if(idx !== -1){
       if(!_confQueue[idx].isFinal){
@@ -8076,8 +8078,13 @@ function initConfRecognition(){
   async function _translateAndRender(item){
     const apiKey = localStorage.getItem('gemini_api_key');
     const statusEl = document.getElementById('confStatus');
+    const bar = document.getElementById('confInterimBar');
+
+    // ★ 화면 디버그: 번역 진입 표시
+    if(bar) bar.innerText = `🔄 번역중: ${item.text} (${item.from}→${item.to})`;
 
     if(!apiKey){
+      if(bar) bar.innerText = '⚠️ API 키 없음';
       _renderCaption(item.id, item.text, null, item.from);
       return;
     }
@@ -8130,7 +8137,9 @@ function initConfRecognition(){
       _confTrCache[cacheKey] = { result, ts: Date.now() };
       _renderCaption(item.id, item.text, result, item.from);
       confSpeakBidir(result, LANG_BCP47[item.to] || 'zh-CN');
+      if(bar) bar.innerText = '✅ 번역 완료';
     } else {
+      if(bar) bar.innerText = '❌ 번역 실패 (API 오류)';
       _renderCaption(item.id, item.text, null, item.from);
     }
 
@@ -8545,10 +8554,9 @@ function confSpeakBidir(text, lang){
   // ③ continuous=true 환경에서 STT가 자기 목소리를 인식하는 피드백 루프 방지
   //    발화 중 인식기 일시 정지 (Android continuous=false는 onend가 이미 발생한 상태)
   const isDesktop = !/android|iphone|ipad/i.test(navigator.userAgent);
-  if(isDesktop){
-    if(confRecognition){ try{ confRecognition.abort(); }catch{} }
-    if(window._confRecognition2){ try{ window._confRecognition2.abort(); }catch{} }
-  }
+  // ★ continuous=true: TTS 중 피드백 루프 방지용 abort (재시작은 TTS onend에서)
+  if(confRecognition){ try{ confRecognition.abort(); }catch{} }
+  if(window._confRecognition2){ try{ window._confRecognition2.abort(); }catch{} }
 
   const utter = new SpeechSynthesisUtterance(text);
 
@@ -8566,16 +8574,21 @@ function confSpeakBidir(text, lang){
   // ⑤ 발화 완료 → STT 재시작 트리거
   utter.onend = () => {
     _confTtsSpeaking = false;
-    // 회의가 아직 진행 중이면 인식기 재시작
     if(isConfRunning && !_confStopIntentional){
-      // Desktop·Android 공통: TTS 완료 후 항상 initConfRecognition으로 재시작
-      // ★ Android continuous=false → onend가 TTS 전에 이미 끝나므로 safeRestart가 재호출 안 됨
-      //    utter.onend에서 직접 재시작해야 STT가 살아남
-      const delay = isDesktop ? 50 : 300; // Android는 오디오 버퍼 정리 여유
+      // ★ continuous=true 환경: initConfRecognition() 호출 금지
+      //    (호출 시 클로저 변수 _confQueue/_confSeq 전부 초기화 → 번역 결과 소실)
+      //    confRecognition.start()만 호출해 기존 인식기 재개
       setTimeout(() => {
         if(!isConfRunning || _confStopIntentional) return;
-        initConfRecognition();
-      }, delay);
+        if(confRecognition){
+          try{ confRecognition.start(); }
+          catch(e){
+            const msg = e.message || '';
+            if(!msg.includes('already') && !msg.includes('InvalidState'))
+              console.warn('[TTS onend] STT 재시작 실패:', msg);
+          }
+        }
+      }, isDesktop ? 50 : 300);
     }
   };
 
@@ -8583,8 +8596,13 @@ function confSpeakBidir(text, lang){
   utter.onerror = (e) => {
     console.warn('[TTS Conf] 발화 오류:', e.error);
     _confTtsSpeaking = false;
-    if(isConfRunning && !_confStopIntentional && isDesktop){
-      setTimeout(() => { if(isConfRunning) initConfRecognition(); }, 200);
+    if(isConfRunning && !_confStopIntentional){
+      setTimeout(() => {
+        if(!isConfRunning || _confStopIntentional) return;
+        if(confRecognition){
+          try{ confRecognition.start(); }catch{}
+        }
+      }, 200);
     }
   };
 
