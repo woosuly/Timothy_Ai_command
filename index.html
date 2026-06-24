@@ -2302,6 +2302,29 @@ textarea::-webkit-scrollbar-thumb{background:#334155;border-radius:4px;}
 
 <script>
 // ══════════════════════════════════════════════════════
+// ★ localStorage 폴백 — content:// / file:// 환경 대응
+// Android 다운로드 폴더에서 열 때 localStorage가 막히는 경우 인메모리로 대체
+// ══════════════════════════════════════════════════════
+(function(){
+  let _ok = false;
+  try { localStorage.setItem('__chk__','1'); localStorage.removeItem('__chk__'); _ok = true; } catch(e){}
+  if(!_ok){
+    const _mem = {};
+    const _fake = {
+      getItem:    function(k){ return Object.prototype.hasOwnProperty.call(_mem,k) ? _mem[k] : null; },
+      setItem:    function(k,v){ _mem[k] = String(v); },
+      removeItem: function(k){ delete _mem[k]; },
+      clear:      function(){ Object.keys(_mem).forEach(k=>delete _mem[k]); },
+      key:        function(i){ return Object.keys(_mem)[i] || null; },
+      get length(){ return Object.keys(_mem).length; }
+    };
+    try { Object.defineProperty(window, 'localStorage', { value: _fake, writable: false }); }
+    catch(e){ window.localStorage = _fake; }
+    console.warn('[Timothy] localStorage 차단 감지 → 인메모리 폴백 적용 (세션 종료 시 데이터 초기화됨)');
+  }
+})();
+
+// ══════════════════════════════════════════════════════
 // ★ 탭 전환 시스템 (스크립트 최상단 — onclick 호출 즉시 가능)
 // ══════════════════════════════════════════════════════
 let _currentMainMode = 'doc';
@@ -5334,7 +5357,7 @@ ${_replyRule}`;
         const _dUrl = `https://generativelanguage.googleapis.com/v1beta/models/${_dModel}:generateContent?key=${_dKey}`;
         const _dBody = {
           contents:[{ parts:[{text:fullPrompt}] }],
-          generationConfig:{ maxOutputTokens:8192, temperature:0.4 }
+          generationConfig:{ maxOutputTokens:8192 }
         };
         const _dCtl = new AbortController();
         const _dTmr = setTimeout(()=>_dCtl.abort(), 120000);
@@ -8117,7 +8140,7 @@ function initConfRecognition(){
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
               contents: [{ parts: [{ text: prompt }] }],
-              generationConfig: { maxOutputTokens: 150, temperature: 0 },
+              generationConfig: { maxOutputTokens: 150 },
             }),
             signal: ctrl.signal,
           }
@@ -9026,7 +9049,7 @@ async function quickTranslateBidir(text, fromLang, toLang, toLangName, targetElI
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             contents: [{ parts: [{ text: prompt }] }],
-            generationConfig: { maxOutputTokens: 150, temperature: 0 },
+              generationConfig: { maxOutputTokens: 150 },
           }),
           signal: controller.signal,
         }
@@ -10525,7 +10548,8 @@ function renderFontSelect(){
 
 // ── AI 모델 선택 ──
 const AI_MODELS = [
-  { id:'gemini-3.5-flash',   label:'Gemini 3.5 Flash',                    provider:'gemini' },
+  { id:'gemini-3.5-flash',   label:'Gemini 3.5 Flash (최신)',              provider:'gemini' },
+  { id:'gemini-2.5-flash',   label:'Gemini 2.5 Flash',                     provider:'gemini' },
   { id:'gpt-4o',             label:'GPT-4o (실시간 통역용)',               provider:'openai' },
   { id:'gpt-4o-mini',        label:'GPT-4o Mini (경량 번역용)',            provider:'openai' },
   { id:'claude-3-5-sonnet',  label:'Claude 3.5 Sonnet (번역·문체 모사)',   provider:'anthropic' },
@@ -10948,7 +10972,7 @@ async function callAI(prompt, systemRole, taskType){
 
   if(provider === 'gemini'){
     const url  = 'https://generativelanguage.googleapis.com/v1beta/models/' + modelId + ':generateContent?key=' + geminiKey;
-    const body = { contents:[{ parts: (fullSystemRole ? [{text:fullSystemRole}] : []).concat([{text:prompt}]) }]};
+    const body = { contents:[{ parts: (fullSystemRole ? [{text:fullSystemRole}] : []).concat([{text:prompt}]) }] };
     try{
       const ctl = new AbortController();
       const tmr = setTimeout(function(){ ctl.abort(); }, 90000);
