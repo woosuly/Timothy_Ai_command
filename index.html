@@ -5451,12 +5451,19 @@ function loadSttAudio(f){
 // 11. ★ STT/회의록 분석 — 상세 분석 (메일 분석 수준 동등)
 async function analyzeMeeting(){
   if(!requireApiKey()) return;
-  const apiKey = localStorage.getItem('gemini_api_key');
+  const geminiKey = localStorage.getItem('gemini_api_key');
   const text=document.getElementById('meetingPasteInput').value.trim();
   if(!text && !sttAudioData){showToast(t('toast_voice_or_text'));return;}
   const btn=document.getElementById('meetingBtn');
   btn.disabled=true; btn.innerText=t('status_analyzing');
-  const url=`https://generativelanguage.googleapis.com/v1beta/models/${(currentAiModel&&currentAiModel.startsWith("gemini"))?currentAiModel:"gemini-3.5-flash"}:generateContent?key=${apiKey}`;
+
+  // 오디오 파일이 있으면 Gemini 고정 (타 API는 음성 inlineData 미지원)
+  // 텍스트만 있으면 currentAiModel 따라 callAI() 경유
+  const hasAudio = !!sttAudioData;
+  const geminiModel = (currentAiModel&&currentAiModel.startsWith('gemini'))?currentAiModel:'gemini-3.5-flash';
+  const url = hasAudio
+    ? `https://generativelanguage.googleapis.com/v1beta/models/${geminiModel}:generateContent?key=${geminiKey}`
+    : null;
 
   const sttRole=t('stt_role');
   const langOut=t('ai_lang_out');
@@ -5508,13 +5515,85 @@ ${text ? '【회의록/전사본 내용】\n'+text : ''}`;
   parts.push({text:prompt});
 
   try{
-    const res=await fetch(url,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({contents:[{parts}]})});
-    if(!res.ok){ const eb=await res.json().catch(()=>({})); throw new Error(`Gemini ${res.status}: ${eb?.error?.message||res.statusText}`); }
-    const data=await res.json();
-    if(!data.candidates || !data.candidates[0]){
-      throw new Error(JSON.stringify(data.error||'Unknown error'));
+    let raw = '';
+    if(hasAudio){
+      // ★ 음성파일 분석 폴백 체인: Gemini 3.5 → Gemini 2.5 → GPT Whisper+분석
+      const openaiKey = localStorage.getItem('openai_api_key');
+      const GEMINI_AUDIO_MODELS = ['gemini-3.5-flash', 'gemini-2.5-flash'];
+      let audioSuccess = false;
+
+      // 1단계: Gemini 시도 (3.5 → 2.5 순)
+      if(geminiKey){
+        for(const gModel of GEMINI_AUDIO_MODELS){
+          try{
+            btn.innerText = `분석 중... (${gModel})`;
+            const gUrl = `https://generativelanguage.googleapis.com/v1beta/models/${gModel}:generateContent?key=${geminiKey}`;
+            const res = await fetch(gUrl, {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({contents:[{parts}]})});
+            if(!res.ok){
+              const eb = await res.json().catch(()=>({}));
+              const status = res.status;
+              console.warn(`[STT] ${gModel} HTTP ${status}: ${eb?.error?.message}`);
+              if(status === 503 || status === 429){ continue; } // 과부하 → 다음 모델
+              throw new Error(`Gemini ${status}: ${eb?.error?.message||res.statusText}`);
+            }
+            const data = await res.json();
+            if(!data.candidates?.[0]) throw new Error('응답 없음');
+            raw = data.candidates[0].content.parts[0].text || '';
+            if(raw){ audioSuccess = true; break; }
+          } catch(ge){
+            console.warn(`[STT] ${gModel} 실패:`, ge.message);
+          }
+        }
+      }
+
+      // 2단계: GPT Whisper 전사 → callAI 분석
+      if(!audioSuccess && openaiKey){
+        try{
+          btn.innerText = '분석 중... (GPT Whisper)';
+          // 2-1: base64 → Blob → FormData
+          const byteStr = atob(sttAudioData.base64);
+          const arr = new Uint8Array(byteStr.length);
+          for(let i=0;i<byteStr.length;i++) arr[i]=byteStr.charCodeAt(i);
+          const audioBlob = new Blob([arr], {type: sttAudioData.mime});
+          const ext = sttAudioData.mime.includes('mp4')||sttAudioData.mime.includes('m4a') ? 'm4a'
+                    : sttAudioData.mime.includes('webm') ? 'webm'
+                    : sttAudioData.mime.includes('ogg')  ? 'ogg'
+                    : sttAudioData.mime.includes('wav')  ? 'wav' : 'mp3';
+          const formData = new FormData();
+          formData.append('file', audioBlob, `audio.${ext}`);
+          formData.append('model', 'whisper-1');
+          formData.append('response_format', 'text');
+
+          // 2-2: Whisper 전사
+          const wRes = await fetch('https://api.openai.com/v1/audio/transcriptions', {
+            method: 'POST',
+            headers: { 'Authorization': `Bearer ${openaiKey}` },
+            body: formData
+          });
+          if(!wRes.ok){ const we=await wRes.json().catch(()=>({})); throw new Error(`Whisper ${wRes.status}: ${we?.error?.message||wRes.statusText}`); }
+          const transcript = await wRes.text();
+          if(!transcript) throw new Error('Whisper 전사 결과 없음');
+          console.log('[STT] Whisper 전사 완료, 분석 시작');
+
+          // 2-3: 전사 텍스트를 callAI로 분석
+          btn.innerText = '분석 중... (GPT 분석)';
+          const whisperPrompt = `${t('stt_role')}\n${t('ai_lang_out')}\n아래 회의록 또는 STT 전사본을 심층 분석하여 반드시 순수 JSON만 응답하세요 (마크다운 래퍼 없이).\n\n【출력 JSON 스키마】\n{"title":"회의 제목","date":"YYYY-MM-DD 또는 null","participants":"참석자","summary_bullets":["결론1","결론2","결론3","결론4"],"guide":{"worker":"담당자","due":"기한","instruction":"즉시 지시사항"},"action_items":[{"task":"조치사항","worker":"담당자","due":"기한"}],"dept_requests":[{"dept":"부서","task":"협조내용"}],"reply_draft":"후속 안내 메일 초안 300자"}\n\n【전사본】\n${transcript}`;
+          raw = await callAI(whisperPrompt, t('stt_role'), 'analyze');
+          audioSuccess = true;
+        } catch(we){
+          console.warn('[STT] GPT Whisper 실패:', we.message);
+          throw new Error('모든 음성 분석 수단 실패. Gemini·GPT 키 및 네트워크를 확인하세요.\n마지막 오류: ' + we.message);
+        }
+      }
+
+      if(!audioSuccess){
+        throw new Error('Gemini 서버 과부하 (503/429). 잠시 후 재시도하거나 GPT API 키를 등록하세요.');
+      }
+
+    } else {
+      // ★ 텍스트만 → callAI() 경유 (currentAiModel 반영, GPT·Claude 가능)
+      raw = await callAI(prompt, t('stt_role'), 'analyze');
     }
-    const raw=data.candidates[0].content.parts[0].text||'';
     let jsonStr=raw.replace(/```json\s*/gi,'').replace(/```\s*/gi,'').trim();
     const s=jsonStr.indexOf('{'), e=jsonStr.lastIndexOf('}');
     if(s===-1||e===-1) throw new Error('JSON 파싱 실패: '+raw.substring(0,200));
@@ -10549,12 +10628,12 @@ function renderFontSelect(){
 
 // ── AI 모델 선택 ──
 const AI_MODELS = [
-  { id:'gemini-3.5-flash',   label:'Gemini 3.5 Flash (최신)',              provider:'gemini' },
-  { id:'gemini-2.5-flash',   label:'Gemini 2.5 Flash',                     provider:'gemini' },
-  { id:'gpt-4o',             label:'GPT-4o (실시간 통역용)',               provider:'openai' },
-  { id:'gpt-4o-mini',        label:'GPT-4o Mini (경량 번역용)',            provider:'openai' },
-  { id:'claude-3-5-sonnet',  label:'Claude 3.5 Sonnet (번역·문체 모사)',   provider:'anthropic' },
-  { id:'claude-3-haiku',     label:'Claude 3 Haiku (빠른 요약용)',         provider:'anthropic' },
+  { id:'gemini-3.5-flash',  label:'Gemini 3.5 Flash (최신)',           provider:'gemini',    caps:'메일분석·번역·음성분석·PPT·보고서' },
+  { id:'gemini-2.5-flash',  label:'Gemini 2.5 Flash',                  provider:'gemini',    caps:'메일분석·번역·음성분석·PPT·보고서' },
+  { id:'gpt-4o',            label:'GPT-4o + Whisper',                  provider:'openai',    caps:'메일분석·번역·음성전사(Whisper)' },
+  { id:'gpt-4o-mini',       label:'GPT-4o Mini + Whisper (경량)',      provider:'openai',    caps:'메일분석·번역·음성전사(Whisper)' },
+  { id:'claude-3-5-sonnet', label:'Claude 3.5 Sonnet (번역·문체)',     provider:'anthropic', caps:'메일분석·번역·문서작성' },
+  { id:'claude-3-haiku',    label:'Claude 3 Haiku (빠른 요약)',        provider:'anthropic', caps:'메일분석·번역·문서작성' },
 ];
 let currentAiModel = localStorage.getItem('ai_model') || 'gemini-3.5-flash';
 
@@ -10677,6 +10756,7 @@ function saveApiKey(provider){
   updateApiKeyStatus();
   syncFunctionLockState();
   syncModelSelectsToKeys(); // ★ DeepL 등 모델 셀렉트 즉시 갱신
+  renderAiModelSelect();    // ★ 기본 모델 셀렉트 키 상태 반영
   showToast(`✅ ${provider.toUpperCase()} ${t('toast_api_key_ok')}`);
 }
 
@@ -10690,6 +10770,7 @@ function releaseApiKey(provider){
   }
   renderApiKeyState(provider);
   syncFunctionLockState();
+  renderAiModelSelect(); // ★ 기본 모델 셀렉트 키 상태 반영
   showToast(`${provider.toUpperCase()} ${t('toast_api_key_released')}`);
 }
 
@@ -10872,16 +10953,17 @@ function renderTaskModelSelects(){
     const sel = document.getElementById(selId);
     if(!sel) return;
 
-    // AI 모델 옵션이 없으면 추가 (DeepL 전용 옵션 제외하고 판단)
-    const hasAiOptions = Array.from(sel.options).some(o => AI_MODELS.find(m => m.id === o.value));
-    if(!hasAiOptions){
-      AI_MODELS.forEach(m=>{
-        const opt = document.createElement('option');
-        opt.value = m.id;
-        opt.textContent = m.label;
-        sel.appendChild(opt);
-      });
-    }
+    // AI 모델 옵션 항상 재렌더 (키 상태 반영)
+    sel.innerHTML = '';
+    AI_MODELS.forEach(m=>{
+      const hasKey = !!localStorage.getItem(API_KEY_MAP[m.provider]?.storage);
+      const opt = document.createElement('option');
+      opt.value = m.id;
+      opt.textContent = hasKey ? m.label : `🔒 ${m.label}`;
+      opt.disabled = !hasKey;
+      opt.style.color = hasKey ? '' : '#94a3b8';
+      sel.appendChild(opt);
+    });
 
     sel.value = getModelForTask(task);
     // 저장값이 없거나 목록에 없으면 기본값으로 fallback
@@ -11118,14 +11200,22 @@ function applyAiModel(modelId){
 
 function renderAiModelSelect(){
   const sel = document.getElementById('aiModelSelect'); if(!sel) return;
-  if(sel.options.length > 0) return;
+  sel.innerHTML = ''; // 항상 재렌더 (키 상태 반영)
   AI_MODELS.forEach(m=>{
+    const hasKey = !!localStorage.getItem(API_KEY_MAP[m.provider]?.storage);
     const opt = document.createElement('option');
     opt.value = m.id;
-    opt.textContent = m.label;
-    if(m.id === currentAiModel) opt.selected = true;
+    opt.textContent = hasKey ? m.label : `🔒 ${m.label}`;
+    opt.disabled = !hasKey;
+    opt.style.color = hasKey ? '' : '#94a3b8';
+    if(m.id === currentAiModel && hasKey) opt.selected = true;
     sel.appendChild(opt);
   });
+  // 선택된 모델 키가 없으면 첫 번째 유효 모델로 교체
+  if(!sel.value || sel.options[sel.selectedIndex]?.disabled){
+    const first = Array.from(sel.options).find(o=>!o.disabled);
+    if(first) sel.value = first.value;
+  }
 }
 
 /** ★ 설정 탭 전환 */
